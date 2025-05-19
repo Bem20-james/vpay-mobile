@@ -1,45 +1,139 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import { Tabs } from "expo-router";
+import React from "react";
+import { Platform, View, Image, StyleSheet } from "react-native";
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { HapticTab } from "@/components/HapticTab";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import TabBarBackground from "@/components/ui/TabBarBackground";
+import { Colors } from "@/constants/Colors";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { ThemedText } from "@/components/ThemedText";
+import icons from "@/constants/Icons";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
+  const TabIcon = ({
+    name,
+    icon,
+    color,
+    focused
+  }: {
+    name: string;
+    icon: any;
+    color: string;
+    focused: boolean;
+  }) => {
+    return (
+      <View style={styles.items}>
+        <Image
+          source={icon}
+          resizeMode="contain"
+          tintColor={color}
+          style={styles.icon}
+        />
+        <ThemedText
+          style={{
+            fontFamily: focused ? "Inter-SemiBold" : "Inter-Regular",
+            fontSize: 9,
+            color: color
+          }}
+        >
+          {name}
+        </ThemedText>
+      </View>
+    );
+  };
+
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
+        tabBarShowLabel: false,
+        tabBarActiveTintColor: "#218DC9",
+        tabBarInactiveTintColor: "#9B9B9B",
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
+        tabBarStyle: {
+          backgroundColor: colorScheme === "dark" ? "#000000" : "#FFFFFF",
+          borderTopWidth: 0,
+          borderTopColor: "none",
+          height: 50,
+          paddingTop: 7
+        }
+      }}
+    >
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: "Home",
+          headerShown: false,
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon
+              icon={icons.home}
+              color={color}
+              name="Home"
+              focused={focused}
+            />
+          )
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="transfer"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: "Transfer",
+          headerShown: false,
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon
+              icon={icons.transfer}
+              color={color}
+              name="Transfer"
+              focused={focused}
+            />
+          )
+        }}
+      />
+      <Tabs.Screen
+        name="cards"
+        options={{
+          title: "Cards",
+          headerShown: false,
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon
+              icon={icons.cards}
+              color={color}
+              name="Cards"
+              focused={focused}
+            />
+          )
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Settings",
+          headerShown: false,
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon
+              icon={icons.settings}
+              color={color}
+              name="Settings"
+              focused={focused}
+            />
+          )
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  icon: {
+    width: 20,
+    height: 19
+  },
+  items: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 2
+  }
+});
