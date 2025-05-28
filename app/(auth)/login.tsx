@@ -7,7 +7,7 @@ import { ThemedText } from "@/components/ThemedText";
 import images from "@/constants/Images";
 import FormField from "@/components/FormFields";
 import CustomButton from "@/components/CustomButton";
-import { styles } from "@/components/styles/auth";
+import { styles } from "@/styles/auth";
 import { Link } from "expo-router";
 import { Entypo } from "@expo/vector-icons";
 
