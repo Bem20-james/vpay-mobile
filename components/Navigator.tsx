@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { Entypo, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome6, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, useRouter } from "expo-router";
 import { ThemedText } from "./ThemedText";
 
@@ -31,6 +31,8 @@ const Navigator: React.FC<NavigatorProps> = ({
   const handleBack = () => {
     if (onBack) {
       onBack();
+    } else if (backPath) {
+      router.push(backPath as any);
     } else {
       navigation.goBack();
     }
@@ -38,24 +40,24 @@ const Navigator: React.FC<NavigatorProps> = ({
 
   return (
     <View style={styles.container}>
-      {showBackIcon && (
+      {showBackIcon ? (
         <TouchableOpacity onPress={handleBack} style={styles.icon}>
-          <FontAwesome6
-            name="arrow-left-long"
-            size={25}
-            color={backIconColor}
-          />
+          <FontAwesome6 name="arrow-left-long" size={16} color={backIconColor} />
         </TouchableOpacity>
+      ) : (
+        <View style={styles.iconPlaceholder} />
       )}
 
       <ThemedText type="subtitle" style={styles.title}>
         {title}
       </ThemedText>
 
-      {showCloseIcon && (
+      {showCloseIcon ? (
         <TouchableOpacity onPress={onClose} style={styles.icon}>
           <MaterialIcons name="close" size={24} color={closeIconColor} />
         </TouchableOpacity>
+      ) : (
+        <View style={styles.iconPlaceholder} />
       )}
     </View>
   );
@@ -68,19 +70,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    position: "relative"
+    paddingHorizontal: 10,
+    paddingVertical: 15,
   },
   title: {
-    position: "absolute",
-    left: "50%",
-    transform: [{ translateX: "-40%" }],
-    textAlign: "center"
+    flex: 1,
+    textAlign: "center",
+    fontSize: 18,
   },
   icon: {
     backgroundColor: "#E9F7FF",
-    padding: 7,
-    borderRadius: 100
-  }
+    padding: 5,
+    borderRadius: 100,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  iconPlaceholder: {
+    width: 34,
+    height: 34, 
+  },
 });

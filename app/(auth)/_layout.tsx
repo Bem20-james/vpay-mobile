@@ -1,4 +1,3 @@
-import { StyleSheet } from "react-native";
 import React from "react";
 import { StatusBar } from "expo-status-bar";
 import {
@@ -28,7 +27,7 @@ const AuthLayout = () => {
 
       <StatusBar
         style={colorScheme === "dark" ? "light" : "dark"}
-        backgroundColor={colorScheme === "dark" ? "#000000" : "#ffffff"}
+        backgroundColor={colorScheme === "dark" ? "#161622" : "#ffffff"}
       />
     </ThemeProvider>
   );

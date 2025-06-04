@@ -73,7 +73,7 @@ const Onboarding = () => {
       >
         <Text></Text>
         <Image style={styles.logo} source={images.logo} />
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
           <ThemedText
             darkColor="#000000"
             lightColor="#000000"

@@ -7,14 +7,85 @@ import { ThemedText } from "@/components/ThemedText";
 import images from "@/constants/Images";
 import FormField from "@/components/FormFields";
 import CustomButton from "@/components/CustomButton";
-import { styles } from "@/components/styles/auth";
+import { styles } from "@/styles/auth";
 import { Link } from "expo-router";
 import { Entypo } from "@expo/vector-icons";
+import { useLogin } from "@/hooks/useAuthentication";
+import OtpVerification from "./otp-verification";
+import Toast from "react-native-toast-message";
+
+const isValidEmail = (value: string): boolean =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
 const Login = () => {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const bgColor = colorScheme === "dark" ? "#161622" : "#ffffff";
+
+  const [form, setForm] = useState({ identifier: "", password: "" });
+  const [errors, setErrors] = useState({ identifier: "", password: "" });
+  const [showOtpScreen, setShowOtpScreen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const login = useLogin();
+
+  const validate = () => {
+    let valid = true;
+    let newErrors = { identifier: "", password: "" };
+
+    if (!form.identifier) {
+      newErrors.identifier = "Username or Email is required.";
+      valid = false;
+    } else if (
+      form.identifier.includes("@") &&
+      !isValidEmail(form.identifier)
+    ) {
+      newErrors.identifier = "Invalid email format.";
+      valid = false;
+    }
+
+    if (!form.password) {
+      newErrors.password = "Password is required.";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
+  const handleSubmit = async () => {
+    if (!validate()) return;
+
+    setIsLoading(true);
+    try {
+      const payload = form.identifier.includes("@")
+        ? { email: form.identifier, password: form.password }
+        : { username: form.identifier, password: form.password };
+
+      const success = await login(payload);
+      if (success) {
+        setShowOtpScreen(true);
+      }
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Login failed",
+        text2: "Please check your credentials"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (showOtpScreen) {
+    return (
+      <OtpVerification
+        mode="login"
+        email={form.identifier}
+        onBack={() => setShowOtpScreen(false)}
+      />
+    );
+  }
 
   return (
     <SafeAreaView style={{ backgroundColor: bgColor, height: "100%" }}>
@@ -40,20 +111,28 @@ const Login = () => {
 
           <FormField
             placeholder={"Username/Email"}
-            handleChangeText={() => {}}
+            handleChangeText={(value) =>
+              setForm((prev) => ({ ...prev, identifier: value }))
+            }
+            value={form.identifier}
+            error={errors.identifier}
             otherStyles={{ marginTop: 5 }}
-            keyboardType="default"
+            keyboardType="email-address"
             isIcon
             iconName="person"
           />
           <FormField
             placeholder={"Password"}
-            handleChangeText={() => {}}
-            otherStyles={{ marginTop: 5 }}
-            keyboardType="default"
+            handleChangeText={(value) =>
+              setForm((prev) => ({ ...prev, password: value }))
+            }
+            value={form.password}
+            error={errors.password}
             isIcon
             iconName="shield"
+            otherStyles={{ marginTop: 5 }}
           />
+
           <Pressable
             onPress={() => router.push("/(auth)/forgot-password")}
             style={({ pressed }) => [
@@ -70,15 +149,20 @@ const Login = () => {
             >
               <Entypo name="lock" size={10} color="#ffffff" />
             </View>
-
-            <ThemedText lightColor="#218DC9" style={styles.forgotPwdTxt}>
+            <ThemedText
+              lightColor="#218DC9"
+              darkColor="#218DC9"
+              style={styles.forgotPwdTxt}
+            >
               Forgot Password?
             </ThemedText>
           </Pressable>
 
           <CustomButton
             title="Login"
-            handlePress={() => {}}
+            handlePress={handleSubmit}
+            isLoading={isLoading}
+            disabled={!form.identifier || !form.password}
             btnStyles={{ width: "100%", marginTop: 150 }}
           />
 
@@ -103,7 +187,7 @@ const Login = () => {
                     textDecorationLine: "underline"
                   }}
                 >
-                  Register
+                  Sign Up
                 </ThemedText>
               </Link>
             </View>

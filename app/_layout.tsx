@@ -8,11 +8,14 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { View } from "react-native";
 import "react-native-reanimated";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { PortalProvider } from "@gorhom/portal";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Toast from "react-native-toast-message";
+import toastConfig from "@/config/toastConfig";
+import UserContextProvider from "@/contexts/UserContexts";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -40,21 +43,49 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <GestureHandlerRootView>
-      <PortalProvider>
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
-          <Stack>
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+    <UserContextProvider>
+      <GestureHandlerRootView>
+        <BottomSheetModalProvider>
+          <PortalProvider>
+            <ThemeProvider
+              value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+            >
+              <Stack>
+                <Stack.Screen name="index" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="(actions)"
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen name="(user)" options={{ headerShown: false }} />
 
-            <Stack.Screen name="+not-found" />
-          </Stack>
-          <StatusBar style="auto" backgroundColor="#fff" />
-        </ThemeProvider>
-      </PortalProvider>
-    </GestureHandlerRootView>
+                <Stack.Screen
+                  name="notifications"
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="transactions"
+                  options={{ headerShown: false }}
+                />
+
+                <Stack.Screen name="+not-found" />
+              </Stack>
+
+              <Toast
+                position="bottom"
+                bottomOffset={50}
+                visibilityTime={6000}
+                autoHide
+                topOffset={50}
+                config={toastConfig}
+              />
+
+              <StatusBar style="auto" backgroundColor="#fff" />
+            </ThemeProvider>
+          </PortalProvider>
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
+    </UserContextProvider>
   );
 }

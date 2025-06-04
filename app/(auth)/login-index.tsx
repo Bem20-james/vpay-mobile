@@ -7,9 +7,8 @@ import { ThemedText } from "@/components/ThemedText";
 import images from "@/constants/Images";
 import FormField from "@/components/FormFields";
 import CustomButton from "@/components/CustomButton";
-import { styles } from "@/components/styles/auth";
-import { Link } from "expo-router";
-import { Entypo } from "@expo/vector-icons";
+import { styles } from "@/styles/auth";
+import { Entypo, MaterialIcons } from "@expo/vector-icons";
 
 const IndexLogin = () => {
   const colorScheme = useColorScheme();
@@ -22,11 +21,26 @@ const IndexLogin = () => {
         <View style={styles.container}>
           <Image source={images.logo} style={styles.logo} />
 
-          <View>
-            <Image source={images.logo} style={styles.logo} />
+          <View style={styles.userField}>
+            <View style={styles.avatarBg}>
+              <Image source={images.avatar} style={styles.avatar} />
+            </View>
+
             <View>
-              <ThemedText>Hello Advanztek</ThemedText>
-              <ThemedText>Welcome back</ThemedText>
+              <ThemedText
+                lightColor="#000000"
+                darkColor="#ffffff"
+                style={styles.heading}
+              >
+                Hello Advanztek
+              </ThemedText>
+              <ThemedText
+                lightColor="#9B9B9B"
+                darkColor="#ffffff"
+                style={styles.welcomeTxt}
+              >
+                Welcome back
+              </ThemedText>
             </View>
           </View>
           <FormField
@@ -54,15 +68,33 @@ const IndexLogin = () => {
               <Entypo name="lock" size={10} color="#ffffff" />
             </View>
 
-            <ThemedText lightColor="#218DC9" style={styles.forgotPwdTxt}>
+            <ThemedText
+              lightColor="#218DC9"
+              darkColor="#218DC9"
+              style={styles.forgotPwdTxt}
+            >
               Forgot Password?
             </ThemedText>
           </Pressable>
 
+          <View style={styles.fingerprint}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.printBg,
+                { opacity: pressed ? 0.7 : 1 }
+              ]}
+            >
+              <MaterialIcons name="fingerprint" size={50} color={"#2FCBF2"} />
+            </Pressable>
+            <ThemedText lightColor="#9B9B9B" style={{ fontSize: 14 }}>
+              use fingerprint
+            </ThemedText>
+          </View>
+
           <CustomButton
             title="Login"
-            handlePress={() => {}}
-            btnStyles={{ width: "100%", marginTop: 150 }}
+            handlePress={() => router.push("/(tabs)/home")}
+            btnStyles={{ width: "100%", marginTop: 100 }}
           />
 
           <View style={styles.btmContent}>
@@ -74,13 +106,20 @@ const IndexLogin = () => {
                 gap: 4
               }}
             >
-              <ThemedText lightColor="#9B9B9B" darkColor="#9B9B9B">
+              <ThemedText
+                lightColor="#9B9B9B"
+                darkColor="#9B9B9B"
+                style={{ fontFamily: "Questrial" }}
+              >
                 Not Advanztek?
               </ThemedText>
-              <Link href="/register">
+              <Pressable
+                style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
+                onPress={() => router.push("/register")}
+              >
                 <ThemedText
                   style={{
-                    fontFamily: "Inter",
+                    fontFamily: "Questrial",
                     fontWeight: "bold",
                     color: "#218DC9",
                     textDecorationLine: "underline"
@@ -88,7 +127,7 @@ const IndexLogin = () => {
                 >
                   Login here
                 </ThemedText>
-              </Link>
+              </Pressable>
             </View>
           </View>
         </View>

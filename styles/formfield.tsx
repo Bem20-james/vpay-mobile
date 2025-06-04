@@ -29,7 +29,7 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderRightWidth: 1,
-    borderRightColor: "#E7E7E7",
+    borderRightColor: "#9B9B9B",
     paddingRight: 8,
     height: "60%"
   },
@@ -54,11 +54,23 @@ export const styles = StyleSheet.create({
   bottomSheetItem: {
     paddingVertical: 14,
     paddingHorizontal: 16,
-
     borderBottomWidth: 0.5,
     borderBottomColor: "#E7E7E7"
   },
+  bottomSheetItemCon: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5
+  },
   bottomSheetItemText: {
     fontSize: 16
+  },
+  errorText: {
+    marginTop: 2,
+    fontFamily: "Questrial",
+    fontWeight: 500,
+    fontSize: 11,
+    lineHeight: 20,
+    letterSpacing: 0
   }
 });

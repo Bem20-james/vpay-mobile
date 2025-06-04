@@ -1,5 +1,12 @@
-import { View, Text, ScrollView, StyleSheet } from "react-native";
-import React, { useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  Pressable,
+  ActivityIndicator
+} from "react-native";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -7,16 +14,123 @@ import { ThemedText } from "@/components/ThemedText";
 import CustomButton from "@/components/CustomButton";
 import OTPInputField from "../../components/OtpInputField";
 import Navigator from "@/components/Navigator";
+import {
+  useVerifyEmail,
+  useVerifyLogin,
+  useResendOTP,
+  useResendPwdResetOTP
+} from "@/hooks/useAuthentication";
+import Toast from "react-native-toast-message";
 
-const OtpVerification = () => {
+interface OtpVerificationProps {
+  email?: string;
+  onBack?: () => void;
+  mode?: "verify-email" | "forgot-password" | "login";
+}
+
+const OtpVerification: React.FC<OtpVerificationProps> = ({
+  mode = "verify-email",
+  email,
+  onBack
+}) => {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const bgColor = colorScheme === "dark" ? "#161622" : "#ffffff";
+  const [otp, setOtp] = useState("");
+  const [isResending, setIsResending] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+
+  const {
+    verifyEmail,
+    loading: verifyingEmail,
+    error: emailError
+  } = useVerifyEmail();
+  const {
+    verifyLogin,
+    loading: verifyingLogin,
+    error: loginError
+  } = useVerifyLogin();
+  const { resendOTP } = useResendOTP();
+  const { resendPwdResetOTP } = useResendPwdResetOTP();
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setInterval> | undefined;
+    if (countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [countdown]);
+
+  const handleOTPSubmit = async () => {
+    if (otp.length !== 6) {
+      return Toast.show({
+        type: "error",
+        text1: "Invalid OTP, Please enter a 6-digit OTP."
+      });
+    }
+    try {
+      if (mode === "verify-email") {
+        await verifyEmail(otp, email ?? "");
+      } else if (mode === "forgot-password") {
+        router.push({
+          pathname: "/(auth)/reset-password",
+          params: { otp, email }
+        });
+      } else if (mode === "login") {
+        await verifyLogin(otp, email ?? "");
+      }
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1:
+          error && typeof error === "object" && "message" in error
+            ? (error as { message: string }).message
+            : "OTP Verification Failed"
+      });
+    }
+  };
+
+  const handleResendOTP = async () => {
+    if (countdown > 0) return;
+
+    setOtp("");
+    setIsResending(true);
+    try {
+      if (mode === "verify-email") {
+        await resendOTP("verify_email", email ?? "");
+      } else if (mode === "forgot-password") {
+        await resendPwdResetOTP("forgot_password", email ?? "");
+      } else if (mode === "login") {
+        await resendOTP("login", email ?? "");
+      }
+
+      setCountdown(60);
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1:
+          error && typeof error === "object" && "message" in error
+            ? (error as { message: string }).message
+            : "OTP Resend Failed"
+      });
+    }
+    setIsResending(false);
+  };
+
+  const handleOTPComplete = (completedOtp: string) => {
+    // Optional: Auto-submit when OTP is complete
+    console.log("OTP completed:", completedOtp);
+  };
+
+  const errorMessage = mode === "verify-email" ? emailError : loginError;
+  const isLoading = verifyingEmail || verifyingLogin;
 
   return (
     <SafeAreaView style={{ backgroundColor: bgColor, height: "100%" }}>
       <ScrollView>
-        <Navigator />
+        <Navigator title={""} onBack={onBack} />
         <View style={styles.container}>
           <View>
             <ThemedText
@@ -39,7 +153,9 @@ const OtpVerification = () => {
                 darkColor="#9B9B9B"
                 style={styles.btmTxt}
               >
-                We have sent a code to your email
+                {mode === "forgot-password"
+                  ? "Enter the OTP sent to reset your password."
+                  : "We have sent a code to your email."}
               </ThemedText>
               <Text
                 style={{
@@ -49,18 +165,59 @@ const OtpVerification = () => {
                   color: "#218DC9"
                 }}
               >
-                advanztek@gmail.com
+                {email}
               </Text>
             </View>
           </View>
 
-          <OTPInputField length={6} onCodeFilled={() => {}} autoFocus={true} />
+          <OTPInputField
+            value={otp}
+            onChangeText={setOtp}
+            onComplete={handleOTPComplete}
+          />
 
           <CustomButton
-            title={"Verify"}
-            handlePress={() => router.push("/(auth)/login-index")}
-            btnStyles={{ width: "100%", marginTop: 50 }}
+            title={isLoading ? "Verifying..." : "Verify"}
+            handlePress={() => handleOTPSubmit()}
+            btnStyles={{
+              width: "100%",
+              marginTop: 50,
+              opacity: isLoading ? 0.7 : 1
+            }}
+            isLoading={isLoading}
           />
+
+          <View style={styles.resendCon}>
+            <ThemedText
+              lightColor="#000000"
+              darkColor="#FFFFFF"
+              style={{ fontFamily: "Questrial" }}
+            >
+              Didn't receive OTP?
+            </ThemedText>
+            <Pressable
+              onPress={handleResendOTP}
+              disabled={countdown > 0 || isResending}
+            >
+              {isResending ? (
+                <ActivityIndicator size="small" color="#D0A106" />
+              ) : (
+                <ThemedText
+                  style={{
+                    fontFamily: "Inter-Bold",
+                    color:
+                      countdown > 0
+                        ? "gray"
+                        : colorScheme === "dark"
+                        ? "#218DC9"
+                        : "#218DC9"
+                  }}
+                >
+                  {countdown > 0 ? `Resend in ${countdown}s` : "Resend"}
+                </ThemedText>
+              )}
+            </Pressable>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -84,11 +241,18 @@ const styles = StyleSheet.create({
     textAlign: "center"
   },
   btmTxt: {
-    fontFamily: "Inter",
+    fontFamily: "Questrial",
     fontWeight: 500,
     fontSize: 16,
     lineHeight: 20,
     letterSpacing: 0,
     textAlign: "center"
+  },
+  resendCon: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+    gap: 5
   }
 });

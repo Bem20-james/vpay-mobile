@@ -1,154 +1,106 @@
-import React, { useState, useRef, useEffect } from "react";
-import { View, StyleSheet, TextInput, Text, Pressable } from "react-native";
+import React, { useState } from "react";
+import { SafeAreaView, Text, StyleSheet, View, Platform } from "react-native";
+import {
+  CodeField,
+  Cursor,
+  useBlurOnFulfill,
+  useClearByFocusCell
+} from "react-native-confirmation-code-field";
 
-const OTPInputField = ({ length = 4, onCodeFilled, autoFocus = true }) => {
-  const [code, setCode] = useState(Array(length).fill(""));
-  const inputRefs = useRef([]);
+const CELL_COUNT = 6;
 
-  // Focus on first input when component mounts
-  useEffect(() => {
-    if (autoFocus && inputRefs.current[0]) {
-      setTimeout(() => {
-        inputRefs.current[0].focus();
-      }, 100);
-    }
-  }, [autoFocus]);
+interface OTPInputFieldProps {
+  value: string;
+  onChangeText: (code: string) => void;
+  onComplete?: (code: string) => void;
+}
 
-  const handleChangeText = (text, index) => {
-    // Copy the current code array
-    const newCode = [...code];
+const OTPInputField: React.FC<OTPInputFieldProps> = ({
+  value,
+  onChangeText,
+  onComplete
+}) => {
+  const [isFull, setIsFull] = useState<boolean>(false);
 
-    // Update the current position with the new value
-    newCode[index] = text.slice(-1);
-    setCode(newCode);
+  const ref = useBlurOnFulfill({ value, cellCount: CELL_COUNT });
 
-    // If there's a value and not the last input, focus next input
-    if (text && index < length - 1) {
-      inputRefs.current[index + 1].focus();
-    }
+  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
+    value,
+    setValue: onChangeText
+  });
 
-    // Check if all inputs are filled
-    if (newCode.every((digit) => digit !== "")) {
-      onCodeFilled(newCode.join(""));
-    }
-  };
+  const handleCodeChange = (code: string) => {
+    onChangeText(code);
 
-  const handleKeyPress = (e, index) => {
-    // If backspace is pressed and current input is empty, focus previous input
-    if (e.nativeEvent.key === "Backspace" && !code[index] && index > 0) {
-      inputRefs.current[index - 1].focus();
-    }
-  };
-
-  const handlePaste = async (pastedText, index) => {
-    if (!pastedText) return;
-
-    const digits = pastedText.replace(/\D/g, "").split("").slice(0, length);
-    const newCode = [...code];
-
-    // Fill as many inputs as we have digits
-    digits.forEach((digit, i) => {
-      if (index + i < length) {
-        newCode[index + i] = digit;
-      }
-    });
-
-    setCode(newCode);
-
-    // Focus on the next empty input or the last one
-    const nextEmptyIndex = newCode.findIndex((val) => val === "");
-    if (nextEmptyIndex !== -1) {
-      inputRefs.current[nextEmptyIndex].focus();
-    } else if (digits.length > 0) {
-      // All filled, call the callback
-      onCodeFilled(newCode.join(""));
-      inputRefs.current[length - 1].focus();
+    if (code.length === CELL_COUNT) {
+      setIsFull(true);
+      onComplete?.(code);
+    } else {
+      setIsFull(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.inputContainer}>
-        {Array(length)
-          .fill(0)
-          .map((_, index) => (
-            <View key={index} style={styles.inputWrapper}>
-              <TextInput
-                ref={(ref) => {
-                  inputRefs.current[index] = ref;
-                }}
-                style={styles.input}
-                value={code[index]}
-                onChangeText={(text) => handleChangeText(text, index)}
-                onKeyPress={(e) => handleKeyPress(e, index)}
-                keyboardType="numeric"
-                maxLength={1}
-                selectTextOnFocus
-                onPaste={(e) => handlePaste(e.nativeEvent.text, index)}
-              />
-            </View>
-          ))}
-      </View>
-
-      <Pressable style={styles.resendContainer}>
-        <Text style={styles.resendText}>
-          Resend code in <Text style={styles.timer}>01:32s</Text>
-        </Text>
-      </Pressable>
-    </View>
+    <SafeAreaView style={styles.root}>
+      <CodeField
+        ref={ref}
+        {...props}
+        value={value}
+        onChangeText={handleCodeChange}
+        cellCount={CELL_COUNT}
+        rootStyle={styles.codeFieldRoot}
+        keyboardType="number-pad"
+        textContentType="oneTimeCode"
+        autoComplete={Platform.select({
+          android: "sms-otp",
+          default: "one-time-code"
+        })}
+        renderCell={({ index, symbol, isFocused }) => (
+          <Text
+            key={index}
+            style={[
+              styles.cell,
+              isFocused && styles.focusCell,
+              isFull && styles.fullCell
+            ]}
+            onLayout={getCellOnLayoutHandler(index)}
+          >
+            {symbol || (isFocused ? <Cursor /> : null)}
+          </Text>
+        )}
+      />
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-    backgroundColor: "#fff"
+  root: {
+    flex: 1,
+    padding: 10,
+    justifyContent: "center"
   },
-  subtitle: {
-    fontSize: 14,
-    textAlign: "center",
-    color: "#666",
-    marginBottom: 32,
-    lineHeight: 20
-  },
-
-  inputContainer: {
+  codeFieldRoot: {
     flexDirection: "row",
-    justifyContent: "center",
-    width: "100%",
-    gap: 5,
-    maxWidth: 250,
-    marginBottom: 24
+    justifyContent: "center"
   },
-  inputWrapper: {
+  cell: {
     width: 50,
     height: 50,
-    borderRadius: 35,
+    lineHeight: 51,
+    fontSize: 24,
     borderWidth: 1,
-    borderColor: "#ddd",
-    justifyContent: "center",
-    alignItems: "center",
-    overflow: "hidden"
-  },
-  input: {
-    width: "60%",
-    height: "100%",
+    borderColor: "#E7E7E7",
     textAlign: "center",
-    fontSize: 20,
-    color: "#000"
+    borderRadius: 100,
+    marginHorizontal: 2,
+    backgroundColor: "#fff"
   },
-  resendContainer: {
-    marginTop: 24
+  focusCell: {
+    borderColor: "#007AFF",
+    backgroundColor: "#E9F7FF"
   },
-  resendText: {
-    fontSize: 14,
-    color: "#666"
-  },
-  timer: {
-    color: "#6200ee",
-    fontWeight: "500"
+  fullCell: {
+    borderColor: "#34C759"
   }
 });
 

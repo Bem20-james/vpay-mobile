@@ -1,109 +1,170 @@
-import { StyleSheet, Image, Platform } from 'react-native';
+import React from "react";
+import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import RecentTransfers from "@/components/RecentTransfers";
+import Navigator from "@/components/Navigator";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { useRouter } from "expo-router";
+import { ThemedText } from "@/components/ThemedText";
+import { MaterialIcons } from "@expo/vector-icons";
+import { beneficiaries, recentActions } from "@/assets/data";
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+const TransferScreen: React.FC = () => {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+  const backgroundColor = isDark ? "#000000" : "#EEF3FB";
+  const router = useRouter();
 
-export default function TabTwoScreen() {
+  const TransferOption = ({
+    label,
+    icon,
+    iconColor = "#218DC9",
+    iconBg = "#F1FAFF",
+    route
+  }: {
+    label: string;
+    icon: keyof typeof MaterialIcons.glyphMap;
+    iconColor?: string;
+    iconBg?: string;
+    route: string;
+  }) => {
+    return (
+      <TouchableOpacity
+        style={styles.optionContainer}
+        onPress={() => router.push(route as any)}
+        activeOpacity={0.7}
+      >
+        <View style={[styles.iconContainer, { backgroundColor: iconBg }]}>
+          <MaterialIcons name={icon} size={20} color={iconColor} />
+        </View>
+        <View style={styles.textContainer}>
+          <ThemedText style={styles.optionText}>{label}</ThemedText>
+        </View>
+        <MaterialIcons name="chevron-right" size={20} color="#218DC9" />
+      </TouchableOpacity>
+    );
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user's current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
+    <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.container}>
+          <Navigator title="Send Money" showBackIcon={false} />
+
+          <View style={styles.infoSection}>
+            <ThemedText style={styles.infoText}>
+              Free monthly transfers to other banks:
+              <ThemedText
+                style={styles.highlightText}
+                lightColor="#000000"
+                darkColor="#FFFFFF"
+              >
+                15
+              </ThemedText>
             </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+          </View>
+
+          <View style={styles.options}>
+            <TransferOption
+              label="Vpay Tag"
+              icon="call-made"
+              route="/international-transfer"
+            />
+            <TransferOption
+              label="Local Bank Transfer"
+              icon="account-balance"
+              route="/schedule-transfer"
+            />
+            <TransferOption
+              label="International Transfer"
+              icon="public"
+              route="/schedule-transfer"
+            />
+            <TransferOption
+              label="Cryptocurrency"
+              icon="currency-bitcoin"
+              route="/schedule-transfer"
+            />
+            <TransferOption
+              label="Payment  Link"
+              icon="link"
+              route="/schedule-transfer"
+            />
+          </View>
+
+          {/* Recent Transfers */}
+          <RecentTransfers
+            title="Recent Transfers"
+            recents={recentActions}
+            beneficiaries={beneficiaries}
+          />
+        </View>
+      </ScrollView>
+      <StatusBar
+        style={isDark ? "light" : "dark"}
+        backgroundColor={backgroundColor}
+      />
+    </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  safeArea: {
+    flex: 1,
+    paddingHorizontal: 16
   },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 20
   },
+  container: {
+    flex: 1
+  },
+  infoSection: {
+    paddingHorizontal: 4,
+    paddingVertical: 10
+  },
+  infoText: {
+    fontSize: 13,
+    fontFamily: "Questrial",
+    textAlign: "left",
+    color: "#a0a0a0"
+  },
+  highlightText: {
+    fontSize: 12,
+    fontFamily: "Inter-Medium"
+  },
+  optionContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 9,
+    paddingHorizontal: 0,
+    marginBottom: 5
+  },
+  iconContainer: {
+    width: 30,
+    height: 30,
+    borderRadius: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10
+  },
+  textContainer: {
+    flex: 1
+  },
+  optionText: {
+    fontSize: 15,
+    fontWeight: "500",
+    fontFamily: "Inter-Medium"
+  },
+  options: {
+    paddingHorizontal: 4,
+    marginTop: 8
+  }
 });
+
+export default TransferScreen;

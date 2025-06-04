@@ -24,7 +24,7 @@ export const styles = StyleSheet.create({
     textAlign: "left"
   },
   subtitle: {
-    fontFamily: "Inter-Medium",
+    fontFamily: "Questrial",
     fontWeight: 500,
     fontSize: 14,
     lineHeight: 30,
@@ -56,5 +56,49 @@ export const styles = StyleSheet.create({
     textDecorationLine: "underline",
     fontFamily: "Inter-Bold",
     fontSize: 13
-  }
+  },
+  userField: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    gap: 7,
+    borderWidth: 0.5,
+    borderColor: "#9B9B9B",
+    borderRadius: 100,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    marginTop: 60
+  },
+  avatarBg: {
+    backgroundColor: "#BFEFFB",
+    padding: 7,
+    borderRadius: 58
+  },
+  avatar: {
+    width: 30,
+    height: 30,
+    borderRadius: 20,
+    resizeMode: "cover"
+  },
+  welcomeTxt: {
+    fontFamily: "Questrial",
+    fontWeight: 500,
+    fontSize: 13,
+    lineHeight: 20,
+    letterSpacing: 0
+  },
+  printBg: {
+    backgroundColor: "#EAFAFE",
+    borderRadius: 58,
+    borderWidth: 0.5,
+    borderColor: "#9FE7F9",
+    padding: 7
+  },
+  fingerprint: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 50
+  },
+  
 });
