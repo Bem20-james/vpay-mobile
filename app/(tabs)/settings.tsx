@@ -185,8 +185,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    minHeight: 50,
+    paddingVertical: 7,
+    minHeight: 40,
   },
   settingLeft: {
     flexDirection: "row",

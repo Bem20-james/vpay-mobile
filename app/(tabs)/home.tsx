@@ -142,7 +142,7 @@ export default function HomeScreen() {
           </View>
           <View style={{ marginTop: 7 }}>
             <Pressable
-              onPress={handleAddVisible}
+              onPress={() => router.push("/accounts")}
               style={({ pressed }) => [
                 styles.addBtn,
                 { opacity: pressed ? 0.7 : 1 }

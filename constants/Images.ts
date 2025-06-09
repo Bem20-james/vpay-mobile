@@ -11,6 +11,8 @@ import ninemobile from "../assets/images/ninemobile.png";
 import dstv from "../assets/images/dstv.png";
 import gotv from "../assets/images/gotv.png";
 import showmax from "../assets/images/showmax.png";
+import matic from "../assets/images/matic.png";
+import tether from "../assets/images/tether.png";
 
 const images = {
   onboard1,
@@ -25,7 +27,9 @@ const images = {
   ninemobile,
   showmax,
   dstv,
-  gotv
+  gotv,
+  matic,
+  tether
 };
 
 export default images;
