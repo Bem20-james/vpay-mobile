@@ -90,7 +90,6 @@ const Profile = () => {
   const colorScheme = useColorScheme();
   const backgroundColor = colorScheme === "dark" ? "#000000" : "#EEF3FB";
   const boxBg = colorScheme === "dark" ? "#161622" : "#FFFFFF";
-
   const router = useRouter();
   const { clearUser, user } = useUser();
   const [securityLock, setSecurityLock] = useState(false);

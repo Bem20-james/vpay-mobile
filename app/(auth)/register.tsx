@@ -14,6 +14,7 @@ import { useRegister } from "@/hooks/useAuthentication";
 import OtpVerification from "./otp-verification";
 import { FontAwesome } from "@expo/vector-icons";
 import CountryBottomSheet from "@/components/BottomSheets/countries";
+import { CountryItem } from "@/components/FormFields";
 
 const Register = () => {
   const colorScheme = useColorScheme();
@@ -26,7 +27,18 @@ const Register = () => {
   const [showOtpScreen, setShowOtpScreen] = useState(false);
   const [showCountryBottomSheet, setShowCountryBottomSheet] = useState(false);
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    fname: string;
+    lname: string;
+    email: string;
+    username: string;
+    password: string;
+    country: string;
+    countryId: string;
+    countryObj: CountryItem | null;
+    phone: string;
+    referralCode: string;
+  }>({
     fname: "",
     lname: "",
     email: "",
@@ -34,6 +46,7 @@ const Register = () => {
     password: "",
     country: "",
     countryId: "",
+    countryObj: null,
     phone: "",
     referralCode: ""
   });
@@ -61,7 +74,7 @@ const Register = () => {
   };
   const handleFieldChange = (field: string, value: string) => {
     if (field === "phone") {
-      value = value.trim().slice(0, 10);
+      value = value.trim().slice(0, 11);
     }
 
     if (["fname", "lname", "username", "email"].includes(field)) {
@@ -205,6 +218,7 @@ const Register = () => {
             referral: form.referralCode
           });
           if (success) {
+            setShowOtpScreen(true);
             setIsSubmitting(false);
             setShowOtpScreen(true);
           }
@@ -269,7 +283,6 @@ const Register = () => {
                 iconName="public"
                 error={errors.country}
               />
-
               <FormField
                 placeholder="First Name"
                 handleChangeText={(val) => handleFieldChange("fname", val)}
@@ -295,7 +308,7 @@ const Register = () => {
                 value={form.phone}
                 isPhoneInput
                 keyboardType="phone-pad"
-                defaultCountry={countries[0]}
+                defaultCountry={form.countryObj ?? undefined}
                 placeholder="Enter phone number"
                 error={errors.phone}
               />
@@ -375,7 +388,8 @@ const Register = () => {
           setForm((prev) => ({
             ...prev,
             country: item.country_name,
-            countryId: item.id?.toString() || ""
+            countryId: item.id?.toString() || "",
+            countryObj: item
           }));
           setErrors((prev) => ({
             ...prev,

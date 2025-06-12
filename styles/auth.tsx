@@ -30,6 +30,14 @@ export const styles = StyleSheet.create({
     lineHeight: 30,
     letterSpacing: 0
   },
+  radioLabel: {
+    fontFamily: "Questrial",
+    fontSize: 14
+  },
+  radioBox: {
+    marginTop: 10,
+    borderRadius: 10
+  },
   btmContent: {
     marginVertical: 10,
     alignItems: "center"
@@ -99,6 +107,5 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 50
-  },
-  
+  }
 });

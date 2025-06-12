@@ -17,7 +17,8 @@ import Navigator from "@/components/Navigator";
 import {
   useVerifyEmail,
   useVerifyLogin,
-  useResendOTP,
+  useResendLoginOTP,
+  useResendEmailOTP,
   useResendPwdResetOTP
 } from "@/hooks/useAuthentication";
 import Toast from "react-native-toast-message";
@@ -26,12 +27,16 @@ interface OtpVerificationProps {
   email?: string;
   onBack?: () => void;
   mode?: "verify-email" | "forgot-password" | "login";
+  otp_medium?: string;
+  password?: string;
 }
 
 const OtpVerification: React.FC<OtpVerificationProps> = ({
   mode = "verify-email",
   email,
-  onBack
+  onBack,
+  otp_medium,
+  password
 }) => {
   const colorScheme = useColorScheme();
   const router = useRouter();
@@ -43,14 +48,13 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
   const {
     verifyEmail,
     loading: verifyingEmail,
-    error: emailError
   } = useVerifyEmail();
   const {
     verifyLogin,
     loading: verifyingLogin,
-    error: loginError
   } = useVerifyLogin();
-  const { resendOTP } = useResendOTP();
+  const { resendEmailOTP } = useResendEmailOTP();
+  const { resendLoginOTP } = useResendLoginOTP();
   const { resendPwdResetOTP } = useResendPwdResetOTP();
 
   useEffect(() => {
@@ -76,10 +80,10 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
       } else if (mode === "forgot-password") {
         router.push({
           pathname: "/(auth)/reset-password",
-          params: { otp, email }
+          params: { otp, email, otp_medium }
         });
       } else if (mode === "login") {
-        await verifyLogin(otp, email ?? "");
+        await verifyLogin(otp, email ?? "",  otp_medium ?? "",  password ?? "");
       }
     } catch (error) {
       Toast.show({
@@ -99,11 +103,11 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
     setIsResending(true);
     try {
       if (mode === "verify-email") {
-        await resendOTP("verify_email", email ?? "");
+        await resendEmailOTP("verify_email", email ?? "");
       } else if (mode === "forgot-password") {
-        await resendPwdResetOTP("forgot_password", email ?? "");
+        await resendPwdResetOTP(otp_medium ?? "", email ?? "");
       } else if (mode === "login") {
-        await resendOTP("login", email ?? "");
+        await resendLoginOTP(otp_medium ?? "", email ?? "");
       }
 
       setCountdown(60);
@@ -124,7 +128,6 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
     console.log("OTP completed:", completedOtp);
   };
 
-  const errorMessage = mode === "verify-email" ? emailError : loginError;
   const isLoading = verifyingEmail || verifyingLogin;
 
   return (

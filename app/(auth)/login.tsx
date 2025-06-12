@@ -13,6 +13,7 @@ import { Entypo } from "@expo/vector-icons";
 import { useLogin } from "@/hooks/useAuthentication";
 import OtpVerification from "./otp-verification";
 import Toast from "react-native-toast-message";
+import OtpMediumModal from "@/components/OtpMediumModal";
 
 const isValidEmail = (value: string): boolean =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -26,6 +27,10 @@ const Login = () => {
   const [errors, setErrors] = useState({ identifier: "", password: "" });
   const [showOtpScreen, setShowOtpScreen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [otpMedium, setOtpMedium] = useState<"email" | "sms" | "authenticator">(
+    "email"
+  );
 
   const login = useLogin();
 
@@ -53,17 +58,33 @@ const Login = () => {
     return valid;
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (method: "email" | "sms" | "authenticator") => {
     if (!validate()) return;
+    setOtpMedium(method);
+
+    if (method === "authenticator") {
+      setShowOtpScreen(true);
+      return;
+    }
 
     setIsLoading(true);
+
     try {
       const payload = form.identifier.includes("@")
-        ? { email: form.identifier, password: form.password }
-        : { username: form.identifier, password: form.password };
+        ? {
+            email: form.identifier,
+            password: form.password,
+            otp_medium: method
+          }
+        : {
+            username: form.identifier,
+            password: form.password,
+            otp_medium: method
+          };
 
       const success = await login(payload);
       if (success) {
+        setIsLoading(false);
         setShowOtpScreen(true);
       }
     } catch (error) {
@@ -83,6 +104,8 @@ const Login = () => {
         mode="login"
         email={form.identifier}
         onBack={() => setShowOtpScreen(false)}
+        otp_medium={otpMedium}
+        password={form.password}
       />
     );
   }
@@ -160,7 +183,7 @@ const Login = () => {
 
           <CustomButton
             title="Login"
-            handlePress={handleSubmit}
+            handlePress={() => setShowModal(true)}
             isLoading={isLoading}
             disabled={!form.identifier || !form.password}
             btnStyles={{ width: "100%", marginTop: 150 }}
@@ -211,6 +234,13 @@ const Login = () => {
             </ThemedText>
           </View>
         </View>
+
+        <OtpMediumModal
+          visible={showModal}
+          onClose={() => setShowModal(false)}
+          isLoading={isLoading}
+          onSubmit={handleSubmit}
+        />
       </ScrollView>
     </SafeAreaView>
   );

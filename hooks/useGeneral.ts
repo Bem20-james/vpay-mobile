@@ -33,6 +33,9 @@ function useFetchCountries() {
         setCountries(response.data.result);
       } 
 
+      const result = response.data
+      console.log("res:",result)
+
     } catch (error: unknown) {
       const axiosError = error as AxiosError<{ message?: string }>;
       const errorMessage =
@@ -40,7 +43,6 @@ function useFetchCountries() {
         "An error occurred while fetching countries.";
 
       console.error("Error fetching data:", errorMessage);
-      Toast.show({ type: "error", text1: errorMessage });
     } finally {
       setLoading(false);
     }

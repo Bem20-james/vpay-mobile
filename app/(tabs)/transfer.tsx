@@ -80,6 +80,11 @@ const TransferScreen: React.FC = () => {
               route="/schedule-transfer"
             />
             <TransferOption
+              label="Mobile money"
+              icon="send-to-mobile"
+              route="/schedule-transfer"
+            />
+            <TransferOption
               label="International Transfer"
               icon="public"
               route="/schedule-transfer"
@@ -87,11 +92,6 @@ const TransferScreen: React.FC = () => {
             <TransferOption
               label="Cryptocurrency"
               icon="currency-bitcoin"
-              route="/schedule-transfer"
-            />
-            <TransferOption
-              label="Payment  Link"
-              icon="link"
               route="/schedule-transfer"
             />
           </View>

@@ -22,7 +22,7 @@ interface LoginData {
 }
 
 interface AuthResponse {
-  error: boolean | number;
+  code: boolean | number;
   message: string;
   success: string;
 }
@@ -38,11 +38,11 @@ function useRegister() {
       const result = response?.data;
       console.log("Register Response:", result);
 
-      if (result.error) {
+      if (result.code) {
         Toast.show({ type: "error", text1: result.message });
       }
 
-      if (result.error === 0) {
+      if (result.code === 0 || result.success === "true") {
         return true;
       }
 
@@ -94,16 +94,16 @@ const useVerifyEmail = () => {
   return { verifyEmail, loading, error };
 };
 
-const useResendOTP = () => {
+const useResendEmailOTP = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const resendOTP = async (otp_type: string, email: string): Promise<void> => {
+  const resendEmailOTP = async (otp_type: string, email: string): Promise<void> => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await axios.post(`${SERVER_BASE_URL}/auth/user/resend/email/otp`, {
+      const response = await axios.post(`${SERVER_BASE_URL}/auth/user/resend/verification-otp`, {
         otp_type,
         email
       });
@@ -125,7 +125,41 @@ const useResendOTP = () => {
     }
   };
 
-  return { resendOTP, loading, error };
+  return { resendEmailOTP, loading, error };
+}
+
+const useResendLoginOTP = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  const resendLoginOTP = async (otp_medium: string, email: string): Promise<void> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await axios.post(`${SERVER_BASE_URL}/auth/user/resend/login/otp`, {
+        otp_medium,
+        email
+      });
+
+      const result = response.data;
+      console.log("data:",result)
+
+      if (response.status === 200) {
+        Toast.show({ type: "success", text1: result.message || "OTP resent successfully!" });
+      }
+      
+    } catch (err: any) {
+      const errMsg = err.response?.data?.message || err.message || "Network or server error";
+      setError(errMsg);
+      Toast.show({ type: "error", text1: errMsg });
+      console.error("Error Response:", err.response?.data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { resendLoginOTP, loading, error };
 }
 
 function useLogin() {
@@ -139,7 +173,7 @@ function useLogin() {
       const result = response?.data;
       console.log("Login Response:", result);
 
-      if (result.error) {
+      if (result.code) {
         Toast.show({ type: "error", text1: result.message });
         return false;
       }
@@ -173,7 +207,7 @@ const useForgotPwd = () => {
     setError(null);
 
     try {
-      const response = await axios.post(`${SERVER_BASE_URL}/auth/user/reset/password`,email );
+      const response = await axios.post(`${SERVER_BASE_URL}/auth/user/forgot/password/mobile`,email );
 
       const result = response?.data;
 
@@ -185,7 +219,7 @@ const useForgotPwd = () => {
       const errMsg = err.response?.data?.message || err.message || "Network or server error";
       setError(errMsg);
       Toast.show({ type: "error", text1: errMsg });
-      console.error("Error Response:", err.response?.data);
+      console.error("Error Response:", errMsg);
     } finally {
       setLoading(false);
     }
@@ -200,13 +234,13 @@ const useResendPwdResetOTP = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const resendPwdResetOTP = async (otp_type: string, email: string): Promise<void> => {
+  const resendPwdResetOTP = async (otp_medium: string, email: string): Promise<void> => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await axios.post(`${SERVER_BASE_URL}/auth/resend/password/reset-otp`, {
-        otp_type,
+      const response = await axios.post(`${SERVER_BASE_URL}/auth/user/resend/password/reset-otp/mobile`, {
+        otp_medium,
         email
       });
 
@@ -235,13 +269,14 @@ const useResetPwd = () => {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const resetPwd = async ({ otp, email, password }: { otp: string; email: string; password: string }): Promise<void> => {
+  const resetPwd = async ({ otp, otp_medium, email, password }: { otp: string; email: string; password: string, otp_medium: string }): Promise<void> => {
     setLoading(true);
     setError(null);
 
     try {
-      const { data, status } = await axios.post(`${SERVER_BASE_URL}/auth/verify/forgot/password`, {
+      const { data, status } = await axios.post(`${SERVER_BASE_URL}/auth/verify/reset/password/mobile`, {
         otp,
+        otp_medium,
         email,
         password,
       });
@@ -275,21 +310,22 @@ const useResetPwd = () => {
   return { resetPwd, loading, error };
 };
 
-
 const useVerifyLogin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { updateUser } = useUser()
   const router = useRouter()
     
-  const verifyLogin = async (token: string, email: string): Promise<void> => {
+  const verifyLogin = async (otp: string, email: string, otp_medium: string, password: string): Promise<void> => {
     setLoading(true);
     setError(null);
-
+    
     try {
       const response = await axios.post(`${SERVER_BASE_URL}/auth/user/login`, {
-        otp: token,
-        email: email
+        otp,
+        email,
+        otp_medium,
+        password,
       });
 
       const result = response.data;
@@ -318,4 +354,4 @@ const useVerifyLogin = () => {
 };
 
 
-export  {useRegister, useVerifyEmail, useVerifyLogin, useResendOTP, useLogin, useForgotPwd, useResendPwdResetOTP, useResetPwd};
+export  {useRegister, useVerifyEmail, useVerifyLogin, useResendEmailOTP, useResendLoginOTP, useLogin, useForgotPwd, useResendPwdResetOTP, useResetPwd};

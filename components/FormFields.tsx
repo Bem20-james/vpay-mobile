@@ -1,5 +1,5 @@
 import { TextInput, TouchableOpacity, View } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ThemedView } from "./ThemedView";
 import { ThemedText } from "./ThemedText";
 import { DefaultTheme } from "@react-navigation/native";
@@ -8,7 +8,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import CountryFlag from "react-native-country-flag";
 import { styles } from "../styles/formfield";
 
-type CountryItem = {
+export type CountryItem = {
   id?: number;
   country_name: string;
   country_code: string;
@@ -28,10 +28,10 @@ interface FormFieldProps {
   editable?: boolean;
   error?: string;
   isIcon?: boolean;
-  isLeftIcon?: boolean; // New prop to determine if the icon is on the left
+  isLeftIcon?: boolean;
   iconName?: keyof typeof MaterialIcons.glyphMap;
   isDropdown?: boolean;
-  onDropdownPress?: () => void; // New prop to trigger external bottom sheet
+  onDropdownPress?: () => void;
   dropdownIcon?: React.ReactNode;
   isPhoneInput?: boolean;
   defaultCountry?: CountryItem;
@@ -69,6 +69,16 @@ const FormField = ({
   const [selectedCountry, setSelectedCountry] = useState<CountryItem | null>(
     defaultCountry
   );
+
+  useEffect(() => {
+    if (
+      defaultCountry &&
+      defaultCountry.country_code !== selectedCountry?.country_code
+    ) {
+      setSelectedCountry(defaultCountry);
+    }
+  }, [defaultCountry, selectedCountry]);
+
   const colorScheme = useColorScheme();
   const border = colorScheme === "dark" ? "#E7E7E7" : "#E7E7E7";
   const txtColor = colorScheme === "dark" ? "#FFFFFF" : "#000000";
@@ -135,7 +145,7 @@ const FormField = ({
           {...props}
         />
 
-                {isLeftIcon && iconName && (
+        {isLeftIcon && iconName && (
           <View>
             <MaterialIcons name={iconName} size={20} color="#208BC9" />
           </View>

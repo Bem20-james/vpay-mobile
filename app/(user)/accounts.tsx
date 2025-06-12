@@ -9,15 +9,13 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
 import { MaterialIcons } from "@expo/vector-icons";
 import Navigator from "@/components/Navigator";
 import { useRouter, Router } from "expo-router";
 import images from "@/constants/Images";
+import { useColorScheme } from "@/hooks/useColorScheme.web";
+import { useState } from "react";
 
-
-
-// Define types for static data
 interface FiatAccount {
   currency_label: string;
   currency_name: string;
@@ -35,7 +33,6 @@ interface CryptoAccount {
   address: string;
 }
 
-// Static placeholder data
 const fiatData: FiatAccount[] = [
   {
     currency_label: "NGN",
@@ -72,7 +69,6 @@ const cryptoData: CryptoAccount[] = [
   }
 ];
 
-// Static image mappings
 const fiatImages: { [key: string]: ImageSourcePropType } = {
   ngn: images.glo,
   usd: images.airtel
@@ -83,7 +79,6 @@ const cryptoImages: { [key: string]: ImageSourcePropType } = {
   USDT: images.matic
 };
 
-// Define props for PaymentOption component
 interface PaymentOptionProps {
   name: string;
   label: string;
@@ -95,9 +90,9 @@ interface PaymentOptionProps {
   account_name?: string;
   bank_name?: string;
   account_number?: string;
+  bgColor?: string;
 }
 
-// Reusable PaymentOption component
 const PaymentOption: React.FC<PaymentOptionProps> = ({
   name,
   label,
@@ -108,13 +103,14 @@ const PaymentOption: React.FC<PaymentOptionProps> = ({
   account_balance,
   account_name,
   bank_name,
-  account_number
+  account_number,
+  bgColor
 }) => {
   const router: Router = useRouter();
 
   return (
     <TouchableOpacity
-      style={styles.optionContainer}
+      style={[styles.optionContainer, { backgroundColor: bgColor }]}
       onPress={() =>
         router.push({
           pathname: type === "fiat" ? "/" : "/",
@@ -133,65 +129,74 @@ const PaymentOption: React.FC<PaymentOptionProps> = ({
     >
       <Image source={image} style={styles.icon} />
       <View style={styles.textContainer}>
-        <ThemedText style={styles.accountText}>{name}</ThemedText>
+        <ThemedText
+          lightColor="#000000"
+          darkColor="#F5F5F5"
+          style={styles.accountText}
+        >
+          {name}
+        </ThemedText>
         <ThemedText style={styles.optionDescription}>{label}</ThemedText>
       </View>
       <ThemedText>{balance}</ThemedText>
       <ThemedText style={styles.arrow}>
-        <MaterialIcons name="chevron-right" size={30} color="#7b7b9b" />
+        <MaterialIcons name="chevron-right" size={30} color="#218DC9" />
       </ThemedText>
     </TouchableOpacity>
   );
 };
 
 const Accounts: React.FC = () => {
-  // Simulate loading state (set to true initially, can be toggled for testing)
-  const isLoading: boolean = true; // Change to false to show actual content
+  const colorScheme = useColorScheme();
+  const backgroundColor = colorScheme === "dark" ? "#000000" : "#EEF3FB";
+  const [isLoading, setIsLoading] = useState(true);
+  const boxBg = colorScheme === "dark" ? "#161622" : "#FFFFFF";
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[styles.safeArea, { backgroundColor: backgroundColor }]}
+    >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Navigator title="Accounts" />
 
-        <ThemedView style={styles.content}>
+        <View style={styles.content}>
           {/* Fiat Accounts Section */}
           <ThemedText style={styles.sectionHeader}>FIAT CURRENCY</ThemedText>
-          {isLoading ?
-            fiatData.map((item, index) => (
-              <PaymentOption
-                key={`fiat-${index}`}
-                name={item.currency_label}
-                label={item.currency_name}
-                image={fiatImages[item.currency_name] || images.logo}
-                balance={item.balance}
-                type="fiat"
-                account_balance={item.account_balance}
-                account_name={item.account_name}
-                bank_name={item.bank_name}
-                account_number={item.account_number}
-              />
-            ))
-            : null
-          }
+          {isLoading
+            ? fiatData.map((item, index) => (
+                <PaymentOption
+                  bgColor={boxBg}
+                  key={`fiat-${index}`}
+                  name={item.currency_label}
+                  label={item.currency_name}
+                  image={fiatImages[item.currency_name] || images.logo}
+                  balance={item.balance}
+                  type="fiat"
+                  account_balance={item.account_balance}
+                  account_name={item.account_name}
+                  bank_name={item.bank_name}
+                  account_number={item.account_number}
+                />
+              ))
+            : null}
 
           {/* Crypto Accounts Section */}
           <ThemedText style={styles.sectionHeader}>CRYPTOCURRENCY</ThemedText>
-          {isLoading ? 
-            // Static crypto accounts
-            cryptoData.map((item, index) => (
-              <PaymentOption
-                key={`crypto-${index}`}
-                name={item.token}
-                label={item.token_label}
-                image={cryptoImages[item.token] || images.logo}
-                balance={item.balance}
-                type="crypto"
-                address={item.address}
-              />
-            ))
-            : null
-          }
-        </ThemedView>
+          {isLoading
+            ? cryptoData.map((item, index) => (
+                <PaymentOption
+                  bgColor={boxBg}
+                  key={`crypto-${index}`}
+                  name={item.token}
+                  label={item.token_label}
+                  image={cryptoImages[item.token] || images.logo}
+                  balance={item.balance}
+                  type="crypto"
+                  address={item.address}
+                />
+              ))
+            : null}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -200,9 +205,8 @@ const Accounts: React.FC = () => {
 export default Accounts;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#ffffff"
+  safeArea: {
+    flex: 1
   },
   scrollContent: {
     flexGrow: 1
@@ -225,7 +229,6 @@ const styles = StyleSheet.create({
     padding: 7,
     borderRadius: 10,
     marginBottom: 10,
-    backgroundColor: "#fff",
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 5,
@@ -249,14 +252,10 @@ const styles = StyleSheet.create({
   },
   optionDescription: {
     fontSize: 12,
-    color: "#666",
     textTransform: "capitalize" as const
   },
   arrow: {
     fontSize: 18,
     color: "#999"
-  },
-  skeletonContainer: {
-    marginBottom: 10
   }
 });

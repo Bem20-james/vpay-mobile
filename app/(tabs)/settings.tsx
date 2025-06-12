@@ -8,8 +8,7 @@ import {
   StyleSheet,
   Switch,
   TouchableOpacity,
-  ScrollView,
-  StatusBar
+  ScrollView
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -128,14 +127,20 @@ const SettingsScreen: React.FC = () => {
               />
 
               <SettingItem
-                title="Enable Fingerprint"
+                title="Enable 2FA"
                 hasSwitch
                 switchValue={fingerprint}
                 onSwitchChange={setFingerprint}
               />
 
               <SettingItem
-                title="Change VPay PIN"
+                title="Change VPay Password"
+                hasChevron
+                onPress={() => console.log("Change VPay PIN pressed")}
+              />
+              
+              <SettingItem
+                title="Transaction Limit"
                 hasChevron
                 onPress={() => console.log("Change VPay PIN pressed")}
               />
@@ -185,7 +190,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingVertical: 7,
+    paddingVertical: 12,
     minHeight: 40,
   },
   settingLeft: {
