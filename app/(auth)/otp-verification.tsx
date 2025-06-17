@@ -19,7 +19,8 @@ import {
   useVerifyLogin,
   useResendLoginOTP,
   useResendEmailOTP,
-  useResendPwdResetOTP
+  useResendPwdResetOTP,
+  useVerifyForgotPwd,
 } from "@/hooks/useAuthentication";
 import Toast from "react-native-toast-message";
 
@@ -56,6 +57,8 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
   const { resendEmailOTP } = useResendEmailOTP();
   const { resendLoginOTP } = useResendLoginOTP();
   const { resendPwdResetOTP } = useResendPwdResetOTP();
+    const { verifyForgotPwd } = useVerifyForgotPwd();
+
 
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | undefined;
@@ -78,6 +81,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
       if (mode === "verify-email") {
         await verifyEmail(otp, email ?? "");
       } else if (mode === "forgot-password") {
+        await verifyForgotPwd(otp, email ?? "");
         router.push({
           pathname: "/(auth)/reset-password",
           params: { otp, email, otp_medium }

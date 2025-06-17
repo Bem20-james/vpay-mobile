@@ -151,6 +151,8 @@ const Accounts: React.FC = () => {
   const backgroundColor = colorScheme === "dark" ? "#000000" : "#EEF3FB";
   const [isLoading, setIsLoading] = useState(true);
   const boxBg = colorScheme === "dark" ? "#161622" : "#FFFFFF";
+  const [showFiatModal, setShowFiatModal] = useState(false);
+  const [showCryptoModal, setshowCryptoModal] = useState(false);
 
   return (
     <SafeAreaView
@@ -158,7 +160,7 @@ const Accounts: React.FC = () => {
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Navigator title="Accounts" />
-
+       
         <View style={styles.content}>
           {/* Fiat Accounts Section */}
           <ThemedText style={styles.sectionHeader}>FIAT CURRENCY</ThemedText>

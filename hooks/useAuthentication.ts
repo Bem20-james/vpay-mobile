@@ -353,5 +353,44 @@ const useVerifyLogin = () => {
     return { verifyLogin, loading, error };
 };
 
+const useVerifyForgotPwd = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter()
+    
+  const verifyForgotPwd = async (otp: string, email: string): Promise<void> => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await axios.post(`${SERVER_BASE_URL}/auth/user/forgot/password/mobile`,{ otp, email});
 
-export  {useRegister, useVerifyEmail, useVerifyLogin, useResendEmailOTP, useResendLoginOTP, useLogin, useForgotPwd, useResendPwdResetOTP, useResetPwd};
+      const result = response.data;
+
+      console.log("res", result)
+  
+      if (!result || result.error) {
+          Toast.show({ type: "error", text1: result?.message || "Invalid response from server." });
+          return;
+      }
+        
+      if (result.success) {
+        Toast.show({ type: "success", text1: result.message });
+        return;
+      }
+      
+    } catch (err: any) {
+      const errMsg = err.response?.data?.message || err.message || "Network or server error";
+      setError(errMsg);
+      Toast.show({ type: "error", text1: errMsg });
+      console.error("Error Response:", err.response?.data);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+    return { verifyForgotPwd, loading, error };
+};
+
+
+export  {useRegister, useVerifyEmail, useVerifyLogin, useResendEmailOTP, useResendLoginOTP, useLogin, useForgotPwd, useResendPwdResetOTP, useResetPwd, useVerifyForgotPwd};

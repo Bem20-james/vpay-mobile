@@ -65,10 +65,11 @@ const ForgotPassword = () => {
       if (error?.message) {
         errorMessage = error.message;
       }
-
       Toast.show({
         type: "error",
-        text1: errorMessage
+        text1: errorMessage,
+        text2:
+          error.message || "An unexpected error occurred. Please try again."
       });
 
       console.error("Forgot password error:", error);
@@ -130,8 +131,8 @@ const ForgotPassword = () => {
 
           <CustomButton
             title="Send OTP"
-            handlePress={() => router.push("/(tabs)/home")}
-            // handlePress={handleSubmit}
+            //handlePress={() => router.push("/(tabs)/home")}
+            handlePress={handleSubmit}
             isLoading={isSubmitting}
             disabled={!email.trim() || isSubmitting}
             btnStyles={{ width: "100%", marginTop: 100 }}
