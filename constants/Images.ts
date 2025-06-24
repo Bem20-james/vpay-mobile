@@ -1,6 +1,7 @@
 import onboard1 from "../assets/images/onboard1.png";
 import onboard2 from "../assets/images/onboard2.png";
-import logo from "../assets/images/logo.png";
+import logolight from "../assets/images/logo-light.png";
+import logodark from "../assets/images/logo-dark.png";
 import avatar from "../assets/images/avatar.png"
 import mastercard from "../assets/images/mastercard.png";
 import visacard from "../assets/images/visacard.png";
@@ -17,7 +18,8 @@ import tether from "../assets/images/tether.png";
 const images = {
   onboard1,
   onboard2,
-  logo,
+  logolight,
+  logodark,
   avatar,
   mastercard,
   visacard,

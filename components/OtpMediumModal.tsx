@@ -10,22 +10,22 @@ import {
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { ThemedText } from "./ThemedText";
 
-const methods = ["email", "sms", "authenticator"] as const;
-
-type OtpMethod = (typeof methods)[number];
+type OtpMethod = "email" | "sms" | "authenticator";
 
 interface OtpMethodModalProps {
   visible: boolean;
   onClose: () => void;
   onSubmit: (method: OtpMethod) => void;
   isLoading: boolean;
+  methods?: OtpMethod[];
 }
 
 const OtpMediumModal = ({
   visible,
   onClose,
   onSubmit,
-  isLoading
+  isLoading,
+  methods = ["email", "sms", "authenticator"]
 }: OtpMethodModalProps) => {
   const [selectedMethod, setSelectedMethod] = useState<OtpMethod>("email");
   const colorScheme = useColorScheme();

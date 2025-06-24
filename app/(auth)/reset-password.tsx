@@ -9,7 +9,7 @@ import FormField from "@/components/FormFields";
 import CustomButton from "@/components/CustomButton";
 import { styles } from "@/styles/auth";
 import Navigator from "@/components/Navigator";
-import { useResetPwd } from "@/hooks/useAuthentication";
+import { useSendResetPwdOTP } from "@/hooks/useAuthentication";
 import Toast from "react-native-toast-message";
 import OtpMediumModal from "@/components/OtpMediumModal";
 import OtpVerification from "./otp-verification";
@@ -17,12 +17,10 @@ import OtpVerification from "./otp-verification";
 const ResetPassword = () => {
   const colorScheme = useColorScheme();
   const bgColor = colorScheme === "dark" ? "#161622" : "#ffffff";
-  const { resetPwd } = useResetPwd();
-  const { otp, otp_medium, email } = useLocalSearchParams();
+  const { sendResetOTP } = useSendResetPwdOTP();
+  const { otp, email: rawEmail } = useLocalSearchParams();
 
-  console.log("OTP :", otp);
-  console.log("EMAIL :", email);
-  console.log("OTP MEDIUM :", otp_medium);
+  const email = Array.isArray(rawEmail) ? rawEmail[0] : rawEmail;
 
   const [form, setForm] = useState({
     password: "",
@@ -30,9 +28,9 @@ const ResetPassword = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [otpMedium, setOtpMedium] = useState<"email" | "sms" | "authenticator">(
-    "email"
-  );
+  type OtpMethod = "sms" | "authenticator" | "email";
+
+  const [otpMedium, setOtpMedium] = useState<OtpMethod>("sms");
   const [showOtpScreen, setShowOtpScreen] = useState(false);
 
   const handleInputChange = (key: string, value: string) => {
@@ -55,7 +53,7 @@ const ResetPassword = () => {
     return null;
   };
 
-  const submitForm = async (method: "email" | "sms" | "authenticator") => {
+  const submitForm = async (method: OtpMethod) => {
     if (!form.password || !form.confirmPassword) {
       Toast.show({ type: "error", text1: "All fields are required" });
       return;
@@ -82,12 +80,17 @@ const ResetPassword = () => {
     setIsSubmitting(true);
 
     try {
-      await resetPwd({
+      const success = await sendResetOTP({
         otp: String(otp),
         email: String(email),
-        otp_medium: String(otp_medium),
+        otp_medium: method,
         password: form.password
       });
+
+      if (success) {
+        setIsSubmitting(false);
+        setShowOtpScreen(true);
+      }
     } catch (error: any) {
       Toast.show({
         type: "error",
@@ -103,7 +106,8 @@ const ResetPassword = () => {
   if (showOtpScreen) {
     return (
       <OtpVerification
-        mode="login"
+        mode="reset-password"
+        email={email}
         onBack={() => setShowOtpScreen(false)}
         otp_medium={otpMedium}
         password={form.password}
@@ -116,11 +120,11 @@ const ResetPassword = () => {
       <ScrollView>
         <Navigator />
         <View style={styles.container}>
-          <Image
-            source={images.logo}
-            style={styles.logo}
-            accessibilityLabel="App logo"
-          />
+          {colorScheme === "dark" ? (
+            <Image source={images.logolight} style={styles.logo} />
+          ) : (
+            <Image source={images.logodark} style={styles.logo} />
+          )}
           <View style={{ marginTop: 40 }}>
             <ThemedText
               darkColor="#FFFFFF"
@@ -173,6 +177,7 @@ const ResetPassword = () => {
           onClose={() => setShowModal(false)}
           isLoading={isSubmitting}
           onSubmit={submitForm}
+          methods={["sms", "authenticator"]}
         />
       </ScrollView>
       <Toast />

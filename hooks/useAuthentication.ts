@@ -4,6 +4,13 @@ import { useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 import { SERVER_BASE_URL } from "../constants/Paths";
 import { useUser } from "@/contexts/UserContexts";
+import { jwtDecode } from 'jwt-decode';
+import { storeData } from "@/utils/store";
+
+interface JwtPayload {
+  exp: number;
+  [key: string]: any;
+}
 
 interface RegisterData {
   firstname?: string;
@@ -79,6 +86,7 @@ const useVerifyEmail = () => {
 
       if (response.status === 200) {
         Toast.show({ type: "success", text1: message || "Email verified successfully!" });
+        await storeData("hasOnboarded", true);
         router.push("/(auth)/login");
       }
     } catch (err: any) {
@@ -267,30 +275,35 @@ const useResendPwdResetOTP = () => {
 const useResetPwd = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
-  const resetPwd = async ({ otp, otp_medium, email, password }: { otp: string; email: string; password: string, otp_medium: string }): Promise<void> => {
+  const resetPwd = async ({ otp, otp_medium, email, password }: { 
+    otp: string; 
+    email: string; 
+    password: string, 
+    otp_medium: string 
+  }): Promise<boolean> => {
     setLoading(true);
     setError(null);
 
     try {
-      const { data, status } = await axios.post(`${SERVER_BASE_URL}/auth/verify/reset/password/mobile`, {
+      const response = await axios.post(`${SERVER_BASE_URL}/auth/verify/reset/password/mobile`, {
         otp,
         otp_medium,
         email,
         password,
       });
+      const result = response.data;
+      console.log("Server Response:", result);
 
-      console.log("Server Response:", data);
-
-      if (status === 200) {
+      if (result.code === 0) {
         Toast.show({
           type: "success",
-          text1: data.message || "Password reset successfully!",
+          text1: result.message || "Password reset successful!",
         });
-
-        router.push("/(auth)/login");
+        return true;
       }
+
+      return false;
     } catch (error: any) {
       const errMsg = error?.response?.data?.message || error?.message || "An unexpected error occurred.";
       setError(errMsg);
@@ -302,6 +315,7 @@ const useResetPwd = () => {
       });
 
       console.error("Password Reset Error:", errMsg);
+      return false;
     } finally {
       setLoading(false);
     }
@@ -310,16 +324,83 @@ const useResetPwd = () => {
   return { resetPwd, loading, error };
 };
 
+const useSendResetPwdOTP = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const sendResetOTP = async ({
+    otp,
+    otp_medium,
+    email,
+    password
+  }: {
+    otp: string;
+    email: string;
+    password: string;
+    otp_medium: string;
+  }): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await axios.post(
+        `${SERVER_BASE_URL}/auth/user/reset/password/2fa-otp`,
+        {
+          otp,
+          otp_medium,
+          email,
+          password
+        }
+      );
+
+      const result = response.data;
+
+      console.log("Server Response:", result);
+
+      if (result.success) {
+        Toast.show({ type: "success", text1: result.message });
+        return true;
+      }
+
+      return false;
+    } catch (error: any) {
+      const errMsg =
+        error?.response?.data?.message ||
+        error?.message ||
+        "An unexpected error occurred.";
+      setError(errMsg);
+
+      Toast.show({
+        type: "error",
+        text1: "Password Reset Failed",
+        text2: errMsg
+      });
+
+      console.error("Password Reset Error:", errMsg);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { sendResetOTP, loading, error };
+};
+
 const useVerifyLogin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { updateUser } = useUser()
-  const router = useRouter()
-    
-  const verifyLogin = async (otp: string, email: string, otp_medium: string, password: string): Promise<void> => {
+  const { updateUser } = useUser();
+  const router = useRouter();
+
+  const verifyLogin = async (
+    otp: string,
+    email: string,
+    otp_medium: string,
+    password: string
+  ): Promise<void> => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await axios.post(`${SERVER_BASE_URL}/auth/user/login`, {
         otp,
@@ -329,19 +410,35 @@ const useVerifyLogin = () => {
       });
 
       const result = response.data;
-  
+      console.log("Login data:", result);
+
       if (!result || result.error) {
-          Toast.show({ type: "error", text1: result?.message || "Invalid response from server." });
-          return;
+        Toast.show({
+          type: "error",
+          text1: result?.message || "Invalid response from server.",
+        });
+        return;
       }
-        
+
       if (response.status === 200) {
-        updateUser(result.result)
+
+        const { token, user } = result.result;
+        const tokenPayload: JwtPayload = jwtDecode(token);
+        const expiresAt = tokenPayload.exp * 1000;
+
+        const userData = {
+          ...user,
+          accessToken: token,
+          refreshToken: null,
+          expiresAt,
+        };
+        await updateUser(userData);
+        console.log("User data:", userData);
         router.push("/(tabs)/home");
       }
-      
     } catch (err: any) {
-      const errMsg = err.response?.data?.message || err.message || "Network or server error";
+      const errMsg =
+        err.response?.data?.message || err.message || "Network or server error";
       setError(errMsg);
       Toast.show({ type: "error", text1: errMsg });
       console.error("Error Response:", err.response?.data);
@@ -349,48 +446,97 @@ const useVerifyLogin = () => {
       setLoading(false);
     }
   };
-  
-    return { verifyLogin, loading, error };
+
+  return { verifyLogin, loading, error };
 };
+
 
 const useVerifyForgotPwd = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter()
     
-  const verifyForgotPwd = async (otp: string, email: string): Promise<void> => {
+  const verifyForgotPwd = async (otp: string, email: string): Promise<boolean> => {
     setLoading(true);
     setError(null);
     
     try {
       const response = await axios.post(`${SERVER_BASE_URL}/auth/user/forgot/password/mobile`,{ otp, email});
-
       const result = response.data;
-
-      console.log("res", result)
   
       if (!result || result.error) {
-          Toast.show({ type: "error", text1: result?.message || "Invalid response from server." });
-          return;
+        Toast.show({ type: "error", text1: result?.message || "Invalid response from server." });
+        return false;
       }
         
       if (result.success) {
         Toast.show({ type: "success", text1: result.message });
-        return;
+        return true;
       }
       
+      return false;
     } catch (err: any) {
       const errMsg = err.response?.data?.message || err.message || "Network or server error";
       setError(errMsg);
       Toast.show({ type: "error", text1: errMsg });
       console.error("Error Response:", err.response?.data);
+      return false;
     } finally {
       setLoading(false);
     }
   };
   
-    return { verifyForgotPwd, loading, error };
+  return { verifyForgotPwd, loading, error };
 };
 
 
-export  {useRegister, useVerifyEmail, useVerifyLogin, useResendEmailOTP, useResendLoginOTP, useLogin, useForgotPwd, useResendPwdResetOTP, useResetPwd, useVerifyForgotPwd};
+function useLogout() {
+  const { config } = useUser();
+  return async (): Promise<boolean> => {
+    try {
+      const response = await axios.post<AuthResponse>(
+        `${SERVER_BASE_URL}/auth/user/logout`,
+        config
+      );
+
+      const result = response?.data;
+      console.log("Logout Response:", result);
+
+      if (result.code !== 0) {
+        Toast.show({ type: "error", text1: result.message });
+        return false;
+      }
+
+      if (result.success) {
+        Toast.show({ type: "success", text1: result.message });
+        return true;
+      }
+
+      Toast.show({ type: "error", text1: "Logout failed unexpectedly." });
+      return false;
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      const errorMessage =
+        axiosError.response?.data?.message || "Logout failed, please try again.";
+
+      console.error("Logout error:", errorMessage);
+      Toast.show({ type: "error", text1: errorMessage });
+
+      return false;
+    }
+  };
+}
+
+export  {
+  useRegister, 
+  useVerifyEmail, 
+  useVerifyLogin, 
+  useResendEmailOTP, 
+  useResendLoginOTP, 
+  useLogin, 
+  useForgotPwd, 
+  useResendPwdResetOTP, 
+  useResetPwd, 
+  useVerifyForgotPwd,
+  useSendResetPwdOTP,
+  useLogout
+};

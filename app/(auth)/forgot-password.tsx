@@ -100,7 +100,11 @@ const ForgotPassword = () => {
       <ScrollView>
         <Navigator />
         <View style={styles.container}>
-          <Image source={images.logo} style={styles.logo} />
+          {colorScheme === "dark" ? (
+            <Image source={images.logolight} style={styles.logo} />
+          ) : (
+            <Image source={images.logodark} style={styles.logo} />
+          )}
           <View style={{ marginTop: 40 }}>
             <ThemedText
               darkColor="#FFFFFF"
@@ -131,7 +135,6 @@ const ForgotPassword = () => {
 
           <CustomButton
             title="Send OTP"
-            //handlePress={() => router.push("/(tabs)/home")}
             handlePress={handleSubmit}
             isLoading={isSubmitting}
             disabled={!email.trim() || isSubmitting}

@@ -256,7 +256,11 @@ const Register = () => {
               <FontAwesome name="angle-left" size={30} color={"#9B9B9B"} />
             </Pressable>
           )}
-          <Image source={images.logo} style={styles.logo} />
+          {colorScheme === "dark" ? (
+            <Image source={images.logolight} style={styles.logo} />
+          ) : (
+            <Image source={images.logodark} style={styles.logo} />
+          )}
 
           <View style={{ marginTop: 40 }}>
             <ThemedText style={styles.heading}>

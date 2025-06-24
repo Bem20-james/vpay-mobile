@@ -86,7 +86,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
         height: 36,
         paddingHorizontal: 12,
         fontSize: 14,
-        borderRadius: 100
+        borderRadius: 10
       },
       medium: {
         height: 45,

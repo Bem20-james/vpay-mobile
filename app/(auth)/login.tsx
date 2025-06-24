@@ -114,7 +114,11 @@ const Login = () => {
     <SafeAreaView style={{ backgroundColor: bgColor, height: "100%" }}>
       <ScrollView>
         <View style={styles.container}>
-          <Image source={images.logo} style={styles.logo} />
+          {colorScheme === "dark" ? (
+            <Image source={images.logolight} style={styles.logo} />
+          ) : (
+            <Image source={images.logodark} style={styles.logo} />
+          )}
           <View style={{ marginTop: 40 }}>
             <ThemedText
               darkColor="#FFFFFF"
@@ -158,6 +162,8 @@ const Login = () => {
 
           <Pressable
             onPress={() => router.push("/(auth)/forgot-password")}
+            //onPress={() => router.push("/(tabs)/home")}
+
             style={({ pressed }) => [
               styles.forgotPwd,
               { opacity: pressed ? 0.7 : 1 }

@@ -15,6 +15,7 @@ import { useRouter } from "expo-router";
 import { useUser } from "@/contexts/UserContexts";
 import images from "@/constants/Images";
 import { styles } from "@/styles/users";
+import { useFetchAuthUser } from "@/hooks/useUser";
 
 const Option = ({
   title,
@@ -94,6 +95,7 @@ const Profile = () => {
   const { clearUser, user } = useUser();
   const [securityLock, setSecurityLock] = useState(false);
   const [transactionPin, setTransactionPin] = useState(false);
+  const { userData } = useFetchAuthUser();
 
   return (
     <SafeAreaView
@@ -119,7 +121,7 @@ const Profile = () => {
             darkColor="#EEF3FB"
             style={styles.heading}
           >
-            Advanztek Technologies
+            {userData?.firstname + " " + userData?.lastname}
           </ThemedText>
           <View style={[styles.heroBox, { backgroundColor: boxBg }]}>
             <View>
@@ -128,14 +130,14 @@ const Profile = () => {
                 darkColor="#FFFFFF"
                 style={styles.title}
               >
-                Your Username
+                Username
               </ThemedText>
               <ThemedText
                 lightColor="#252525"
                 darkColor="#EEF3FB"
                 style={styles.label}
               >
-                @Advanztek
+                {userData?.username}
               </ThemedText>
             </View>
             <MaterialIcons
@@ -151,32 +153,53 @@ const Profile = () => {
             <Option
               title="Accounts"
               hasChevron
-              onPress={() => console.log("Change VPay PIN pressed")}
+              onPress={() => router.push("/(user)/accounts")}
             />
             <Option
-              title="Aondoakura Bem James"
+              title="Personal"
+              hasChevron
+              onPress={() => router.push("/(user)/personal")}
+            />
+            <Option
+              title="Verification"
+              hasChevron
+              onPress={() => console.log("Change VPay PIN pressed")}
+              label="verify your identity"
+            />
+            <Option
+              title={userData?.firstname + " " + userData?.lastname}
               label="Account Name"
               hasChevron
               onPress={() => console.log("Change VPay PIN pressed")}
             />
             <Option
-              title="+2347023214727"
+              title={"+" + userData?.phone}
               label="Phone Number"
               hasChevron
               onPress={() => console.log("Change VPay PIN pressed")}
             />
             <Option
-              title="advanztek@gmail.com"
+              title={userData?.email}
               label="Email Address"
               hasChevron
               onPress={() => console.log("Change VPay PIN pressed")}
             />
-            <Option
-              title="272 New Road Gboko Benue State"
-              label="Address"
-              hasChevron
-              onPress={() => console.log("Change VPay PIN pressed")}
-            />
+            {userData?.residential_address && (
+              <Option
+                title={userData?.residential_address}
+                label="Address"
+                hasChevron
+                onPress={() => console.log("Change VPay PIN pressed")}
+              />
+            )}
+            {userData?.marital_status && (
+              <Option
+                title={userData?.marital_status}
+                label="Marital Status"
+                hasChevron
+                onPress={() => console.log("Change VPay PIN pressed")}
+              />
+            )}
             <Option
               title="Restrict Account"
               label="Stop transactions in emergency situations"

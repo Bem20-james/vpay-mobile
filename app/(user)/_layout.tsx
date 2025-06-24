@@ -16,6 +16,8 @@ const ActionsLayout = () => {
       <Stack>
         <Stack.Screen name="profile" options={{ headerShown: false }} />
         <Stack.Screen name="accounts" options={{ headerShown: false }} />
+        <Stack.Screen name="devices" options={{ headerShown: false }} />
+        <Stack.Screen name="personal" options={{ headerShown: false }} />
       </Stack>
 
       <StatusBar

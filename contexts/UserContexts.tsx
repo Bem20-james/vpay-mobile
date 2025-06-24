@@ -1,28 +1,35 @@
-import { getData, removeData, storeData } from "@/utils/store";
-import {
+import React, {
   createContext,
   useContext,
   useEffect,
   useState,
-  ReactNode,
+  useCallback,
+  useMemo,
+  useRef,
   PropsWithChildren,
-  useCallback
 } from "react";
-import React from "react";
+import { getData, removeData, storeData } from "@/utils/store";
 
 interface User {
+  id?: number;
+  firstname?: string;
+  lastname?: string;
+  email?: string;
+  phone?: string;
+  role?: string;
   accessToken?: string;
-  refreshToken?: string;
-  expiresAt?: number; // Token expiration timestamp
-  [key: string]: any; // Allow additional user properties
+  refreshToken?: string | null;
+  expiresAt?: number;
+  [key: string]: any;
 }
+
 
 interface UserContextType {
   user: User | null;
   config: { headers: { "Content-Type": string; Authorization: string } };
   isUserLoaded: boolean;
-  isAuthenticated: boolean;
-  isTokenExpired: boolean;
+  isAuthenticated: () => boolean;
+  isTokenExpired: () => boolean;
   fetchUser: () => Promise<void>;
   updateUser: (data: User) => Promise<void>;
   clearUser: () => Promise<void>;
@@ -34,15 +41,14 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export default function UserContextProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<User | null>(null);
   const [isUserLoaded, setIsUserLoaded] = useState<boolean>(false);
+  const isRefreshingRef = useRef(false);
 
-  // Check if token is expired
-  const isTokenExpired = useCallback(() => {
+  const isTokenExpired = useCallback((): boolean => {
     if (!user?.accessToken || !user?.expiresAt) return true;
     return Date.now() >= user.expiresAt;
   }, [user?.accessToken, user?.expiresAt]);
 
-  // Check if user is authenticated with valid token
-  const isAuthenticated = useCallback(() => {
+  const isAuthenticated = useCallback((): boolean => {
     return !!(user?.accessToken && !isTokenExpired());
   }, [user?.accessToken, isTokenExpired]);
 
@@ -55,7 +61,7 @@ export default function UserContextProvider({ children }: PropsWithChildren) {
         setUser(null);
       }
     } catch (error) {
-      console.error("Failed to fetch user data:", error);
+      console.error("❌ Failed to fetch user data:", error);
       setUser(null);
     } finally {
       setIsUserLoaded(true);
@@ -67,7 +73,7 @@ export default function UserContextProvider({ children }: PropsWithChildren) {
       await storeData("auth", data);
       setUser(data);
     } catch (error) {
-      console.error("Failed to update user data:", error);
+      console.error("❌ Failed to update user data:", error);
       throw error;
     }
   }, []);
@@ -77,20 +83,21 @@ export default function UserContextProvider({ children }: PropsWithChildren) {
       await removeData("auth");
       setUser(null);
     } catch (error) {
-      console.error("Failed to clear user data:", error);
+      console.error("❌ Failed to clear user data:", error);
       throw error;
     }
   }, []);
 
-  // Refresh token functionality (implement based on your API)
   const refreshUserToken = useCallback(async (): Promise<boolean> => {
-    if (!user?.refreshToken) {
-      await clearUser();
-      return false;
-    }
+    if (isRefreshingRef.current) return false;
+    isRefreshingRef.current = true;
 
     try {
-      // Replace with your actual refresh token API call
+      if (!user?.refreshToken) {
+        await clearUser();
+        return false;
+      }
+
       const response = await fetch("auth/refresh/token", {
         method: "POST",
         headers: {
@@ -99,46 +106,45 @@ export default function UserContextProvider({ children }: PropsWithChildren) {
         body: JSON.stringify({ refreshToken: user.refreshToken })
       });
 
-      if (response.ok) {
-        const newTokenData = await response.json();
-        const updatedUser = {
-          ...user,
-          accessToken: newTokenData.accessToken,
-          refreshToken: newTokenData.refreshToken || user.refreshToken,
-          expiresAt: Date.now() + newTokenData.expiresIn * 1000 // Convert to timestamp
-        };
-        await updateUser(updatedUser);
-        return true;
-      } else {
-        await clearUser();
-        return false;
+      if (!response.ok) {
+        throw new Error("Token refresh failed");
       }
+
+      const newTokenData = await response.json();
+      const updatedUser = {
+        ...user,
+        accessToken: newTokenData.accessToken,
+        refreshToken: newTokenData.refreshToken || user.refreshToken,
+        expiresAt: Date.now() + newTokenData.expiresIn * 1000
+      };
+
+      await updateUser(updatedUser);
+      return true;
     } catch (error) {
-      console.error("Failed to refresh token:", error);
+      console.error("❌ Failed to refresh token:", error);
       await clearUser();
       return false;
+    } finally {
+      isRefreshingRef.current = false;
     }
   }, [user, updateUser, clearUser]);
 
-  // Create config with automatic token refresh
-  const config = {
+  const config = useMemo(() => ({
     headers: {
       "Content-Type": "application/json",
       Authorization: user?.accessToken ? `Bearer ${user.accessToken}` : ""
     }
-  };
+  }), [user?.accessToken]);
 
-  // Initialize user data on mount
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
 
-  // Auto-refresh token when it's about to expire
   useEffect(() => {
     if (!user?.accessToken || !user?.expiresAt) return;
 
     const timeUntilExpiry = user.expiresAt - Date.now();
-    const refreshThreshold = 5 * 60 * 1000; // Refresh 5 minutes before expiry
+    const refreshThreshold = 5 * 60 * 1000; // 5 minutes
 
     if (timeUntilExpiry <= refreshThreshold && timeUntilExpiry > 0) {
       refreshUserToken();
@@ -146,16 +152,10 @@ export default function UserContextProvider({ children }: PropsWithChildren) {
     }
 
     if (timeUntilExpiry <= 0) {
-      // Token already expired
-      if (user.refreshToken) {
-        refreshUserToken();
-      } else {
-        clearUser();
-      }
+      user.refreshToken ? refreshUserToken() : clearUser();
       return;
     }
 
-    // Set timeout to refresh token before it expires
     const timeoutId = setTimeout(() => {
       refreshUserToken();
     }, timeUntilExpiry - refreshThreshold);
@@ -169,27 +169,39 @@ export default function UserContextProvider({ children }: PropsWithChildren) {
     clearUser
   ]);
 
-  const contextValue: UserContextType = {
+  const contextValue = useMemo((): UserContextType => ({
     user,
     config,
     isUserLoaded,
-    isAuthenticated: isAuthenticated(),
-    isTokenExpired: isTokenExpired(),
+    isAuthenticated,
+    isTokenExpired,
     fetchUser,
     updateUser,
     clearUser,
     refreshUserToken
-  };
+  }), [
+    user,
+    config,
+    isUserLoaded,
+    isAuthenticated,
+    isTokenExpired,
+    fetchUser,
+    updateUser,
+    clearUser,
+    refreshUserToken
+  ]);
 
   return (
-    <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>
+    <UserContext.Provider value={contextValue}>
+      {children}
+    </UserContext.Provider>
   );
 }
 
 export function useUser(): UserContextType {
   const context = useContext(UserContext);
   if (!context) {
-    throw new Error("useUser must be used within a UserContextProvider");
+    throw new Error("❗ useUser must be used within a UserContextProvider");
   }
   return context;
 }

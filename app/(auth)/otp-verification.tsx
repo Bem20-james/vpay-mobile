@@ -21,13 +21,14 @@ import {
   useResendEmailOTP,
   useResendPwdResetOTP,
   useVerifyForgotPwd,
+  useResetPwd
 } from "@/hooks/useAuthentication";
 import Toast from "react-native-toast-message";
 
 interface OtpVerificationProps {
   email?: string;
   onBack?: () => void;
-  mode?: "verify-email" | "forgot-password" | "login";
+  mode?: "verify-email" | "forgot-password" | "reset-password" | "login";
   otp_medium?: string;
   password?: string;
 }
@@ -46,19 +47,13 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
   const [isResending, setIsResending] = useState(false);
   const [countdown, setCountdown] = useState(0);
 
-  const {
-    verifyEmail,
-    loading: verifyingEmail,
-  } = useVerifyEmail();
-  const {
-    verifyLogin,
-    loading: verifyingLogin,
-  } = useVerifyLogin();
+  const { verifyEmail, loading: verifyingEmail } = useVerifyEmail();
+  const { verifyLogin, loading: verifyingLogin } = useVerifyLogin();
   const { resendEmailOTP } = useResendEmailOTP();
   const { resendLoginOTP } = useResendLoginOTP();
   const { resendPwdResetOTP } = useResendPwdResetOTP();
-    const { verifyForgotPwd } = useVerifyForgotPwd();
-
+  const { verifyForgotPwd, loading: verifyingForgotPwd } = useVerifyForgotPwd();
+  const { resetPwd, loading: verifyingResetPwd } = useResetPwd();
 
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | undefined;
@@ -81,13 +76,28 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
       if (mode === "verify-email") {
         await verifyEmail(otp, email ?? "");
       } else if (mode === "forgot-password") {
-        await verifyForgotPwd(otp, email ?? "");
-        router.push({
-          pathname: "/(auth)/reset-password",
-          params: { otp, email, otp_medium }
-        });
+        const success = await verifyForgotPwd(otp, email ?? "");
+        if (success) {
+          router.push({
+            pathname: "/(auth)/reset-password",
+            params: { otp, email }
+          });
+        }
       } else if (mode === "login") {
-        await verifyLogin(otp, email ?? "",  otp_medium ?? "",  password ?? "");
+        await verifyLogin(otp, email ?? "", otp_medium ?? "", password ?? "");
+      } else if (mode === "reset-password") {
+        const success = await resetPwd({
+          otp,
+          otp_medium: otp_medium ?? "",
+          email: email ?? "",
+          password: password ?? ""
+        });
+        if (success) {
+          router.push({
+            pathname: "/(auth)/login",
+            params: { otp, email }
+          });
+        }
       }
     } catch (error) {
       Toast.show({
@@ -112,6 +122,8 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
         await resendPwdResetOTP(otp_medium ?? "", email ?? "");
       } else if (mode === "login") {
         await resendLoginOTP(otp_medium ?? "", email ?? "");
+      } else if (mode === "reset-password") {
+        await resendLoginOTP(otp_medium ?? "", email ?? "");
       }
 
       setCountdown(60);
@@ -132,7 +144,8 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
     console.log("OTP completed:", completedOtp);
   };
 
-  const isLoading = verifyingEmail || verifyingLogin;
+  const isLoading =
+    verifyingEmail || verifyingLogin || verifyingForgotPwd || verifyingResetPwd;
 
   return (
     <SafeAreaView style={{ backgroundColor: bgColor, height: "100%" }}>

@@ -72,23 +72,24 @@ const RecentTransfers: React.FC<Props> = ({ beneficiaries, recents }) => {
         </Pressable>
       </View>
 
-      <View
-        style={[
-          styles.listContainer,
-          { backgroundColor: isDark ? "#161622" : "#FFFFFF" }
-        ]}
-      >
+      <View>
         <FlatList
           data={data}
           keyExtractor={(item, index) => `${item.label}-${index}`}
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={[styles.itemContainer, { borderBottomColor: isDark ? "#0a0a10" : "#F8F8F8" }]}
+              style={[
+                styles.itemContainer,
+                {
+                  borderBottomColor: isDark ? "#0a0a10" : "#F8F8F8",
+                  backgroundColor: isDark ? "#161622" : "#FFFFFF"
+                }
+              ]}
               onPress={() => {}}
               activeOpacity={0.7}
             >
               <View style={styles.itemContent}>
-                <View >
+                <View>
                   <ThemedText
                     lightColor="#252525"
                     darkColor="#FFFFFF"
@@ -169,16 +170,15 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0
   },
-  listContainer: {
-    borderRadius: 10,
-    padding: 15,
-    marginTop: 10,
-  },
   itemContainer: {
-    marginBottom: 10,
-    paddingVertical: 5,
-    borderBottomColor: "#F8F8F8",
-    borderBottomWidth: 1
+    marginTop: 7,
+    padding: 10,
+    borderRadius: 6,
+    elevation: 1,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 }
   },
   itemContent: {
     flexDirection: "row",
@@ -206,11 +206,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 5,
+    paddingVertical: 7
   },
   viewAllText: {
     fontFamily: "Inter-SemiBold",
-    fontSize: 14,
+    fontSize: 14
   }
 });
 

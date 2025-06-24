@@ -14,6 +14,8 @@ const TransferScreen: React.FC = () => {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const backgroundColor = isDark ? "#000000" : "#EEF3FB";
+  const bgColor = isDark ? "#161619" : "#FFFFFF";
+
   const router = useRouter();
 
   const TransferOption = ({
@@ -31,7 +33,7 @@ const TransferScreen: React.FC = () => {
   }) => {
     return (
       <TouchableOpacity
-        style={styles.optionContainer}
+        style={[styles.optionContainer, {backgroundColor: bgColor}]}
         onPress={() => router.push(route as any)}
         activeOpacity={0.7}
       >
@@ -115,7 +117,7 @@ const TransferScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    paddingHorizontal: 16
+    marginHorizontal: 10
   },
   scrollContent: {
     flexGrow: 1,
@@ -142,8 +144,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 9,
-    paddingHorizontal: 0,
-    marginBottom: 5
+    paddingHorizontal: 7,
+    marginBottom: 7,
+    borderRadius: 6
   },
   iconContainer: {
     width: 30,

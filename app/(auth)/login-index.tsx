@@ -19,8 +19,11 @@ const IndexLogin = () => {
     <SafeAreaView style={{ backgroundColor: bgColor, height: "100%" }}>
       <ScrollView>
         <View style={styles.container}>
-          <Image source={images.logo} style={styles.logo} />
-
+          {colorScheme === "dark" ? (
+            <Image source={images.logolight} style={styles.logo} />
+          ) : (
+            <Image source={images.logodark} style={styles.logo} />
+          )}
           <View style={styles.userField}>
             <View style={styles.avatarBg}>
               <Image source={images.avatar} style={styles.avatar} />
@@ -115,7 +118,7 @@ const IndexLogin = () => {
               </ThemedText>
               <Pressable
                 style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
-                onPress={() => router.push("/register")}
+                onPress={() => router.push("/login")}
               >
                 <ThemedText
                   style={{

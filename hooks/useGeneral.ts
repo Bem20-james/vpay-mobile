@@ -1,7 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { SERVER_BASE_URL } from "../constants/Paths";
 import { useEffect, useState } from "react";
-import Toast from "react-native-toast-message";
 
 interface Country {
   id: number;
@@ -10,11 +9,12 @@ interface Country {
   country_dial_code: string;
 }
 
-interface CountryResponse {
+interface GenericResponse<T> {
   error: number;
+  code: number;
   message: string;
   success: boolean;
-  result: Country[];
+  result: any[];
 }
 
 function useFetchCountries() {
@@ -25,16 +25,16 @@ function useFetchCountries() {
     setLoading(true);
 
     try {
-      const response = await axios.get<CountryResponse>(
+      const response = await axios.get<GenericResponse<Country[]>>(
         `${SERVER_BASE_URL}/countries`,
       );
 
-      if (response.data.success && response.data.error === 0) {
-        setCountries(response.data.result);
-      } 
-
       const result = response.data
-      console.log("res:",result)
+      console.log("Response data:", result);
+
+      if (result.success && result.error === 0) {
+        setCountries(result.result);
+      } 
 
     } catch (error: unknown) {
       const axiosError = error as AxiosError<{ message?: string }>;
@@ -54,5 +54,6 @@ function useFetchCountries() {
 
   return { countries, loading, refetch: fetchData };
 }
+
 
 export  {useFetchCountries};

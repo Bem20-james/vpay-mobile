@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Image,
   View,
   ScrollView,
   TouchableOpacity,
   Pressable,
-  Text
+  Text,
+  Animated
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -23,6 +24,8 @@ import RecentTransaction from "@/components/RecentTransactions";
 import { quickActions, billOptions } from "@/assets/data";
 import { trnxHistory } from "@/assets/data";
 import OptionsBottomSheet from "@/components/BottomSheets/options";
+import StickyHeader from "@/components/StickyHeader";
+import { useUser } from "@/contexts/UserContexts";
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
@@ -33,17 +36,71 @@ export default function HomeScreen() {
   const symbolNGN = getSymbolFromCurrency("NGN");
   const symbolUSD = getSymbolFromCurrency("USD");
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
-  const [isAddSheetVisible, setIsAddSheetVisible] = useState(false);
 
-  const handleAddVisible =  () =>{
-    setIsAddSheetVisible(true)
-  }
+  // Animated values for sticky header
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const headerOpacity = useRef(new Animated.Value(0)).current;
+  const headerTranslateY = useRef(new Animated.Value(-50)).current;
+  const { user} = useUser()
+
+  const handleScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+    {
+      useNativeDriver: false,
+      listener: (
+        event: import("react-native").NativeSyntheticEvent<
+          import("react-native").NativeScrollEvent
+        >
+      ) => {
+        const offsetY = event.nativeEvent.contentOffset.y;
+
+        // Show sticky header when scrolled past 60px
+        if (offsetY > 60) {
+          Animated.parallel([
+            Animated.timing(headerOpacity, {
+              toValue: 1,
+              duration: 200,
+              useNativeDriver: false
+            }),
+            Animated.timing(headerTranslateY, {
+              toValue: 0,
+              duration: 200,
+              useNativeDriver: false
+            })
+          ]).start();
+        } else {
+          Animated.parallel([
+            Animated.timing(headerOpacity, {
+              toValue: 0,
+              duration: 200,
+              useNativeDriver: false
+            }),
+            Animated.timing(headerTranslateY, {
+              toValue: -50,
+              duration: 200,
+              useNativeDriver: false
+            })
+          ]).start();
+        }
+      }
+    }
+  );
 
   return (
     <SafeAreaView
       style={[styles.safeArea, { backgroundColor: backgroundColor }]}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <StickyHeader
+        headerOpacity={headerOpacity}
+        headerTranslateY={headerTranslateY}
+      />
+
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.hero}>
           <View style={styles.profileContainer}>
             <Pressable onPress={() => router.push("/profile")}>
@@ -55,18 +112,27 @@ export default function HomeScreen() {
               lightColor="#252525"
               style={{ fontFamily: "Inter", fontSize: 15 }}
             >
-              Hello, <Text style={{ fontFamily: "Inter-Bold" }}>Advanztek</Text>
+              Hello, <Text style={{ fontFamily: "Inter-Bold" }}>{user?.firstname}</Text>
               {String.fromCodePoint(0x1f44b)}
             </ThemedText>
           </View>
-
-          <Pressable onPress={() => router.push("/notifications")}>
-            <MaterialIcons
-              name="notifications"
-              size={25}
-              color={colorScheme === "dark" ? "#218DC9" : "#80D1FF"}
-            />
-          </Pressable>
+          <View style={styles.dFlex}>
+            <Pressable onPress={() => router.push("/notifications")}>
+              <MaterialIcons
+                name="notifications"
+                size={25}
+                color={colorScheme === "dark" ? "#218DC9" : "#80D1FF"}
+                style={{ marginRight: 7 }}
+              />
+            </Pressable>
+            <Pressable onPress={() => router.push("/notifications")}>
+              <MaterialIcons
+                name="dark-mode"
+                size={25}
+                color={colorScheme === "dark" ? "#218DC9" : "#80D1FF"}
+              />
+            </Pressable>
+          </View>
         </View>
 
         <ThemedView style={styles.balCon}>

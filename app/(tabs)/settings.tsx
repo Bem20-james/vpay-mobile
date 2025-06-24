@@ -1,85 +1,32 @@
 import { useColorScheme } from "@/hooks/useColorScheme.web";
-import { useRouter } from "expo-router";
 import Navigator from "@/components/Navigator";
 import { ThemedText } from "@/components/ThemedText";
 import React, { useState } from "react";
-import {
-  View,
-  StyleSheet,
-  Switch,
-  TouchableOpacity,
-  ScrollView
-} from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
+import { SettingItem } from "@/components/SettingItem";
+import { useRouter } from "expo-router";
+import { useLogout } from "@/hooks/useAuthentication";
+import { useUser } from "@/contexts/UserContexts";
 
 const SettingsScreen: React.FC = () => {
   const [hideBalance, setHideBalance] = useState(false);
   const [securityLock, setSecurityLock] = useState(false);
   const [transactionPin, setTransactionPin] = useState(false);
   const [fingerprint, setFingerprint] = useState(false);
-
   const colorScheme = useColorScheme();
   const boxBackgroundColor = colorScheme === "dark" ? "#000000" : "#EEF3FB";
-  const statusBarBg = colorScheme === "dark" ? "#000000" : "#EEF3FB";
   const router = useRouter();
+  const logout = useLogout();
+  const { clearUser } = useUser();
 
-  const SettingItem = ({
-    title,
-    hasSwitch,
-    switchValue,
-    onSwitchChange,
-    hasChevron,
-    onPress,
-    icon,
-    iconColor,
-    bgColor = "#F2F2F7"
-  }: {
-    title: string;
-    hasSwitch?: boolean;
-    switchValue?: boolean;
-    onSwitchChange?: (value: boolean) => void;
-    hasChevron?: boolean;
-    onPress?: () => void;
-    icon?: any;
-    iconColor?: string;
-    bgColor?: string;
-  }) => (
-    <TouchableOpacity
-      style={styles.settingItem}
-      onPress={onPress}
-      disabled={hasSwitch}
-    >
-      <View style={styles.settingLeft}>
-        {icon && (
-          <View style={[styles.iconContainer, { backgroundColor: bgColor }]}>
-            <Ionicons name={icon} size={20} color={iconColor} />
-          </View>
-        )}
-        <ThemedText
-          lightColor="#252525"
-          darkColor="#FFFFFF"
-          style={styles.settingText}
-        >
-          {title}
-        </ThemedText>
-      </View>
-
-      {hasSwitch && (
-        <Switch
-          value={switchValue}
-          onValueChange={onSwitchChange}
-          trackColor={{ false: "#E5E5E5", true: "#34C759" }}
-          thumbColor={switchValue ? "#FFFFFF" : "#FFFFFF"}
-          ios_backgroundColor="#E5E5E5"
-        />
-      )}
-
-      {hasChevron && (
-        <Ionicons name="chevron-forward" size={18} color="#218DC9" />
-      )}
-    </TouchableOpacity>
-  );
+  const handleLogout = async () => {
+    const success = await logout();
+    if (success) {
+      clearUser();
+      router.push("/(auth)/login-index");
+    }
+  };
 
   return (
     <SafeAreaView
@@ -100,6 +47,20 @@ const SettingsScreen: React.FC = () => {
             <View style={{ marginVertical: 10 }}>
               <SettingItem
                 title="Manage Devices"
+                hasChevron
+                onPress={() => router.push("/(user)/devices")}
+                iconColor="#218DC9"
+              />
+
+              <SettingItem
+                title="Profile"
+                hasChevron
+                onPress={() => router.push("/(user)/profile")}
+                iconColor="#218DC9"
+              />
+
+              <SettingItem
+                title="Account Verification"
                 hasChevron
                 onPress={() => console.log("Manage Devices pressed")}
                 iconColor="#218DC9"
@@ -138,7 +99,7 @@ const SettingsScreen: React.FC = () => {
                 hasChevron
                 onPress={() => console.log("Change VPay PIN pressed")}
               />
-              
+
               <SettingItem
                 title="Transaction Limit"
                 hasChevron
@@ -147,7 +108,6 @@ const SettingsScreen: React.FC = () => {
             </View>
           </View>
 
-          {/* Bottom Section */}
           <View style={styles.bottomSection}>
             <SettingItem
               title="Feedback"
@@ -162,8 +122,10 @@ const SettingsScreen: React.FC = () => {
               title="Logout"
               icon="power"
               iconColor="#D92D20"
-              onPress={() => console.log("Logout pressed")}
+              onPress={handleLogout}
               bgColor="#D92D2014"
+              background={colorScheme === "dark" ? "#161622" : "#FFFFFF"}
+              itemStyles={{ marginHorizontal: 7, borderRadius: 6 }}
             />
           </View>
         </View>
@@ -176,6 +138,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1
   },
+  safeArea: {
+    flex: 1,
+    paddingHorizontal: 5
+  },
   section: {
     paddingTop: 20
   },
@@ -185,41 +151,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 12
   },
-  settingItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    minHeight: 40,
-  },
-  settingLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1
-  },
-  settingText: {
-    fontFamily: "Inter",
-    fontWeight: 600,
-    fontSize: 14,
-    lineHeight: 14,
-    letterSpacing: 0
-  },
-  iconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 32,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12
-  },
   bottomSection: {
-    marginTop: 50,
+    marginTop: 40,
     paddingBottom: 32
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: 5
   }
 });
 
