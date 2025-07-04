@@ -22,7 +22,6 @@ const Login = () => {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const bgColor = colorScheme === "dark" ? "#161622" : "#ffffff";
-
   const [form, setForm] = useState({ identifier: "", password: "" });
   const [errors, setErrors] = useState({ identifier: "", password: "" });
   const [showOtpScreen, setShowOtpScreen] = useState(false);
@@ -31,7 +30,6 @@ const Login = () => {
   const [otpMedium, setOtpMedium] = useState<"email" | "sms" | "authenticator">(
     "email"
   );
-
   const login = useLogin();
 
   const validate = () => {

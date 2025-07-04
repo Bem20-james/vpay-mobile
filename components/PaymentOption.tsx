@@ -23,6 +23,7 @@ interface PaymentOptionProps {
   bank_name?: string;
   account_number?: string;
   bgColor?: string;
+  handlePress: () => void;  
 }
 
 export const PaymentOption: React.FC<PaymentOptionProps> = ({
@@ -37,28 +38,15 @@ export const PaymentOption: React.FC<PaymentOptionProps> = ({
   account_name,
   bank_name,
   account_number,
-  bgColor
+  bgColor,
+  handlePress
 }) => {
   const router: Router = useRouter();
 
   return (
     <TouchableOpacity
       style={[styles.optionContainer, { backgroundColor: bgColor }]}
-      onPress={() =>
-        router.push({
-          pathname: type === "fiat" ? "/" : "/",
-          params: {
-            name,
-            label,
-            balance,
-            address,
-            account_balance,
-            account_name,
-            bank_name,
-            account_number
-          }
-        })
-      }
+      onPress={() => handlePress()}
     >
       <Image source={image} style={styles.icon} />
       <View style={styles.textContainer}>

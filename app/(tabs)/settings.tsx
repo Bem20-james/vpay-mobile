@@ -62,7 +62,7 @@ const SettingsScreen: React.FC = () => {
               <SettingItem
                 title="Account Verification"
                 hasChevron
-                onPress={() => console.log("Manage Devices pressed")}
+                onPress={() => router.push("/verification")}
                 iconColor="#218DC9"
               />
 

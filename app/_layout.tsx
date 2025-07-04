@@ -72,6 +72,10 @@ export default function RootLayout() {
                   name="transactions"
                   options={{ headerShown: false }}
                 />
+                <Stack.Screen
+                  name="verification"
+                  options={{ headerShown: false }}
+                />
 
                 <Stack.Screen name="+not-found" />
               </Stack>

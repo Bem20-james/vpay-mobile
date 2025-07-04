@@ -6,14 +6,15 @@ import React, {
   useCallback,
   useMemo,
   useRef,
-  PropsWithChildren,
+  PropsWithChildren
 } from "react";
 import { getData, removeData, storeData } from "@/utils/store";
 
-interface User {
+export interface User {
   id?: number;
   firstname?: string;
   lastname?: string;
+  username?: string;
   email?: string;
   phone?: string;
   role?: string;
@@ -22,7 +23,6 @@ interface User {
   expiresAt?: number;
   [key: string]: any;
 }
-
 
 interface UserContextType {
   user: User | null;
@@ -129,12 +129,15 @@ export default function UserContextProvider({ children }: PropsWithChildren) {
     }
   }, [user, updateUser, clearUser]);
 
-  const config = useMemo(() => ({
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: user?.accessToken ? `Bearer ${user.accessToken}` : ""
-    }
-  }), [user?.accessToken]);
+  const config = useMemo(
+    () => ({
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: user?.accessToken ? `Bearer ${user.accessToken}` : ""
+      }
+    }),
+    [user?.accessToken]
+  );
 
   useEffect(() => {
     fetchUser();
@@ -169,32 +172,33 @@ export default function UserContextProvider({ children }: PropsWithChildren) {
     clearUser
   ]);
 
-  const contextValue = useMemo((): UserContextType => ({
-    user,
-    config,
-    isUserLoaded,
-    isAuthenticated,
-    isTokenExpired,
-    fetchUser,
-    updateUser,
-    clearUser,
-    refreshUserToken
-  }), [
-    user,
-    config,
-    isUserLoaded,
-    isAuthenticated,
-    isTokenExpired,
-    fetchUser,
-    updateUser,
-    clearUser,
-    refreshUserToken
-  ]);
+  const contextValue = useMemo(
+    (): UserContextType => ({
+      user,
+      config,
+      isUserLoaded,
+      isAuthenticated,
+      isTokenExpired,
+      fetchUser,
+      updateUser,
+      clearUser,
+      refreshUserToken
+    }),
+    [
+      user,
+      config,
+      isUserLoaded,
+      isAuthenticated,
+      isTokenExpired,
+      fetchUser,
+      updateUser,
+      clearUser,
+      refreshUserToken
+    ]
+  );
 
   return (
-    <UserContext.Provider value={contextValue}>
-      {children}
-    </UserContext.Provider>
+    <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>
   );
 }
 

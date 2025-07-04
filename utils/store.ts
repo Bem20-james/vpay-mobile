@@ -12,7 +12,7 @@ export interface StorageSuccess<T = any> {
 
 export type StorageResult<T = any> = StorageSuccess<T> | StorageError;
 
-// Store data with better error handling and type safety
+// Store data
 export const storeData = async <T = any>(
   key: string, 
   value: T
@@ -30,7 +30,7 @@ export const storeData = async <T = any>(
   }
 };
 
-// Get data with better error handling and type safety
+// Get data
 export const getData = async <T = any>(key: string): Promise<StorageResult<T | null>> => {
   try {
     const value = await AsyncStorage.getItem(key);
@@ -55,7 +55,6 @@ export const getData = async <T = any>(key: string): Promise<StorageResult<T | n
   }
 };
 
-// Remove data with better error handling
 export const removeData = async (key: string): Promise<StorageResult<null>> => {
   try {
     await AsyncStorage.removeItem(key);

@@ -1,18 +1,24 @@
-import React from "react";
+import React, { useState, useRef, useMemo, useCallback } from "react";
 import {
   View,
   ScrollView,
   StyleSheet,
-  ImageSourcePropType
+  ImageSourcePropType,
+  Dimensions
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider
+} from "@gorhom/bottom-sheet";
 import { ThemedText } from "@/components/ThemedText";
 import Navigator from "@/components/Navigator";
 import images from "@/constants/Images";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
-import { useState } from "react";
 import { PaymentOption } from "@/components/PaymentOption";
 import { useFetchUserAssets } from "@/hooks/useUser";
+import { MotiView } from "moti";
+import AccountBottomSheet from "@/components/BottomSheets/Accounts";
 
 interface FiatAccount {
   currency_label: string;
@@ -46,26 +52,52 @@ const cryptoImages: { [key: string]: ImageSourcePropType } = {
 const Accounts: React.FC = () => {
   const colorScheme = useColorScheme();
   const backgroundColor = colorScheme === "dark" ? "#000000" : "#EEF3FB";
-  const [isLoading, setIsLoading] = useState(true);
   const boxBg = colorScheme === "dark" ? "#161622" : "#FFFFFF";
-  const [showFiatModal, setShowFiatModal] = useState(false);
-  const [showCryptoModal, setshowCryptoModal] = useState(false);
-  const { assets } = useFetchUserAssets();
+  const { assets, loading } = useFetchUserAssets();
 
-  console.log("Assets:", assets);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const [selectedItem, setSelectedItem] = useState<
+    FiatAccount | CryptoAccount | null
+  >(null);
+  const [selectedType, setSelectedType] = useState<"fiat" | "crypto" | null>(
+    null
+  );
+
+  const handleItemPress = useCallback((item: any, type: "fiat" | "crypto") => {
+    setSelectedItem(item);
+    setSelectedType(type);
+    bottomSheetRef.current?.present();
+  }, []);
+
+  const renderSkeleton = () => (
+    <MotiView
+      from={{ opacity: 0.3 }}
+      animate={{ opacity: 1 }}
+      transition={{ loop: true, type: "timing", duration: 800 }}
+      style={styles.skeletonContainer}
+    >
+      <View style={styles.skeletonCircle} />
+      <View style={styles.skeletonLines}>
+        <View style={styles.skeletonLineShort} />
+        <View style={styles.skeletonLineLong} />
+      </View>
+    </MotiView>
+  );
 
   return (
-    <SafeAreaView
-      style={[styles.safeArea, { backgroundColor: backgroundColor }]}
-    >
+    <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Navigator title="Accounts" />
 
         <View style={styles.content}>
-          {/* Fiat Accounts Section */}
           <ThemedText style={styles.sectionHeader}>FIAT CURRENCY</ThemedText>
-          {isLoading
-            ? assets?.fiat?.map((item: FiatAccount, index: number) => (
+          {loading
+            ? Array(2)
+                .fill(0)
+                .map((_, i) => (
+                  <View key={`fiat-skeleton-${i}`}>{renderSkeleton()}</View>
+                ))
+            : assets?.fiat?.map((item: FiatAccount, index: number) => (
                 <PaymentOption
                   bgColor={boxBg}
                   key={`fiat-${index}`}
@@ -78,14 +110,18 @@ const Accounts: React.FC = () => {
                   account_name={item.account_name}
                   bank_name={item.bank_name}
                   account_number={item.account_number}
+                  handlePress={() => handleItemPress(item, "fiat")}
                 />
-              ))
-            : null}
+              ))}
 
-          {/* Crypto Accounts Section */}
           <ThemedText style={styles.sectionHeader}>CRYPTOCURRENCY</ThemedText>
-          {isLoading
-            ? assets?.crypto?.map((item: CryptoAccount, index: number) => (
+          {loading
+            ? Array(2)
+                .fill(0)
+                .map((_, i) => (
+                  <View key={`crypto-skeleton-${i}`}>{renderSkeleton()}</View>
+                ))
+            : assets?.crypto?.map((item: CryptoAccount, index: number) => (
                 <PaymentOption
                   bgColor={boxBg}
                   key={`crypto-${index}`}
@@ -96,10 +132,15 @@ const Accounts: React.FC = () => {
                   price={item.price}
                   type="crypto"
                   address={item.address}
+                  handlePress={() => handleItemPress(item, "crypto")}
                 />
-              ))
-            : null}
+              ))}
         </View>
+        <AccountBottomSheet
+          ref={bottomSheetRef}
+          selectedItem={selectedItem}
+          selectedType={selectedType}
+        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -125,5 +166,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     fontSize: 14,
     fontWeight: "600"
+  },
+  skeletonContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 10,
+    paddingHorizontal: 10
+  },
+  skeletonCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#e0e0e0",
+    marginRight: 10
+  },
+  skeletonLines: {
+    flex: 1
+  },
+  skeletonLineShort: {
+    width: "40%",
+    height: 10,
+    backgroundColor: "#e0e0e0",
+    marginBottom: 5
+  },
+  skeletonLineLong: {
+    width: "80%",
+    height: 10,
+    backgroundColor: "#e0e0e0"
   }
 });

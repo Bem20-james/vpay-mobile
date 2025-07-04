@@ -23,7 +23,7 @@ import QuickActionsSection from "@/components/QuickAction";
 import RecentTransaction from "@/components/RecentTransactions";
 import { quickActions, billOptions } from "@/assets/data";
 import { trnxHistory } from "@/assets/data";
-import OptionsBottomSheet from "@/components/BottomSheets/options";
+import OptionsBottomSheet from "@/components/BottomSheets/Options";
 import StickyHeader from "@/components/StickyHeader";
 import { useUser } from "@/contexts/UserContexts";
 

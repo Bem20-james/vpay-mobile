@@ -5,7 +5,7 @@ import {
   ActivityIndicator,
   StyleSheet
 } from "react-native";
-import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
+import BottomSheet from "@gorhom/bottom-sheet";
 import { Portal } from "@gorhom/portal";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { ThemedText } from "../ThemedText";

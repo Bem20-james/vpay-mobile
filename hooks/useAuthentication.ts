@@ -433,7 +433,8 @@ const useVerifyLogin = () => {
           expiresAt,
         };
         await updateUser(userData);
-        console.log("User data:", userData);
+        await storeData("lastUser", user.email);
+        await storeData("user_" + user.email, userData);
         router.push("/(tabs)/home");
       }
     } catch (err: any) {

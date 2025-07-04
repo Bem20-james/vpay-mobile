@@ -40,6 +40,7 @@
     "expo-web-browser": "~14.0.2",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.511.0",
+    "moti": "^0.30.0",
     "react-native": "0.76.9",
     "react-native-confirmation-code-field": "^7.6.1",
     "react-native-country-flag": "^2.0.2",

@@ -13,7 +13,7 @@ import { useFetchCountries } from "@/hooks/useGeneral";
 import { useRegister } from "@/hooks/useAuthentication";
 import OtpVerification from "./otp-verification";
 import { FontAwesome } from "@expo/vector-icons";
-import CountryBottomSheet from "@/components/BottomSheets/countries";
+import CountryBottomSheet from "@/components/BottomSheets/Countries";
 import { CountryItem } from "@/components/FormFields";
 
 const Register = () => {
