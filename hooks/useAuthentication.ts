@@ -4,8 +4,9 @@ import { useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 import { SERVER_BASE_URL } from "../constants/Paths";
 import { useUser } from "@/contexts/UserContexts";
-import { jwtDecode } from 'jwt-decode';
 import { storeData } from "@/utils/store";
+import JWT from 'expo-jwt';
+
 
 interface JwtPayload {
   exp: number;
@@ -423,7 +424,7 @@ const useVerifyLogin = () => {
       if (response.status === 200) {
 
         const { token, user } = result.result;
-        const tokenPayload: JwtPayload = jwtDecode(token);
+        const tokenPayload: JwtPayload = JWT.decode(token, "");
         const expiresAt = tokenPayload.exp * 1000;
 
         const userData = {

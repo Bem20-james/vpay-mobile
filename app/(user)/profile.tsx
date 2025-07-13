@@ -16,8 +16,9 @@ import { useUser } from "@/contexts/UserContexts";
 import images from "@/constants/Images";
 import { styles } from "@/styles/users";
 import { useFetchAuthUser } from "@/hooks/useUser";
+import VerificationBtmSheet from "@/components/BottomSheets/Verification";
 
-const Option = ({
+export const Option = ({
   title,
   label,
   hasSwitch,
@@ -28,7 +29,10 @@ const Option = ({
   textColor,
   icon,
   iconColor,
-  bgColor = "#F2F2F7"
+  iconBgColor = "#F2F2F7",
+  backgroundColor,
+  titleStyle = 18,
+  image
 }: {
   title: string;
   label?: string;
@@ -40,24 +44,32 @@ const Option = ({
   textColor?: string;
   icon?: any;
   iconColor?: string;
-  bgColor?: string;
+  iconBgColor?: string;
+  backgroundColor?: string;
+  titleStyle?: any;
+  image?: any;
 }) => (
   <TouchableOpacity
-    style={styles.optionItem}
+    style={[styles.optionItem, { backgroundColor: backgroundColor }]}
     onPress={onPress}
     disabled={hasSwitch}
   >
     <View style={styles.optionLeft}>
       {icon && (
-        <View style={[styles.iconContainer, { backgroundColor: bgColor }]}>
+        <View style={[styles.iconContainer, { backgroundColor: iconBgColor }]}>
           <Ionicons name={icon} size={20} color={iconColor} />
+        </View>
+      )}
+      {image && (
+        <View style={[styles.iconContainer, { backgroundColor: iconBgColor }]}>
+          <Image source={image} width={50} height={50} />
         </View>
       )}
       <View>
         <ThemedText
           lightColor={textColor ?? "#252525"}
           darkColor={textColor ?? "#FFFFFF"}
-          style={styles.optionTitle}
+          style={[titleStyle, styles.optionTitle]}
         >
           {title}
         </ThemedText>
@@ -96,6 +108,7 @@ const Profile = () => {
   const [securityLock, setSecurityLock] = useState(false);
   const [transactionPin, setTransactionPin] = useState(false);
   const { userData } = useFetchAuthUser();
+  const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
 
   return (
     <SafeAreaView
@@ -121,7 +134,7 @@ const Profile = () => {
             darkColor="#EEF3FB"
             style={styles.heading}
           >
-            {userData?.firstname + " " + userData?.lastname}
+            {userData?.firstname + " " + userData?.lastname || "John Doe"}
           </ThemedText>
           <View style={[styles.heroBox, { backgroundColor: boxBg }]}>
             <View>
@@ -137,7 +150,7 @@ const Profile = () => {
                 darkColor="#EEF3FB"
                 style={styles.label}
               >
-                {userData?.username}
+                {userData?.username || "johndoe123"}
               </ThemedText>
             </View>
             <MaterialIcons
@@ -163,23 +176,27 @@ const Profile = () => {
             <Option
               title="Verification"
               hasChevron
-              onPress={() => console.log("Change VPay PIN pressed")}
+              onPress={() => setIsBottomSheetVisible(true)}
+              //onPress={() => console.log("Change VPay PIN pressed")}
+
               label="verify your identity"
             />
             <Option
-              title={userData?.firstname + " " + userData?.lastname}
+              title={
+                userData?.firstname + " " + userData?.lastname || "John Doe"
+              }
               label="Account Name"
               hasChevron
               onPress={() => console.log("Change VPay PIN pressed")}
             />
             <Option
-              title={"+" + userData?.phone}
+              title={"+" + userData?.phone || "0123456789"}
               label="Phone Number"
               hasChevron
               onPress={() => console.log("Change VPay PIN pressed")}
             />
             <Option
-              title={userData?.email}
+              title={userData?.email || "myemail@gmail.com"}
               label="Email Address"
               hasChevron
               onPress={() => console.log("Change VPay PIN pressed")}
@@ -216,6 +233,11 @@ const Profile = () => {
             />
           </View>
         </View>
+        <VerificationBtmSheet
+          isVisible={isBottomSheetVisible}
+          onClose={() => setIsBottomSheetVisible(false)}
+          title="Pay bills"
+        />
       </ScrollView>
     </SafeAreaView>
   );

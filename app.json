@@ -1,54 +1,69 @@
 {
-  "expo": {
-    "name": "Versee-pay",
-    "slug": "versee-pay",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/logo-dark.png",
-    "scheme": "versee-pay",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.jimie.verseepay",
-      "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
-      }
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/logo-dark.png",
+  "name": "Versee-pay",
+  "slug": "versee-pay",
+  "version": "1.0.0",
+  "orientation": "portrait",
+  "icon": "./assets/images/logo-dark.png",
+  "scheme": "versee-pay",
+  "userInterfaceStyle": "automatic",
+  "newArchEnabled": true,
+  "plugins": [
+    "expo-router",
+    [
+      "expo-splash-screen",
+      {
+        "image": "./assets/images/splash-image.png",
+        "imageWidth": 200,
+        "resizeMode": "contain",
         "backgroundColor": "#ffffff"
-      },
-      "package": "com.jimie.verseepay"
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/logo-dark.png"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-image.png",
-          "imageWidth": "200",
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ]
-    ],
-    "experiments": {
-      "typedRoutes": true
-    },
-    "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "92690080-ed0f-457f-a75a-4ffd76433573"
       }
+    ],
+    [
+      "expo-camera",
+      {
+        "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+        "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+        "recordAudioAndroid": true
+      }
+    ]
+  ],
+  "description": null,
+  "sdkVersion": "52.0.0",
+  "platforms": ["ios", "android", "web"],
+  "ios": {
+    "supportsTablet": true,
+    "bundleIdentifier": "com.jimie.verseepay",
+    "infoPlist": {
+      "ITSAppUsesNonExemptEncryption": false
     }
+  },
+  "android": {
+    "package": "com.jimie.verseepay",
+    "permissions": [
+      "android.permission.CAMERA",
+      "android.permission.RECORD_AUDIO"
+    ],
+    "adaptiveIcon": {
+      "foregroundImage": "./assets/images/logo-dark.png",
+      "backgroundColor": "#ffffff"
+    }
+  },
+  "web": {
+    "bundler": "metro",
+    "favicon": "./assets/images/logo-dark.png"
+  },
+  "experiments": {
+    "typedRoutes": true
+  },
+  "extra": {
+    "eas": {
+      "projectId": "92690080-ed0f-457f-a75a-4ffd76433573"
+    },
+    "router": {
+      "origin": false
+    }
+  },
+  "androidStatusBar": {
+    "backgroundColor": "#ffffff"
   }
 }

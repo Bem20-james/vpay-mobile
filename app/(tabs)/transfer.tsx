@@ -33,7 +33,7 @@ const TransferScreen: React.FC = () => {
   }) => {
     return (
       <TouchableOpacity
-        style={[styles.optionContainer, {backgroundColor: bgColor}]}
+        style={[styles.optionContainer, { backgroundColor: bgColor }]}
         onPress={() => router.push(route as any)}
         activeOpacity={0.7}
       >
@@ -50,10 +50,7 @@ const TransferScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
           <Navigator title="Send Money" showBackIcon={false} />
 
@@ -74,27 +71,27 @@ const TransferScreen: React.FC = () => {
             <TransferOption
               label="Vpay Tag"
               icon="call-made"
-              route="/international-transfer"
+              route="/vpay-tag"
             />
             <TransferOption
               label="Local Bank Transfer"
               icon="account-balance"
-              route="/schedule-transfer"
+              route="/local-bank"
             />
             <TransferOption
               label="Mobile money"
               icon="send-to-mobile"
-              route="/schedule-transfer"
+              route="/mobile-money"
             />
             <TransferOption
               label="International Transfer"
               icon="public"
-              route="/schedule-transfer"
+              route="/international"
             />
             <TransferOption
               label="Cryptocurrency"
               icon="currency-bitcoin"
-              route="/schedule-transfer"
+              route="/crypto"
             />
           </View>
 
@@ -117,18 +114,14 @@ const TransferScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    marginHorizontal: 10
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingBottom: 20
   },
   container: {
-    flex: 1
+    marginHorizontal: 7,
+    marginTop: 10
   },
   infoSection: {
-    paddingHorizontal: 4,
-    paddingVertical: 10
+    paddingHorizontal: 2,
+    paddingVertical: 5
   },
   infoText: {
     fontSize: 13,

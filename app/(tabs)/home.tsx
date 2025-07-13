@@ -23,8 +23,8 @@ import QuickActionsSection from "@/components/QuickAction";
 import RecentTransaction from "@/components/RecentTransactions";
 import { quickActions, billOptions } from "@/assets/data";
 import { trnxHistory } from "@/assets/data";
-import OptionsBottomSheet from "@/components/BottomSheets/Options";
 import StickyHeader from "@/components/StickyHeader";
+import OptionsBottomSheet from "@/components/BottomSheets/Options";
 import { useUser } from "@/contexts/UserContexts";
 
 export default function HomeScreen() {
@@ -54,7 +54,6 @@ export default function HomeScreen() {
       ) => {
         const offsetY = event.nativeEvent.contentOffset.y;
 
-        // Show sticky header when scrolled past 60px
         if (offsetY > 60) {
           Animated.parallel([
             Animated.timing(headerOpacity, {

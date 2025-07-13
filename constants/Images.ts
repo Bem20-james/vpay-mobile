@@ -14,6 +14,9 @@ import gotv from "../assets/images/gotv.png";
 import showmax from "../assets/images/showmax.png";
 import matic from "../assets/images/matic.png";
 import tether from "../assets/images/tether.png";
+import tier1 from "../assets/images/tier1.png";
+import tier2 from "../assets/images/tier2.png";
+import tier3 from "../assets/images/tier3.png";
 
 const images = {
   onboard1,
@@ -31,7 +34,10 @@ const images = {
   dstv,
   gotv,
   matic,
-  tether
+  tether,
+  tier1,
+  tier2,
+  tier3,
 };
 
 export default images;

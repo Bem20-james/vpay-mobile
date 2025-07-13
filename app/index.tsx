@@ -14,9 +14,9 @@ export default function Index() {
       const hasOnboarded = await getData("hasOnboarded");
 
       if (hasOnboarded) {
-        router.replace("/(auth)/login-index"); // Main home screen
+        router.replace("/(auth)/login-index");
       } else {
-        router.replace("/onboarding"); // Your beautiful onboarding screen
+        router.replace("/onboarding");
       }
 
       setLoading(false);

@@ -181,11 +181,11 @@ const IndexLogin = () => {
 
           <CustomButton
             title="Login"
-            //handlePress={() => router.push("/(tabs)/home")}
-            handlePress={() => setShowModal(true)}
+            handlePress={() => router.push("/(tabs)/home")}
+            //handlePress={() => setShowModal(true)}
             btnStyles={{ width: "100%", marginTop: 100 }}
             isLoading={isLoading}
-            disabled={!password}
+            //disabled={!password}
           />
 
           <View style={styles.btmContent}>
