@@ -66,15 +66,16 @@ export const styles = StyleSheet.create({
     fontSize: 13
   },
   userField: {
+    width: "100%",
     display: "flex",
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
     gap: 7,
-    borderWidth: 0.5,
+    borderWidth: 0.8,
     borderColor: "#9B9B9B",
     borderRadius: 100,
-    paddingVertical: 10,
+    paddingVertical: 7,
     paddingHorizontal: 8,
     marginTop: 60
   },

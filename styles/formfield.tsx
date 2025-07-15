@@ -2,17 +2,15 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   inputField: {
-    borderWidth: 0.87,
-    borderRadius: 100,
+    borderWidth: 0.78,
+    borderRadius: 15,
     width: "100%",
-    color: "#9B9B9B",
     paddingHorizontal: 12,
     justifyContent: "space-between",
     flexDirection: "row",
     alignItems: "center"
   },
   input: {
-    color: "#000000",
     fontFamily: "Inter-Regular",
     flex: 1,
     height: "100%",

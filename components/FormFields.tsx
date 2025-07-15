@@ -80,12 +80,12 @@ const FormField = ({
   }, [defaultCountry, selectedCountry]);
 
   const colorScheme = useColorScheme();
-  const border = colorScheme === "dark" ? "#E7E7E7" : "#E7E7E7";
+  const border = colorScheme === "dark" ? "#9B9B9B" : "#E7E7E7";
   const txtColor = colorScheme === "dark" ? "#FFFFFF" : "#000000";
 
   return (
     <ThemedView style={[otherStyles, { backgroundColor: DefaultTheme }]}>
-      <ThemedText type="default">{title}</ThemedText>
+      <ThemedText type="default" style={{marginLeft: 6}}>{title}</ThemedText>
       <ThemedView
         lightColor="transparent"
         darkColor="transparent"

@@ -137,7 +137,7 @@ const RecentTransfers: React.FC<Props> = ({ beneficiaries, recents }) => {
           >
             See more
           </ThemedText>
-          <Entypo name="chevron-small-right" size={20} color={"#218DC9"} />
+          <Entypo name="chevron-small-right" size={20} color={"#218DC9"} style={{marginTop: 1}} />
         </Pressable>
       </View>
     </View>
@@ -204,9 +204,8 @@ const styles = StyleSheet.create({
   },
   moreBtn: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 7
+    paddingVertical: 20
   },
   viewAllText: {
     fontFamily: "Inter-SemiBold",

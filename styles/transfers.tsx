@@ -1,7 +1,6 @@
-import {StyleSheet} from "react-native"
+import { StyleSheet } from "react-native";
 export const TransferStyles = StyleSheet.create({
-
- safeArea: {
+  safeArea: {
     flex: 1,
     paddingHorizontal: 7
   },
@@ -75,6 +74,14 @@ export const TransferStyles = StyleSheet.create({
   },
   handle: {
     fontSize: 13,
-    fontFamily: "Questrial",
+    fontFamily: "Questrial"
+  },
+  inputField: {
+    borderBottomWidth: 1.5,
+    width: "100%",
+    paddingHorizontal: 5,
+    justifyContent: "space-between",
+    flexDirection: "row",
+    alignItems: "center"
   }
-})
+});
