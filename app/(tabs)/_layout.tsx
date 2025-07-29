@@ -35,7 +35,7 @@ export default function TabLayout() {
         <ThemedText
           style={{
             fontFamily: focused ? "Inter-SemiBold" : "Inter-Regular",
-            fontSize: 9,
+            fontSize: 10,
             color: color
           }}
         >
@@ -134,6 +134,7 @@ const styles = StyleSheet.create({
   items: {
     alignItems: "center",
     justifyContent: "center",
-    gap: 2
+    gap: 2,
+    width: 50
   }
 });

@@ -19,10 +19,11 @@ import { PaymentOption } from "@/components/PaymentOption";
 import { useFetchUserAssets } from "@/hooks/useUser";
 import { MotiView } from "moti";
 import AccountBottomSheet from "@/components/BottomSheets/Accounts";
+import { Colors } from "@/constants/Colors";
 
 interface FiatAccount {
-  currency_label: string;
-  currency_name: string;
+  fiat_currency_label: string;
+  fiat_currency_name: string;
   balance: string;
   account_balance: string;
   account_name: string;
@@ -51,8 +52,8 @@ const cryptoImages: { [key: string]: ImageSourcePropType } = {
 
 const Accounts: React.FC = () => {
   const colorScheme = useColorScheme();
-  const backgroundColor = colorScheme === "dark" ? "#000000" : "#EEF3FB";
-  const boxBg = colorScheme === "dark" ? "#161622" : "#FFFFFF";
+  const backgroundColor = colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const boxBg = colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
   const { assets, loading } = useFetchUserAssets();
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
@@ -73,7 +74,7 @@ const Accounts: React.FC = () => {
     <MotiView
       from={{ opacity: 0.3 }}
       animate={{ opacity: 1 }}
-      transition={{ loop: true, type: "timing", duration: 800 }}
+      transition={{ loop: true, type: "timing", duration: 1000 }}
       style={styles.skeletonContainer}
     >
       <View style={styles.skeletonCircle} />
@@ -101,9 +102,9 @@ const Accounts: React.FC = () => {
                 <PaymentOption
                   bgColor={boxBg}
                   key={`fiat-${index}`}
-                  name={item.currency_code}
-                  label={item.currency_name}
-                  image={fiatImages[item.currency_name] || images.logodark}
+                  name={item.fiat_currency_name}
+                  label={item.fiat_currency_label}
+                  image={fiatImages[item.fiat_currency_name] || images.logodark}
                   balance={item.balance}
                   type="fiat"
                   account_balance={item.account_balance}
@@ -157,14 +158,14 @@ const styles = StyleSheet.create({
   },
   content: {
     marginHorizontal: 10,
-    marginTop: 10
   },
   sectionHeader: {
     color: "#999",
-    marginTop: 20,
+    marginTop: 10,
     marginBottom: 10,
     paddingHorizontal: 5,
-    fontSize: 14,
+    fontSize: 15,
+    fontFamily: "Inter-SemiBold",
     fontWeight: "600"
   },
   skeletonContainer: {
@@ -177,7 +178,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#e0e0e0",
+    backgroundColor: Colors.dark.primaryBgDark,
     marginRight: 10
   },
   skeletonLines: {
@@ -186,12 +187,12 @@ const styles = StyleSheet.create({
   skeletonLineShort: {
     width: "40%",
     height: 10,
-    backgroundColor: "#e0e0e0",
+    backgroundColor: Colors.dark.primaryBgDark,
     marginBottom: 5
   },
   skeletonLineLong: {
     width: "80%",
     height: 10,
-    backgroundColor: "#e0e0e0"
+    backgroundColor: Colors.dark.primaryBgDark,
   }
 });

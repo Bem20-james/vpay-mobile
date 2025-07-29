@@ -24,6 +24,7 @@ import {
   useResetPwd
 } from "@/hooks/useAuthentication";
 import Toast from "react-native-toast-message";
+import { Colors } from "@/constants/Colors";
 
 interface OtpVerificationProps {
   email?: string;
@@ -42,7 +43,8 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
 }) => {
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const bgColor = colorScheme === "dark" ? "#161622" : "#ffffff";
+  const bgColor =
+    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
   const [otp, setOtp] = useState("");
   const [isResending, setIsResending] = useState(false);
   const [countdown, setCountdown] = useState(0);

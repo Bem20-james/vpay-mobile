@@ -12,6 +12,7 @@ import { ThemedText } from "../ThemedText";
 import { ThemedView } from "../ThemedView";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { Colors } from "@/constants/Colors";
 
 export type OptionItem = {
   id?: number;
@@ -55,18 +56,19 @@ const OptionsBottomSheet = ({
         enablePanDownToClose
         onClose={onClose}
         backgroundStyle={{
-          backgroundColor: colorScheme === "dark" ? "#1A1A1A" : "#FFFFFF"
+          backgroundColor:
+            colorScheme === "dark"
+              ? Colors.dark.primaryBgDark
+              : Colors.light.accentBg
         }}
       >
-        <ThemedView style={styles.sheetHeader}>
-          <ThemedText
-            lightColor="#252525"
-            darkColor="#F8F8F8"
-            style={styles.title}
-          >
-            {title}
-          </ThemedText>
-        </ThemedView>
+        <ThemedText
+          style={styles.title}
+          lightColor="#252525"
+          darkColor="#F8F8F8"
+        >
+          {title}
+        </ThemedText>
         <BottomSheetFlatList
           data={data}
           keyExtractor={(item, index) =>
@@ -139,7 +141,10 @@ const styles = StyleSheet.create({
   title: {
     textAlign: "center",
     fontFamily: "Inter-Bold",
-    fontSize: 16
+    fontSize: 16,
+    borderBottomWidth: 0.7,
+    borderBottomColor: "#9B9B9B",
+    paddingBottom: 5
   },
   sheetItem: {
     paddingVertical: 14,

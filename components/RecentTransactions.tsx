@@ -11,6 +11,7 @@ import { useRouter } from "expo-router";
 import { ThemedText } from "./ThemedText";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/constants/Colors";
 
 interface HistoryItem {
   id: string;
@@ -33,14 +34,14 @@ const RecentTransaction: React.FC<Props> = ({
 }) => {
   const router = useRouter();
   const colorScheme = useColorScheme();
-  const bgColor = colorScheme === "dark" ? "#161622" : "#ffffff";
+  const bgColor = colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
 
   return (
     <View style={styles.container}>
       <View style={styles.hero}>
         <ThemedText
-          lightColor="#9B9B9B"
-          darkColor="#9B9B9B"
+          lightColor={Colors.light.textGray}
+          darkColor={Colors.light.textGray}
           style={styles.title}
         >
           {title}

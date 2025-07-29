@@ -10,6 +10,7 @@ import { MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { ThemedText } from "./ThemedText";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/constants/Colors";
 
 interface TransferItem {
   label: string;
@@ -21,17 +22,25 @@ interface TransferItem {
   subtitle?: string;
 }
 
+export interface Beneficiaries {
+  label: string;
+  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  backgroundColor: string;
+  iconColor: string;
+  subtitle?: string;
+}
+
 interface Props {
   title?: string;
   recents: TransferItem[];
-  beneficiaries: TransferItem[];
+  beneficiaries: Beneficiaries[];
 }
 
 const RecentTransfers: React.FC<Props> = ({ beneficiaries, recents }) => {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
-  const [activeTab, setActiveTab] = useState<"Recents" | "Favourites">(
+  const [activeTab, setActiveTab] = useState<"Recents" | "Beneficiaries">(
     "Recents"
   );
   const data = activeTab === "Recents" ? recents : beneficiaries;
@@ -56,17 +65,17 @@ const RecentTransfers: React.FC<Props> = ({ beneficiaries, recents }) => {
         </Pressable>
 
         <Pressable
-          onPress={() => setActiveTab("Favourites")}
+          onPress={() => setActiveTab("Beneficiaries")}
           style={styles.tabWrapper}
         >
           <ThemedText
-            lightColor={activeTab === "Favourites" ? "#218DC9" : "#9B9B9B"}
-            darkColor={activeTab === "Favourites" ? "#218DC9" : "#9B9B9B"}
+            lightColor={activeTab === "Beneficiaries" ? "#218DC9" : "#9B9B9B"}
+            darkColor={activeTab === "Beneficiaries" ? "#218DC9" : "#9B9B9B"}
             style={styles.tabText}
           >
             Beneficiaries
           </ThemedText>
-          {activeTab === "Favourites" && (
+          {activeTab === "Beneficiaries" && (
             <View style={styles.activeTabIndicator} />
           )}
         </Pressable>
@@ -81,8 +90,9 @@ const RecentTransfers: React.FC<Props> = ({ beneficiaries, recents }) => {
               style={[
                 styles.itemContainer,
                 {
-                  borderBottomColor: isDark ? "#0a0a10" : "#F8F8F8",
-                  backgroundColor: isDark ? "#161622" : "#FFFFFF"
+                  backgroundColor: isDark
+                    ? Colors.dark.accentBg
+                    : Colors.light.accentBg
                 }
               ]}
               onPress={() => {}}
@@ -137,7 +147,12 @@ const RecentTransfers: React.FC<Props> = ({ beneficiaries, recents }) => {
           >
             See more
           </ThemedText>
-          <Entypo name="chevron-small-right" size={20} color={"#218DC9"} style={{marginTop: 1}} />
+          <Entypo
+            name="chevron-small-right"
+            size={20}
+            color={"#218DC9"}
+            style={{ marginTop: 1 }}
+          />
         </Pressable>
       </View>
     </View>

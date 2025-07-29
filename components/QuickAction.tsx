@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { ThemedText } from "./ThemedText";
 import { ThemedView } from "./ThemedView";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/constants/Colors";
 
 interface ActionItem {
   label: string;
@@ -21,12 +22,13 @@ interface Props {
 }
 
 const QuickActionsSection: React.FC<Props> = ({
-  title = "Quick actions",
+  title = "",
   actions
 }) => {
   const router = useRouter();
   const colorScheme = useColorScheme();
-  const bgColor = colorScheme === "dark" ? "#161622" : "#ffffff";
+  const bgColor =
+    colorScheme === "dark" ? Colors.light.primaryDark3 : "#ffffff";
 
   return (
     <View style={styles.container}>
@@ -78,19 +80,21 @@ const QuickActionsSection: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: 10,
-    marginTop: 15
+    marginHorizontal: 7,
   },
   title: {
-    marginBottom: 10,
     fontFamily: "Inter-Medium",
     fontWeight: 500,
     fontSize: 14,
     letterSpacing: 0
   },
   row: {
-    justifyContent: "space-between"
+    flex: 1,
+    justifyContent: "flex-start",
+    gap: 12,
+    marginRight: -10
   },
+
   actionBox: {
     width: "30%",
     aspectRatio: 1,

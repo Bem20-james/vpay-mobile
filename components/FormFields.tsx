@@ -7,6 +7,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import CountryFlag from "react-native-country-flag";
 import { styles } from "../styles/formfield";
+import { Colors } from "@/constants/Colors";
 
 export type CountryItem = {
   id?: number;
@@ -80,8 +81,8 @@ const FormField = ({
   }, [defaultCountry, selectedCountry]);
 
   const colorScheme = useColorScheme();
-  const border = colorScheme === "dark" ? "#9B9B9B" : "#E7E7E7";
-  const txtColor = colorScheme === "dark" ? "#FFFFFF" : "#000000";
+  const border = colorScheme === "dark" ? "#414141" : "#d7d7d7";
+  const txtColor = colorScheme === "dark" ? Colors.light.accentBg : Colors.dark.background;
 
   return (
     <ThemedView style={[otherStyles, { backgroundColor: DefaultTheme }]}>

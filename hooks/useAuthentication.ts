@@ -5,8 +5,7 @@ import Toast from "react-native-toast-message";
 import { SERVER_BASE_URL } from "../constants/Paths";
 import { useUser } from "@/contexts/UserContexts";
 import { storeData } from "@/utils/store";
-import JWT from 'expo-jwt';
-
+import {jwtDecode} from "jwt-decode";
 
 interface JwtPayload {
   exp: number;
@@ -413,7 +412,7 @@ const useVerifyLogin = () => {
       const result = response.data;
       console.log("Login data:", result);
 
-      if (!result || result.error) {
+      if (!result || result.code === 1) {
         Toast.show({
           type: "error",
           text1: result?.message || "Invalid response from server.",
@@ -424,7 +423,7 @@ const useVerifyLogin = () => {
       if (response.status === 200) {
 
         const { token, user } = result.result;
-        const tokenPayload: JwtPayload = JWT.decode(token, "");
+        const tokenPayload: JwtPayload = jwtDecode(token);
         const expiresAt = tokenPayload.exp * 1000;
 
         const userData = {
@@ -433,6 +432,7 @@ const useVerifyLogin = () => {
           refreshToken: null,
           expiresAt,
         };
+        console.log("logged userdata:", userData)
         await updateUser(userData);
         await storeData("lastUser", user.email);
         await storeData("user_" + user.email, userData);
@@ -443,7 +443,7 @@ const useVerifyLogin = () => {
         err.response?.data?.message || err.message || "Network or server error";
       setError(errMsg);
       Toast.show({ type: "error", text1: errMsg });
-      console.error("Error Response:", err.response?.data);
+      console.error("Error Response:", errMsg);
     } finally {
       setLoading(false);
     }
@@ -451,7 +451,6 @@ const useVerifyLogin = () => {
 
   return { verifyLogin, loading, error };
 };
-
 
 const useVerifyForgotPwd = () => {
   const [loading, setLoading] = useState(false);
@@ -489,7 +488,6 @@ const useVerifyForgotPwd = () => {
   
   return { verifyForgotPwd, loading, error };
 };
-
 
 function useLogout() {
   const { config } = useUser();

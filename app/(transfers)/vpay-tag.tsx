@@ -1,9 +1,4 @@
-import {
-  ScrollView,
-  View,
-  TextInput,
-  FlatList,
-} from "react-native";
+import { ScrollView, View, TextInput, FlatList } from "react-native";
 import React, { useState } from "react";
 import Navigator from "@/components/Navigator";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -13,7 +8,7 @@ import { StatusBar } from "expo-status-bar";
 import { ThemedText } from "@/components/ThemedText";
 import { Feather } from "@expo/vector-icons";
 import { TransferStyles as styles } from "@/styles/transfers";
-import { RenderItem as renderItem } from "@/components/RenderItems";
+import { RenderItem } from "@/components/RenderItems";
 
 export type Contact = {
   name: string;
@@ -79,9 +74,9 @@ const VpayTag = () => {
           <FlatList
             data={recent}
             keyExtractor={(item) => item.handle}
-            renderItem={renderItem}
+            renderItem={({ item }) => <RenderItem item={item} />}
             ListHeaderComponent={
-              <ThemedText style={styles.sectionHeader}>
+              <ThemedText style={[styles.sectionHeader, { marginTop: 5 }]}>
                 Recent Beneficiaries
               </ThemedText>
             }
@@ -91,14 +86,13 @@ const VpayTag = () => {
           <FlatList
             data={contacts}
             keyExtractor={(item) => item.handle}
-            renderItem={renderItem}
+            renderItem={({ item }) => <RenderItem item={item} />}
             ListHeaderComponent={
               <ThemedText style={[styles.sectionHeader, { marginTop: 15 }]}>
-                Vpay Contacts
+                Recent Beneficiaries
               </ThemedText>
             }
           />
-
         </View>
       </ScrollView>
       <StatusBar style="dark" backgroundColor={statusBarBg} />

@@ -9,13 +9,17 @@ import { useRouter } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 import { MaterialIcons } from "@expo/vector-icons";
 import { beneficiaries, recentActions } from "@/assets/data";
+import { Colors } from "@/constants/Colors";
+import { transferOptions } from "@/assets/data";
+import QuickActionsSection from "@/components/QuickAction";
 
 const TransferScreen: React.FC = () => {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
-  const backgroundColor = isDark ? "#000000" : "#EEF3FB";
-  const bgColor = isDark ? "#161619" : "#FFFFFF";
-
+  const backgroundColor = isDark
+    ? Colors.dark.background
+    : Colors.light.background;
+  const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
   const router = useRouter();
 
   const TransferOption = ({
@@ -62,36 +66,16 @@ const TransferScreen: React.FC = () => {
                 lightColor="#000000"
                 darkColor="#FFFFFF"
               >
-                15
+                10
               </ThemedText>
             </ThemedText>
           </View>
 
-          <View style={styles.options}>
-            <TransferOption
-              label="Vpay Tag"
-              icon="call-made"
-              route="/vpay-tag"
-            />
-            <TransferOption
-              label="Local Bank Transfer"
-              icon="account-balance"
-              route="/local-bank"
-            />
-            <TransferOption
-              label="Mobile money"
-              icon="send-to-mobile"
-              route="/mobile-money"
-            />
-            <TransferOption
-              label="International Transfer"
-              icon="public"
-              route="/international"
-            />
-            <TransferOption
-              label="Cryptocurrency"
-              icon="currency-bitcoin"
-              route="/crypto"
+          <View style={{ flex: 1 }}>
+            <QuickActionsSection
+              actions={transferOptions.map((action) => {
+                return action;
+              })}
             />
           </View>
 
@@ -113,15 +97,13 @@ const TransferScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   safeArea: {
-    flex: 1,
+    flex: 1
   },
   container: {
-    marginHorizontal: 7,
-    marginTop: 10
+    marginHorizontal: 7
   },
   infoSection: {
     paddingHorizontal: 2,
-    paddingVertical: 5
   },
   infoText: {
     fontSize: 13,

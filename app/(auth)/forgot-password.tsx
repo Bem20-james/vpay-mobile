@@ -12,6 +12,7 @@ import OtpVerification from "./otp-verification";
 import { useForgotPwd } from "@/hooks/useAuthentication";
 import Toast from "react-native-toast-message";
 import { useRouter } from "expo-router";
+import { Colors } from "@/constants/Colors";
 
 const isValidEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -20,7 +21,8 @@ const isValidEmail = (email: string): boolean => {
 
 const ForgotPassword = () => {
   const colorScheme = useColorScheme();
-  const bgColor = colorScheme === "dark" ? "#161622" : "#ffffff";
+  const bgColor =
+    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
   const { forgotPwd, error } = useForgotPwd();
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");

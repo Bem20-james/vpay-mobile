@@ -76,8 +76,6 @@ const Onboarding = () => {
 
         <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
           <ThemedText
-            darkColor="#000000"
-            lightColor="#000000"
             style={styles.skipTxt}
           >
             Skip
@@ -187,7 +185,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 20,
     letterSpacing: 0,
-    textAlign: "center"
+    textAlign: "center",
+    color: "#000000"
   },
   box: {
     width: "100%",

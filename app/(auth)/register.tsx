@@ -15,11 +15,13 @@ import OtpVerification from "./otp-verification";
 import { FontAwesome } from "@expo/vector-icons";
 import CountryBottomSheet from "@/components/BottomSheets/Countries";
 import { CountryItem } from "@/components/FormFields";
+import { Colors } from "@/constants/Colors";
 
 const Register = () => {
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const bgColor = colorScheme === "dark" ? "#161622" : "#ffffff";
+  const bgColor =
+    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
   const [stepTwoVisible, setStepTwoVisible] = useState(false);
   const { loading, countries } = useFetchCountries();
   const [isSubmitting, setIsSubmitting] = useState(false);

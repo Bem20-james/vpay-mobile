@@ -1,7 +1,8 @@
 import { ActionItem } from "@/components/QuickAction";
 import { HistoryItem } from "@/components/RecentTransactions";
-import { OptionItem } from "@/components/BottomSheets/options";
+import { OptionItem } from "@/components/BottomSheets/Options";
 import { TransferItem } from "@/components/RecentTransfers";
+import { Beneficiaries } from "@/components/RecentTransfers";
 
 export const quickActions: ActionItem[] = [
   {
@@ -224,7 +225,7 @@ export const billOptions: OptionItem[] = [
 export const recentActions: TransferItem[] = [
   {
     label: "JOHN DOE TRANSFER",
-    subtitle: "#98765432 Access Bank",
+    subtitle: "98765432 Access Bank",
     icon: "account",
     backgroundColor: "#10B981",
     iconColor: "#FFFFFF",
@@ -233,7 +234,7 @@ export const recentActions: TransferItem[] = [
   },
   {
     label: "GROCERY STORE PAYMENT",
-    subtitle: "234567890 MONIE POINT",
+    subtitle: "234567890 MONIEPOINT",
     icon: "store",
     backgroundColor: "#F59E0B",
     iconColor: "#FFFFFF",
@@ -241,8 +242,26 @@ export const recentActions: TransferItem[] = [
     timestamp: "Yesterday"
   },
   {
+    label: "JANE DOE PAYMENT",
+    subtitle: "234567890 OPAY",
+    icon: "store",
+    backgroundColor: "#F59E0B",
+    iconColor: "#FFFFFF",
+    amount: "13500",
+    timestamp: "Yesterday"
+  },
+  {
     label: "ELECTRICITY BILL",
-    subtitle: "AEDC Payment",
+    subtitle: "9876543210 Stanbic ibtc",
+    icon: "lightning-bolt",
+    backgroundColor: "#EF4444",
+    iconColor: "#FFFFFF",
+    amount: "8500",
+    timestamp: "3 days ago"
+  },
+    {
+    label: "ADVANZTEK",
+    subtitle: "0123456789 moniepoint",
     icon: "lightning-bolt",
     backgroundColor: "#EF4444",
     iconColor: "#FFFFFF",
@@ -251,32 +270,78 @@ export const recentActions: TransferItem[] = [
   }
 ];
 
-export const beneficiaries: TransferItem[] = [
+export const beneficiaries: Beneficiaries[] = [
   {
     label: "NANEES PHARMACY LTD",
     subtitle: "529966729 MONIE POINT",
     icon: "account",
     backgroundColor: "#3B82F6",
-    iconColor: "#FFFFFF",
-    amount: "",
-    timestamp: ""
+    iconColor: "#FFFFFF"
   },
   {
     label: "JAMES AONDOAKURA",
     subtitle: "2032207221 Momo Payment Service Bank",
     icon: "account",
     backgroundColor: "#10B981",
-    iconColor: "#FFFFFF",
-    amount: "",
-    timestamp: ""
+    iconColor: "#FFFFFF"
   },
   {
     label: "SARAH'S BOUTIQUE",
     subtitle: "876543210 First Bank",
     icon: "account",
     backgroundColor: "#8B5CF6",
-    iconColor: "#FFFFFF",
-    amount: "",
-    timestamp: ""
+    iconColor: "#FFFFFF"
+  },
+  {
+    label: "OYE OLAWALE",
+    subtitle: "876543210 STANBIC IBTC",
+    icon: "account",
+    backgroundColor: "#8B5CF6",
+    iconColor: "#FFFFFF"
+  },
+    {
+    label: "ADVANZTEK",
+    subtitle: "876543210 ACCESS BANK",
+    icon: "account",
+    backgroundColor: "#8B5CF6",
+    iconColor: "#FFFFFF"
+  }
+];
+
+export const transferOptions: ActionItem[] = [
+  {
+    label: "Vpay Tag",
+    icon: "call-made",
+    backgroundColor: "#ffe6f0",
+    iconColor: "#ff3d9b",
+    route: "/vpay-tag"
+  },
+  {
+    label: "Local Bank",
+    icon: "bank-transfer-in",
+    backgroundColor: "#ede1ff",
+    iconColor: "#9c27b0",
+    route: "/local-bank"
+  },
+  {
+    label: "Mobile money",
+    icon: "cellphone-dock",
+    backgroundColor: "#e0f7f4",
+    iconColor: "#00bfa5",
+    route: "/local-bank"
+  },
+  {
+    label: "International",
+    icon: "map-check",
+    backgroundColor: "#fff1eb",
+    iconColor: "#ff7043",
+    route: "/international"
+  },
+  {
+    label: "Cryptocurrency",
+    icon: "bitcoin",
+    route: "/crypto",
+    backgroundColor: "#fff1eb",
+    iconColor: "#ff7043",
   }
 ];

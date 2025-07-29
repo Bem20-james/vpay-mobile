@@ -109,6 +109,7 @@ const Profile = () => {
   const [transactionPin, setTransactionPin] = useState(false);
   const { userData } = useFetchAuthUser();
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
+  console.log("user:", userData)
 
   return (
     <SafeAreaView

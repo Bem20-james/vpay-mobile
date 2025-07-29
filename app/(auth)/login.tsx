@@ -14,6 +14,7 @@ import { useLogin } from "@/hooks/useAuthentication";
 import OtpVerification from "./otp-verification";
 import Toast from "react-native-toast-message";
 import OtpMediumModal from "@/components/OtpMediumModal";
+import { Colors } from "@/constants/Colors";
 
 const isValidEmail = (value: string): boolean =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -21,7 +22,8 @@ const isValidEmail = (value: string): boolean =>
 const Login = () => {
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const bgColor = colorScheme === "dark" ? "#161622" : "#ffffff";
+  const bgColor =
+    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
   const [form, setForm] = useState({ identifier: "", password: "" });
   const [errors, setErrors] = useState({ identifier: "", password: "" });
   const [showOtpScreen, setShowOtpScreen] = useState(false);

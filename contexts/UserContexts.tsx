@@ -61,29 +61,41 @@ export default function UserContextProvider({ children }: PropsWithChildren) {
         setUser(null);
       }
     } catch (error) {
-      console.error("❌ Failed to fetch user data:", error);
+      console.error("Failed to fetch user data:", error);
       setUser(null);
     } finally {
       setIsUserLoaded(true);
     }
   }, []);
 
+  // const updateUser = useCallback(async (data: User) => {
+  //   try {
+  //     await storeData("auth", data);
+  //     setUser(data);
+  //   } catch (error) {
+  //     console.error("Failed to update user data:", error);
+  //     throw error;
+  //   }
+  // }, []);
+
   const updateUser = useCallback(async (data: User) => {
-    try {
-      await storeData("auth", data);
-      setUser(data);
-    } catch (error) {
-      console.error("❌ Failed to update user data:", error);
-      throw error;
-    }
-  }, []);
+  try {
+    await storeData("auth", data);
+    setUser(data);
+    console.log("✅ user updated in context:", data);
+  } catch (error) {
+    console.error("❌ Failed to update user data:", error);
+    throw error;
+  }
+}, []);
+
 
   const clearUser = useCallback(async () => {
     try {
       await removeData("auth");
       setUser(null);
     } catch (error) {
-      console.error("❌ Failed to clear user data:", error);
+      console.error("Failed to clear user data:", error);
       throw error;
     }
   }, []);
@@ -121,7 +133,7 @@ export default function UserContextProvider({ children }: PropsWithChildren) {
       await updateUser(updatedUser);
       return true;
     } catch (error) {
-      console.error("❌ Failed to refresh token:", error);
+      console.error("Failed to refresh token:", error);
       await clearUser();
       return false;
     } finally {
@@ -205,7 +217,7 @@ export default function UserContextProvider({ children }: PropsWithChildren) {
 export function useUser(): UserContextType {
   const context = useContext(UserContext);
   if (!context) {
-    throw new Error("❗ useUser must be used within a UserContextProvider");
+    throw new Error("useUser must be used within a UserContextProvider");
   }
   return context;
 }

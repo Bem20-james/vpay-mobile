@@ -26,11 +26,12 @@ import { trnxHistory } from "@/assets/data";
 import StickyHeader from "@/components/StickyHeader";
 import OptionsBottomSheet from "@/components/BottomSheets/Options";
 import { useUser } from "@/contexts/UserContexts";
+import { Colors } from "@/constants/Colors";
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
-  const backgroundColor = colorScheme === "dark" ? "#000000" : "#EEF3FB";
-  const statusBarBg = colorScheme === "dark" ? "#000000" : "#EEF3FB";
+  const backgroundColor = colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const statusBarBg = colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
   const router = useRouter();
   const [showBalance, setShowBalance] = useState(false);
   const symbolNGN = getSymbolFromCurrency("NGN");

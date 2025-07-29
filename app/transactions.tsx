@@ -26,7 +26,7 @@ const TransactionScreen = ({}) => {
         {!showMsg ? (
           <FlatList
             data={trnxHistory2}
-            keyExtractor={(item) => item.label}
+            keyExtractor={(item) => item.id}
             numColumns={1}
             renderItem={({ item }) => (
               <TouchableOpacity

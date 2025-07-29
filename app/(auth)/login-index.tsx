@@ -15,11 +15,12 @@ import Toast from "react-native-toast-message";
 import OtpMediumModal from "@/components/OtpMediumModal";
 import { getData } from "@/utils/store";
 import { User } from "@/contexts/UserContexts";
+import { Colors } from "@/constants/Colors";
 
 const IndexLogin = () => {
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const bgColor = colorScheme === "dark" ? "#161622" : "#ffffff";
+  const bgColor = colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ identifier: "", password: "" });
   const [showOtpScreen, setShowOtpScreen] = useState(false);

@@ -13,6 +13,7 @@ import { useColorScheme } from "@/hooks/useColorScheme.web";
 import images from "@/constants/Images";
 import { styles } from "@/styles/home";
 import { useUser } from "@/contexts/UserContexts";
+import { Colors } from "@/constants/Colors";
 
 interface StickyHeaderProps {
   headerOpacity: Animated.Value;
@@ -37,8 +38,8 @@ export default function StickyHeader({
     transform: [{ translateY: headerTranslateY }],
     backgroundColor:
       colorScheme === "dark"
-        ? "rgba(22, 22, 34, 0.98)"
-        : "rgba(238, 243, 251, 0.95)",
+        ? Colors.dark.accentBg
+        : Colors.light.accentBg,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 7,
     shadowColor: colorScheme === "dark" ? "#FFFFFF" : "#000000",

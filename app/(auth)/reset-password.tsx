@@ -13,10 +13,12 @@ import { useSendResetPwdOTP } from "@/hooks/useAuthentication";
 import Toast from "react-native-toast-message";
 import OtpMediumModal from "@/components/OtpMediumModal";
 import OtpVerification from "./otp-verification";
+import { Colors } from "@/constants/Colors";
 
 const ResetPassword = () => {
   const colorScheme = useColorScheme();
-  const bgColor = colorScheme === "dark" ? "#161622" : "#ffffff";
+  const bgColor =
+    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
   const { sendResetOTP } = useSendResetPwdOTP();
   const { otp, email: rawEmail } = useLocalSearchParams();
 
