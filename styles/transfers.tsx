@@ -10,12 +10,14 @@ export const TransferStyles = StyleSheet.create({
   },
   searchContainer: {
     flexDirection: "row",
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#c9c8c8",
     borderRadius: 6,
     alignItems: "center",
     paddingHorizontal: 12,
     paddingVertical: 10,
-    marginBottom: 20
+    marginBottom: 10
   },
   searchIcon: {
     marginRight: 8
@@ -163,5 +165,34 @@ export const TransferStyles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "Inter-Regular",
     marginTop: 4
+  },
+    itemContainer: {
+    marginTop: 5,
+    padding: 10
+  },
+  itemContent: {
+    flexDirection: "row",
+    gap: 10,
+    alignItems: "center"
+  },
+  iconCircle: {
+    padding: 7,
+    borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#d8f0fdff"
+  },
+  flagItem: {
+    borderRadius: 2
+  },
+  txtBorder: {
+    borderBottomColor: "#9b9b9b",
+    borderBottomWidth: 0.5,
+    width: "100%",
+    paddingVertical: 5
+  },
+  primaryText: {
+    fontFamily: "Inter-Regular",
+    fontSize: 16
   }
 });

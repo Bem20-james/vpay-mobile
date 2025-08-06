@@ -12,13 +12,17 @@ import IdentityVerifiaction from "@/components/kyc/Identification";
 import { KycStyles as styles } from "@/styles/kyc";
 import images from "@/constants/Images";
 import AddressVerification from "@/components/kyc/AddressVerification";
+import { Colors } from "@/constants/Colors";
 
 const Verification = () => {
   const colorScheme = useColorScheme();
-  const backgroundColor = colorScheme === "dark" ? "#000000" : "#EEF3FB";
-  const bgColor = colorScheme === "dark" ? "#161622" : "#ffffff";
+  const backgroundColor =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const bgColor =
+    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
 
-  const statusBarBg = colorScheme === "dark" ? "#000000" : "#EEF3FB";
+  const statusBarBg =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
   const router = useRouter();
   const [showPersonalInfo, setShowPersonalInfo] = useState(false);
   const [showIdVerification, setShowIdVerification] = useState(false);

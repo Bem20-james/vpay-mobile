@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 export const SettingItem = ({
   title,
+  label,
   hasSwitch,
   switchValue,
   onSwitchChange,
@@ -17,6 +18,7 @@ export const SettingItem = ({
   itemStyles
 }: {
   title: string;
+  label?: string;
   hasSwitch?: boolean;
   switchValue?: boolean;
   onSwitchChange?: (value: boolean) => void;
@@ -39,21 +41,24 @@ export const SettingItem = ({
           <Ionicons name={icon} size={20} color={iconColor} />
         </View>
       )}
-      <ThemedText
-        lightColor="#252525"
-        darkColor="#FFFFFF"
-        style={styles.settingText}
-      >
-        {title}
-      </ThemedText>
+      <View style={{ flexDirection: "column" }}>
+        <ThemedText
+          lightColor="#252525"
+          darkColor="#FFFFFF"
+          style={styles.settingText}
+        >
+          {title}
+        </ThemedText>
+        {label && <ThemedText style={styles.label}>{label}</ThemedText>}
+      </View>
     </View>
 
     {hasSwitch && (
       <Switch
         value={switchValue}
         onValueChange={onSwitchChange}
-        trackColor={{ false: "#E5E5E5", true: "#34C759" }}
-        thumbColor={switchValue ? "#FFFFFF" : "#FFFFFF"}
+        trackColor={{ false: "#E5E5E5", true: "#80D1FF" }}
+        thumbColor={switchValue ? "#208BC9" : "#FFFFFF"}
         ios_backgroundColor="#E5E5E5"
       />
     )}
@@ -79,11 +84,18 @@ const styles = StyleSheet.create({
     flex: 1
   },
   settingText: {
-    fontFamily: "Inter",
+    fontFamily: "Inter-Bold",
     fontWeight: 600,
     fontSize: 14,
     lineHeight: 14,
     letterSpacing: 0
+  },
+  label: {
+    fontFamily: "Questrial",
+    fontWeight: 600,
+    fontSize: 12,
+    letterSpacing: 0,
+    color: "#9B9B9B"
   },
   iconContainer: {
     width: 32,

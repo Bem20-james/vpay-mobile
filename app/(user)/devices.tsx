@@ -7,6 +7,7 @@ import { ThemedText } from "@/components/ThemedText";
 import CustomButton from "@/components/CustomButton";
 import { useFetchSessions } from "@/hooks/useUser";
 import Navigator from "@/components/Navigator";
+import { Colors } from "@/constants/Colors";
 
 interface Device {
   id: string;
@@ -19,11 +20,11 @@ interface Device {
 
 const ManageDevices: React.FC = () => {
   const colorScheme = useColorScheme();
-  const boxBackgroundColor = colorScheme === "dark" ? "#000000" : "#EEF3FB";
+  const boxBackgroundColor =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
   const { sessions } = useFetchSessions();
 
   const handleLogoutDevice = (deviceId: string) => {
-    // Call API to revoke session
     console.log("Logging out device:", deviceId);
   };
 
@@ -33,7 +34,10 @@ const ManageDevices: React.FC = () => {
         style={[
           styles.deviceCard,
           {
-            backgroundColor: colorScheme === "dark" ? "#161622" : "#FFFFFF"
+            backgroundColor:
+              colorScheme === "dark"
+                ? Colors.dark.accentBg
+                : Colors.light.accentBg
           },
           item.isCurrentDevice && styles.currentDeviceHighlight
         ]}
@@ -72,7 +76,7 @@ const ManageDevices: React.FC = () => {
     <SafeAreaView
       style={[styles.safeArea, { backgroundColor: boxBackgroundColor }]}
     >
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
           <Navigator title="Manage Devices" showBackIcon={true} />
           <ThemedText style={styles.description}>
@@ -82,7 +86,9 @@ const ManageDevices: React.FC = () => {
             data={sessions}
             keyExtractor={(item) => item.id}
             renderItem={renderItem}
-            contentContainerStyle={{ paddingBottom: 20 }}
+            contentContainerStyle={{ paddingBottom: 10 }}
+            nestedScrollEnabled={true}
+            scrollEnabled={false}
           />
         </View>
       </ScrollView>

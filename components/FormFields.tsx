@@ -24,18 +24,21 @@ interface FormFieldProps {
   placeholder?: string;
   multiline?: boolean;
   keyboardType?: "default" | "numeric" | "email-address" | "phone-pad";
+  autoCapitalize?: "none" | "sentences" | "words" | "characters";
   maxLength?: number;
   inputStyles?: object;
   editable?: boolean;
   error?: string;
   isIcon?: boolean;
   isLeftIcon?: boolean;
+  isRightIcon?: boolean;
   iconName?: keyof typeof MaterialIcons.glyphMap;
   isDropdown?: boolean;
   onDropdownPress?: () => void;
   dropdownIcon?: React.ReactNode;
   isPhoneInput?: boolean;
   defaultCountry?: CountryItem;
+  helpText?: string;
 }
 
 const FormField = ({
@@ -46,6 +49,7 @@ const FormField = ({
   otherStyles,
   multiline = false,
   keyboardType = "default",
+  autoCapitalize = "none",
   maxLength,
   inputStyles,
   editable = true,
@@ -53,6 +57,7 @@ const FormField = ({
   onDropdownPress,
   isIcon,
   isLeftIcon = false, // Default to false for right icon
+  isRightIcon = false,
   iconName,
   error,
   dropdownIcon = (
@@ -64,6 +69,7 @@ const FormField = ({
     country_code: "NG",
     country_dial_code: "+234"
   },
+  helpText,
   ...props
 }: FormFieldProps) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -82,11 +88,16 @@ const FormField = ({
 
   const colorScheme = useColorScheme();
   const border = colorScheme === "dark" ? "#414141" : "#d7d7d7";
-  const txtColor = colorScheme === "dark" ? Colors.light.accentBg : Colors.dark.background;
+  const txtColor =
+    colorScheme === "dark" ? Colors.light.accentBg : Colors.dark.background;
 
   return (
     <ThemedView style={[otherStyles, { backgroundColor: DefaultTheme }]}>
-      <ThemedText type="default" style={{marginLeft: 6}}>{title}</ThemedText>
+      {title && (
+        <ThemedText type="default" style={{ marginLeft: 6, marginBottom: 5 }}>
+          {title}
+        </ThemedText>
+      )}
       <ThemedView
         lightColor="transparent"
         darkColor="transparent"
@@ -133,6 +144,7 @@ const FormField = ({
           placeholderTextColor={"#9B9B9B"}
           onChangeText={handleChangeText}
           editable={editable && !(isDropdown && !isPhoneInput)}
+          autoCapitalize={autoCapitalize}
           secureTextEntry={
             (placeholder === "Password" ||
               placeholder === "Confirm Password" ||
@@ -169,7 +181,17 @@ const FormField = ({
             {dropdownIcon}
           </TouchableOpacity>
         )}
+        {isRightIcon && iconName && (
+          <View>
+            <MaterialIcons name={iconName} size={20} color="#208BC9" />
+          </View>
+        )}
       </ThemedView>
+      <ThemedText
+        style={{ fontFamily: "Questrial", fontSize: 11, color: "#9B9B9B" }}
+      >
+        {helpText}
+      </ThemedText>
       {error && (
         <ThemedText
           style={styles.errorText}

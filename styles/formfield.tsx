@@ -43,8 +43,12 @@ export const styles = StyleSheet.create({
     borderBottomColor: "#E7E7E7"
   },
   bottomSheetTitle: {
-    fontSize: 18,
-    fontWeight: "bold"
+    textAlign: "center",
+    fontFamily: "Inter-Bold",
+    fontSize: 16,
+    borderBottomWidth: 0.7,
+    borderBottomColor: "#9B9B9B",
+    paddingBottom: 5
   },
   bottomSheetContent: {
     paddingBottom: 24

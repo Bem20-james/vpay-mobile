@@ -1,55 +1,47 @@
 import React from "react";
-import { View, FlatList, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { ThemedText } from "@/components/ThemedText";
 import CustomButton from "@/components/CustomButton";
 import Navigator from "@/components/Navigator";
+import { Colors } from "@/constants/Colors";
+import images from "@/constants/Images";
 
-interface Device {
-  id: string;
-  deviceName: string;
-  location: string;
-}
-
-const mockDevices: Device[] = [
-  {
-    id: "1",
-    deviceName: "First Name",
-    location: "+2349870126543"
-  },
-  {
-    id: "2",
-    deviceName: "Last Name",
-    location: "Advanztek@gmail.com"
-  },
-  {
-    id: "3",
-    deviceName: "Phone ",
-    location: "+23.com"
-  }
-];
+type userInfoProps = {
+  label: string;
+  name: string;
+};
 
 const PersonalInfo: React.FC = () => {
   const colorScheme = useColorScheme();
   const boxBackgroundColor = colorScheme === "dark" ? "#000000" : "#EEF3FB";
 
-  const renderItem = ({ item }: { item: Device }) => {
+  const UserInfoItem = ({ label, name }: userInfoProps) => {
     return (
       <View
         style={[
-          styles.deviceCard,
+          styles.userItem,
           {
-            backgroundColor: colorScheme === "dark" ? "#161622" : "#FFFFFF"
+            backgroundColor:
+              colorScheme === "dark"
+                ? Colors.dark.accentBg
+                : Colors.light.accentBg
           }
         ]}
       >
-        <View style={styles.deviceInfo}>
+        <View style={styles.content}>
           <View style={{ flex: 1 }}>
-            <ThemedText style={styles.deviceName}>{item.deviceName}</ThemedText>
-            <ThemedText darkColor="#FEFEFE" style={styles.meta}>
-              {item.location}
+            <ThemedText style={styles.label}>{label}</ThemedText>
+            <ThemedText darkColor="#FEFEFE" style={styles.name}>
+              {name}
             </ThemedText>
           </View>
         </View>
@@ -64,20 +56,30 @@ const PersonalInfo: React.FC = () => {
       <ScrollView>
         <View style={styles.container}>
           <Navigator title="Personal Information" showBackIcon={true} />
+          <View style={styles.imgcontainer}>
+            <TouchableOpacity
+              style={styles.avatarWrapper}
+              activeOpacity={0.7}
+              onPress={() => {}}
+            >
+              <Image
+                source={images.avatar}
+                style={styles.avatar}
+              />
+              <View style={styles.cameraIconContainer}>
+                <Ionicons name="camera" size={20} color="#fff" />
+              </View>
+            </TouchableOpacity>
+          </View>
 
-          <FlatList
-            data={mockDevices}
-            keyExtractor={(item) => item.id}
-            renderItem={renderItem}
-            contentContainerStyle={{ paddingBottom: 20 }}
-          />
+          <UserInfoItem label="Full Name" name="James Bem Aondoakura" />
+          <UserInfoItem label="Email" name="be*gmail.com" />
+          <UserInfoItem label="Gender" name="Male" />
 
-          <CustomButton
-            title="Update Information"
-            handlePress={() => console.log("Update pressed")}
-            btnStyles={styles.logoutButton}
-            variant="outline"
-          />
+          <UserInfoItem label="Mobile Number" name="+0123456789" />
+          <UserInfoItem label="Username" name="Jimie" />
+          <UserInfoItem label="Date of birth" name="James Bem Aondoakura" />
+          <UserInfoItem label="Address" name="James Bem Aondoakura" />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -94,33 +96,51 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginTop: 5
   },
-  deviceCard: {
-    padding: 10,
-    borderRadius: 12,
-    marginBottom: 16,
+  imgcontainer: {
+    alignItems: "center",
+    paddingVertical: 10,
+    marginBottom: 10
+  },
+  avatarWrapper: {
+    position: "relative"
+  },
+  avatar: {
+    width: 80,
+    height: 80,
+    objectFit: "cover",
+    borderRadius: 50,
+    borderColor: "#444",
+    borderWidth: 2
+  },
+  cameraIconContainer: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    backgroundColor: "#000",
+    borderRadius: 20,
+    padding: 5
+  },
+  userItem: {
+    padding: 7,
+    borderRadius: 10,
+    marginBottom: 10,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
     elevation: 2
   },
-  deviceInfo: {
+  content: {
     flexDirection: "row",
     alignItems: "flex-start"
   },
-  deviceName: {
-    fontSize: 16,
-    fontFamily: "Inter-Medium",
-    fontWeight: "600"
+  name: {
+    fontSize: 15,
+    fontFamily: "Inter-Medium"
   },
-  meta: {
-    fontSize: 18,
+  label: {
+    fontSize: 13,
     fontFamily: "Questrial",
     marginTop: 4
-  },
-  logoutButton: {
-    marginTop: 12,
-    alignSelf: "flex-end",
-    width: "100%"
   }
 });

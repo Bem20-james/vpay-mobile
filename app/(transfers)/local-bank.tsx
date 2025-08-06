@@ -12,8 +12,8 @@ import { TransferStyles as styles } from "@/styles/transfers";
 import { RenderItem } from "@/components/RenderItems";
 import { styles as formStyles } from "@/styles/formfield";
 import { Octicons } from "@expo/vector-icons";
-import LocalBankSendScreen from "@/components/Transfers/LocalBankSendScreen";
 import { Colors } from "@/constants/Colors";
+import SendScreen from "@/components/Transfers/SendScreen";
 
 const LocalBank = () => {
   const colorScheme = useColorScheme();
@@ -93,6 +93,8 @@ const LocalBank = () => {
             <FlatList
               data={beneficiaries}
               keyExtractor={(item) => item.handle}
+              nestedScrollEnabled={true}
+              scrollEnabled={false}
               renderItem={({ item }) => <RenderItem item={item} />}
               ListHeaderComponent={
                 <ThemedText style={[styles.sectionHeader, { marginTop: 30 }]}>
@@ -109,7 +111,7 @@ const LocalBank = () => {
           </View>
         </ScrollView>
       ) : (
-        <LocalBankSendScreen onBack={() => setShowSendScreen(false)} />
+        <SendScreen onBack={() => setShowSendScreen(false)} />
       )}
     </SafeAreaView>
   );

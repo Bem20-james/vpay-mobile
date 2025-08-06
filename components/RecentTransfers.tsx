@@ -81,87 +81,87 @@ const RecentTransfers: React.FC<Props> = ({ beneficiaries, recents }) => {
         </Pressable>
       </View>
 
-      <View>
-        <FlatList
-          data={data}
-          keyExtractor={(item, index) => `${item.label}-${index}`}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[
-                styles.itemContainer,
-                {
-                  backgroundColor: isDark
-                    ? Colors.dark.accentBg
-                    : Colors.light.accentBg
-                }
-              ]}
-              onPress={() => {}}
-              activeOpacity={0.7}
-            >
-              <View style={styles.itemContent}>
-                <View>
-                  <ThemedText
-                    lightColor="#252525"
-                    darkColor="#FFFFFF"
-                    style={styles.primaryText}
-                  >
-                    {item.label}
-                  </ThemedText>
-                  <ThemedText
-                    lightColor="#9B9B9B"
-                    darkColor="#9B9B9B"
-                    style={styles.label}
-                  >
-                    {item.subtitle}
-                  </ThemedText>
-                </View>
-
-                <View
-                  style={[
-                    styles.iconCircle,
-                    { backgroundColor: item.backgroundColor }
-                  ]}
-                >
-                  <MaterialCommunityIcons
-                    name={item.icon}
-                    size={16}
-                    color={item.iconColor}
-                  />
-                </View>
-              </View>
-            </TouchableOpacity>
-          )}
-          showsVerticalScrollIndicator={false}
-        />
-        <Pressable
-          onPress={() => router.push("/transactions")}
-          style={({ pressed }) => [
-            styles.moreBtn,
-            { opacity: pressed ? 0.7 : 1 }
-          ]}
-        >
-          <ThemedText
-            style={styles.viewAllText}
-            lightColor="#218DC9"
-            darkColor="#218DC9"
+      <FlatList
+        data={data}
+        keyExtractor={(item, index) => `${item.label}-${index}`}
+        nestedScrollEnabled={true}
+        scrollEnabled={false}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={[
+              styles.itemContainer,
+              {
+                backgroundColor: isDark
+                  ? Colors.dark.accentBg
+                  : Colors.light.accentBg
+              }
+            ]}
+            onPress={() => {}}
+            activeOpacity={0.7}
           >
-            See more
-          </ThemedText>
-          <Entypo
-            name="chevron-small-right"
-            size={20}
-            color={"#218DC9"}
-            style={{ marginTop: 1 }}
-          />
-        </Pressable>
-      </View>
+            <View style={styles.itemContent}>
+              <View>
+                <ThemedText
+                  lightColor="#252525"
+                  darkColor="#FFFFFF"
+                  style={styles.primaryText}
+                >
+                  {item.label}
+                </ThemedText>
+                <ThemedText
+                  lightColor="#9B9B9B"
+                  darkColor="#9B9B9B"
+                  style={styles.label}
+                >
+                  {item.subtitle}
+                </ThemedText>
+              </View>
+
+              <View
+                style={[
+                  styles.iconCircle,
+                  { backgroundColor: item.backgroundColor }
+                ]}
+              >
+                <MaterialCommunityIcons
+                  name={item.icon}
+                  size={16}
+                  color={item.iconColor}
+                />
+              </View>
+            </View>
+          </TouchableOpacity>
+        )}
+        showsVerticalScrollIndicator={false}
+      />
+      <Pressable
+        onPress={() => router.push("/transactions")}
+        style={({ pressed }) => [
+          styles.moreBtn,
+          { opacity: pressed ? 0.7 : 1 }
+        ]}
+      >
+        <ThemedText
+          style={styles.viewAllText}
+          lightColor="#218DC9"
+          darkColor="#218DC9"
+        >
+          See more
+        </ThemedText>
+        <Entypo
+          name="chevron-small-right"
+          size={20}
+          color={"#218DC9"}
+          style={{ marginTop: 1 }}
+        />
+      </Pressable>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 20
+    marginTop: 15
   },
   tabContainer: {
     flexDirection: "row",

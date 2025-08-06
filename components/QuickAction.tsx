@@ -21,10 +21,7 @@ interface Props {
   actions: ActionItem[];
 }
 
-const QuickActionsSection: React.FC<Props> = ({
-  title = "",
-  actions
-}) => {
+const QuickActionsSection: React.FC<Props> = ({ title = "", actions }) => {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const bgColor =
@@ -40,6 +37,8 @@ const QuickActionsSection: React.FC<Props> = ({
         keyExtractor={(item) => item.label}
         numColumns={3}
         columnWrapperStyle={styles.row}
+        nestedScrollEnabled={true}
+        scrollEnabled={false}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={[{ backgroundColor: bgColor }, styles.actionBox]}
@@ -80,7 +79,7 @@ const QuickActionsSection: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: 7,
+    marginHorizontal: 7
   },
   title: {
     fontFamily: "Inter-Medium",

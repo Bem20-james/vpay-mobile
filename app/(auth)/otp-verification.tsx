@@ -1,6 +1,5 @@
 import {
   View,
-  Text,
   ScrollView,
   StyleSheet,
   Pressable,
@@ -179,7 +178,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
                   ? "Enter the OTP sent to reset your password."
                   : "We have sent a code to your email."}
               </ThemedText>
-              <Text
+              <ThemedText
                 style={{
                   fontFamily: "Inter",
                   fontWeight: "bold",
@@ -188,7 +187,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
                 }}
               >
                 {email}
-              </Text>
+              </ThemedText>
             </View>
           </View>
 

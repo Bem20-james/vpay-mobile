@@ -9,11 +9,13 @@ import {
 import { ThemedText } from "@/components/ThemedText";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter, Router } from "expo-router";
+import CountryFlag from "react-native-country-flag";
+import { SERVER_BASE_URL } from "@/constants/Paths";
 
 interface PaymentOptionProps {
   name: string;
   label: string;
-  image: ImageSourcePropType;
+  image?: ImageSourcePropType;
   balance: string;
   price?: string;
   type: "fiat" | "crypto";
@@ -22,8 +24,9 @@ interface PaymentOptionProps {
   account_name?: string;
   bank_name?: string;
   account_number?: string;
+  country_code?: string;
   bgColor?: string;
-  handlePress: () => void;  
+  handlePress: () => void;
 }
 
 export const PaymentOption: React.FC<PaymentOptionProps> = ({
@@ -38,6 +41,7 @@ export const PaymentOption: React.FC<PaymentOptionProps> = ({
   account_name,
   bank_name,
   account_number,
+  country_code,
   bgColor,
   handlePress
 }) => {
@@ -48,27 +52,50 @@ export const PaymentOption: React.FC<PaymentOptionProps> = ({
       style={[styles.optionContainer, { backgroundColor: bgColor }]}
       onPress={() => handlePress()}
     >
-      <Image source={image} style={styles.icon} />
-      <View style={styles.textContainer}>
-        <ThemedText
-          lightColor="#000000"
-          darkColor="#F5F5F5"
-          style={styles.accountText}
-        >
-          {name}
-        </ThemedText>
-        <View style={{ flexDirection: "row", gap: 5 }}>
-          <ThemedText style={styles.optionDescription}>{label}</ThemedText>
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        {type === "crypto" && (
+          <Image
+            source={{ uri: `${SERVER_BASE_URL}/${image}` }}
+            style={styles.icon}
+          />
+        )}
+        {type === "fiat" && (
+          <CountryFlag
+            isoCode={country_code ?? ""}
+            size={20}
+            style={styles.flagicon}
+          />
+        )}
 
-          {type === "crypto" && (
-            <ThemedText style={styles.optionDescription}>{price}</ThemedText>
-          )}
+        <View>
+          <ThemedText
+            lightColor="#000000"
+            darkColor="#F5F5F5"
+            style={styles.accountText}
+          >
+            {name}
+          </ThemedText>
+
+          <View style={{ flexDirection: "row", gap: 5 }}>
+            <ThemedText style={styles.optionDescription}>{label}</ThemedText>
+
+            {type === "crypto" && (
+              <ThemedText style={styles.optionDescription}>
+                {Number(price).toFixed(2)}
+              </ThemedText>
+            )}
+          </View>
         </View>
       </View>
-      <ThemedText>{balance}</ThemedText>
-      <ThemedText style={styles.arrow}>
-        <MaterialIcons name="chevron-right" size={30} color="#218DC9" />
-      </ThemedText>
+
+      <View style={{ flexDirection: "row", gap: 10 }}>
+        <ThemedText>
+          {type === "fiat" ? Number(balance).toFixed(2) : balance}
+        </ThemedText>
+        <ThemedText style={styles.arrow}>
+          <MaterialIcons name="chevron-right" size={30} color="#218DC9" />
+        </ThemedText>
+      </View>
     </TouchableOpacity>
   );
 };
@@ -77,6 +104,7 @@ const styles = StyleSheet.create({
   optionContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     padding: 7,
     borderRadius: 10,
     marginBottom: 10,
@@ -93,19 +121,21 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
     borderRadius: 20
   },
-  textContainer: {
-    flex: 1,
-    gap: 5
+  flagicon: {
+    width: 40,
+    height: 40,
+    marginRight: 10,
+    resizeMode: "contain",
+    borderRadius: 5
   },
   accountText: {
-    fontSize: 16,
-    fontFamily: "Inter-Regular",
-    fontWeight: "500"
+    fontSize: 15,
+    fontFamily: "Inter-Medium"
   },
   optionDescription: {
     fontSize: 12,
     fontFamily: "Questrial",
-    textTransform: "capitalize" as const
+    textTransform: "uppercase"
   },
   arrow: {
     fontSize: 18,

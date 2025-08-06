@@ -1,4 +1,5 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+  const screenHeight = Dimensions.get("window").height;
 
 export const styles = StyleSheet.create({
   container: {
@@ -45,11 +46,14 @@ export const styles = StyleSheet.create({
   btmTxt: {
     fontFamily: "Inter",
     fontWeight: 500,
-    fontSize: 12,
-    marginTop: 35,
+    fontSize: 11,
     lineHeight: 21,
     letterSpacing: 0,
-    textAlign: "center"
+    textAlign: "center",
+    position: "absolute",
+    top: 130,
+    left: 20,
+    right: 20,
   },
   forgotPwd: {
     display: "flex",

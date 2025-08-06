@@ -1,4 +1,4 @@
-import { Image, View, ScrollView, Pressable } from "react-native";
+import { Image, View, ScrollView, Pressable, Dimensions } from "react-native";
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -14,13 +14,15 @@ import { useLogin } from "@/hooks/useAuthentication";
 import Toast from "react-native-toast-message";
 import OtpMediumModal from "@/components/OtpMediumModal";
 import { getData } from "@/utils/store";
-import { User } from "@/contexts/UserContexts";
 import { Colors } from "@/constants/Colors";
+import * as LocalAuthentication from "expo-local-authentication";
+import { Alert } from "react-native";
 
 const IndexLogin = () => {
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const bgColor = colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+  const bgColor =
+    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ identifier: "", password: "" });
   const [showOtpScreen, setShowOtpScreen] = useState(false);
@@ -30,33 +32,42 @@ const IndexLogin = () => {
   );
   const login = useLogin();
   const [showModal, setShowModal] = useState(false);
-  const [lastUser, setLastUser] = useState<User | null>(null);
-  console.log("Last User:", lastUser);
+  const [showBiometricIcon, setShowBiometricIcon] = useState(false);
+  const screenHeight = Dimensions.get("window").height;
+
+  const [username, setUsername] = useState<string | null>(null);
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     const loadLastUser = async () => {
-      try {
-        const email = await getData("lastUser");
-        if (!email) return;
-        console.log("Loading last user with email:", email);
+      const result = await getData<{ username: string; email: string }>(
+        "lastUser"
+      );
 
-        const userData = await getData("user_" + email);
-        console.log("Loaded User Data:", userData);
-        if (userData) {
-          setLastUser(userData);
-        }
-      } catch (error) {
-        console.error("Error loading last user:", error);
+      if (result.success && result.data) {
+        const { username, email } = result.data;
+        setUsername(username);
+        setEmail(email);
+      } else {
+        console.warn("No last user data found or failed to load.");
       }
     };
+
     loadLastUser();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const enabled = await getData("useBiometrics");
+      setShowBiometricIcon(Boolean(enabled));
+    })();
   }, []);
 
   if (showOtpScreen) {
     return (
       <OtpVerification
         mode="login"
-        email={lastUser?.email}
+        email={email}
         onBack={() => setShowOtpScreen(false)}
         otp_medium={otpMedium}
         password={password}
@@ -76,10 +87,11 @@ const IndexLogin = () => {
 
     try {
       const payload = {
-        email: lastUser?.email,
+        email: email,
         password: password,
         otp_medium: method
       };
+      console.log("payload", payload);
 
       const success = await login(payload);
       if (success) {
@@ -94,6 +106,48 @@ const IndexLogin = () => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleBiometricLogin = async () => {
+    const compatible = await LocalAuthentication.hasHardwareAsync();
+    const enrolled = await LocalAuthentication.isEnrolledAsync();
+
+    if (!compatible || !enrolled) {
+      Alert.alert("Biometrics not available");
+      return;
+    }
+
+    const result = await LocalAuthentication.authenticateAsync({
+      promptMessage: "Login with Biometrics",
+      fallbackLabel: "Enter password"
+    });
+
+    if (result.success) {
+      // Retrieve user credentials (if stored securely)
+      const storedCredentials = await getData("biometricCredentials");
+      console.log("bio payload:", "got here now");
+
+      if (
+        storedCredentials?.success &&
+        storedCredentials?.data?.identifier &&
+        storedCredentials?.data?.password
+      ) {
+        console.log("bio payload:", storedCredentials);
+
+        const payload = {
+          email: storedCredentials.data.identifier,
+          password: storedCredentials.data.password,
+          otp_medium: "email"
+        };
+        console.log("bio payload:", payload);
+        // Auto-login using stored credentials
+        await login(payload);
+      } else {
+        Alert.alert("No stored credentials found");
+      }
+    } else {
+      Alert.alert("Authentication failed", result.error ?? "Please try again");
     }
   };
 
@@ -117,7 +171,7 @@ const IndexLogin = () => {
                 darkColor="#ffffff"
                 style={styles.heading}
               >
-                Hello {lastUser?.username || "Jimie"}
+                Hello {username || "Jimie"}
               </ThemedText>
               <ThemedText
                 lightColor="#9B9B9B"
@@ -136,7 +190,7 @@ const IndexLogin = () => {
             error={errors.password}
             isIcon
             iconName="shield"
-            otherStyles={{ marginTop: 5 }}
+            otherStyles={{ marginTop: 20 }}
             keyboardType="default"
           />
 
@@ -166,60 +220,74 @@ const IndexLogin = () => {
             </ThemedText>
           </Pressable>
 
-          <View style={styles.fingerprint}>
-            <Pressable
-              style={({ pressed }) => [
-                styles.printBg,
-                { opacity: pressed ? 0.7 : 1 }
-              ]}
-            >
-              <MaterialIcons name="fingerprint" size={50} color={"#2FCBF2"} />
-            </Pressable>
-            <ThemedText lightColor="#9B9B9B" style={{ fontSize: 14 }}>
-              use fingerprint
-            </ThemedText>
-          </View>
-
-          <CustomButton
-            title="Login"
-            handlePress={() => router.push("/(tabs)/home")}
-            //handlePress={() => setShowModal(true)}
-            btnStyles={{ width: "100%", marginTop: 100 }}
-            isLoading={isLoading}
-            //disabled={!password}
-          />
-
-          <View style={styles.btmContent}>
-            <View
-              style={{
-                marginTop: 10,
-                flexDirection: "row",
-                justifyContent: "center",
-                gap: 4
-              }}
-            >
-              <ThemedText
-                lightColor="#9B9B9B"
-                darkColor="#9B9B9B"
-                style={{ fontFamily: "Questrial" }}
-              >
-                Not {lastUser?.username || "Jimie"}?
-              </ThemedText>
+          {showBiometricIcon && (
+            <View style={styles.fingerprint}>
               <Pressable
-                style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
-                onPress={() => router.push("/login")}
+                onPress={handleBiometricLogin}
+                style={({ pressed }) => [
+                  styles.printBg,
+                  { opacity: pressed ? 0.7 : 1 }
+                ]}
+              >
+                <MaterialIcons name="fingerprint" size={50} color={"#2FCBF2"} />
+              </Pressable>
+              <ThemedText lightColor="#9B9B9B" style={{ fontSize: 14 }}>
+                use fingerprint
+              </ThemedText>
+            </View>
+          )}
+
+          <View
+            style={{
+              position: "absolute",
+              top: screenHeight - 200,
+              left: 20,
+              right: 20,
+              width: "100%",
+              marginTop: 7
+            }}
+          >
+            <CustomButton
+              title="Login"
+              //handlePress={() => router.push("/(tabs)/home")}
+              handlePress={() => setShowModal(true)}
+              btnStyles={{ width: "100%" }}
+              isLoading={isLoading}
+              disabled={!password}
+            />
+
+            <View style={styles.btmContent}>
+              <View
+                style={{
+                  marginTop: 10,
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  gap: 4
+                }}
               >
                 <ThemedText
-                  style={{
-                    fontFamily: "Questrial",
-                    fontWeight: "bold",
-                    color: "#218DC9",
-                    textDecorationLine: "underline"
-                  }}
+                  lightColor="#9B9B9B"
+                  darkColor="#9B9B9B"
+                  style={{ fontFamily: "Questrial" }}
                 >
-                  Login here
+                  Not {username || "Jimie"}?
                 </ThemedText>
-              </Pressable>
+                <Pressable
+                  style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
+                  onPress={() => router.push("/login")}
+                >
+                  <ThemedText
+                    style={{
+                      fontFamily: "Questrial",
+                      fontWeight: "bold",
+                      color: "#218DC9",
+                      textDecorationLine: "underline"
+                    }}
+                  >
+                    Login here
+                  </ThemedText>
+                </Pressable>
+              </View>
             </View>
           </View>
         </View>

@@ -1,17 +1,18 @@
 import React from "react";
 import { View, StyleSheet, FlatList, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { ThemedText } from "@/components/ThemedText";
 import Navigator from "@/components/Navigator";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { notifications } from "@/assets/data";
+import { Colors } from "@/constants/Colors";
 
 const NotificationScreen = ({}) => {
-  const router = useRouter();
   const colorScheme = useColorScheme();
-  const backgroundColor = colorScheme === "dark" ? "#000000" : "#EEF3FB";
-  const bgColor = colorScheme === "dark" ? "#161622" : "#ffffff";
+  const backgroundColor =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const bgColor =
+    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
   const [showMsg, setShowMsg] = React.useState(false);
 
   const handlePress = () => {
@@ -81,7 +82,8 @@ const NotificationScreen = ({}) => {
               style={styles.message}
             >
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-              eiusmod, lorem ipsum dolor sit amet consectetur mayonisa adipiscing bitisi
+              eiusmod, lorem ipsum dolor sit amet consectetur mayonisa
+              adipiscing bitisi
             </ThemedText>
           </View>
         )}

@@ -3,12 +3,12 @@ import React, { useState } from "react";
 import Navigator from "@/components/Navigator";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
-import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ThemedText } from "@/components/ThemedText";
 import { Feather } from "@expo/vector-icons";
 import { TransferStyles as styles } from "@/styles/transfers";
 import { RenderItem } from "@/components/RenderItems";
+import { Colors } from "@/constants/Colors";
 
 export type Contact = {
   name: string;
@@ -40,9 +40,10 @@ const sampleData: Contact[] = [
 
 const VpayTag = () => {
   const colorScheme = useColorScheme();
-  const backgroundColor = colorScheme === "dark" ? "#000000" : "#EEF3FB";
-  const statusBarBg = colorScheme === "dark" ? "#000000" : "#EEF3FB";
-  const router = useRouter();
+  const backgroundColor =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const statusBarBg =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
   const [query, setQuery] = useState("");
 
   const recent = sampleData.filter((item) => item.isRecent);
@@ -74,6 +75,8 @@ const VpayTag = () => {
           <FlatList
             data={recent}
             keyExtractor={(item) => item.handle}
+            nestedScrollEnabled={true}
+            scrollEnabled={false}
             renderItem={({ item }) => <RenderItem item={item} />}
             ListHeaderComponent={
               <ThemedText style={[styles.sectionHeader, { marginTop: 5 }]}>
@@ -86,10 +89,12 @@ const VpayTag = () => {
           <FlatList
             data={contacts}
             keyExtractor={(item) => item.handle}
+            nestedScrollEnabled={true}
+            scrollEnabled={false}
             renderItem={({ item }) => <RenderItem item={item} />}
             ListHeaderComponent={
               <ThemedText style={[styles.sectionHeader, { marginTop: 15 }]}>
-                Recent Beneficiaries
+                Vpay Contacts
               </ThemedText>
             }
           />

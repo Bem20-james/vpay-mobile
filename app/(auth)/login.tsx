@@ -15,6 +15,7 @@ import OtpVerification from "./otp-verification";
 import Toast from "react-native-toast-message";
 import OtpMediumModal from "@/components/OtpMediumModal";
 import { Colors } from "@/constants/Colors";
+import { storeData } from "@/utils/store";
 
 const isValidEmail = (value: string): boolean =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -83,6 +84,12 @@ const Login = () => {
           };
 
       const success = await login(payload);
+
+      await storeData("biometricCredentials", {
+        identifier: form.identifier,
+        password: form.password
+      });
+
       if (success) {
         setIsLoading(false);
         setShowOtpScreen(true);
@@ -111,7 +118,7 @@ const Login = () => {
   }
 
   return (
-    <SafeAreaView style={{ backgroundColor: bgColor, height: "100%" }}>
+    <SafeAreaView style={{ backgroundColor: bgColor, height: "100%", position: "relative" }}>
       <ScrollView>
         <View style={styles.container}>
           {colorScheme === "dark" ? (
@@ -143,7 +150,7 @@ const Login = () => {
             }
             value={form.identifier}
             error={errors.identifier}
-            otherStyles={{ marginTop: 5 }}
+            otherStyles={{ marginTop: 10 }}
             keyboardType="email-address"
             isIcon
             iconName="person"
@@ -157,7 +164,7 @@ const Login = () => {
             error={errors.password}
             isIcon
             iconName="shield"
-            otherStyles={{ marginTop: 5 }}
+            otherStyles={{ marginTop: 20 }}
           />
 
           <Pressable
@@ -198,7 +205,7 @@ const Login = () => {
           <View style={styles.btmContent}>
             <View
               style={{
-                marginTop: 10,
+                marginTop: 5,
                 flexDirection: "row",
                 justifyContent: "center",
                 gap: 4
@@ -231,7 +238,7 @@ const Login = () => {
                 style={{
                   fontFamily: "Inter",
                   fontWeight: "bold",
-                  fontSize: 12,
+                  fontSize: 10,
                   color: "#218DC9"
                 }}
               >

@@ -15,13 +15,13 @@ const currencies = [
     code: "NGN",
     name: "Nigerian Naira",
     flag: "🇳🇬",
-    balance: 1500.25,
+    balance: 1500.25
   },
   {
     code: "GHS",
     name: "Ghana Cedi",
     flag: "🇬🇭",
-    balance: 2000.12,
+    balance: 2000.12
   },
   { code: "USD", name: "US Dollar", flag: "🇺🇸", balance: 123.45 }
 ];
@@ -31,18 +31,22 @@ const paymentData = {
   bank: "Opay Bank",
   accountNumber: "1236547892",
   name: "ADVANTEK TECHNOLOGIES",
-  rate: "5",
+  rate: "5"
 };
 
-type LocalBankSendScreenProps = {
+type SendScreenProps = {
   onBack: () => void;
+  title?: string;
 };
 
-const LocalBankSendScreen = ({ onBack }: LocalBankSendScreenProps) => {
+const SendScreen = ({ onBack, title = "Send to local" }: SendScreenProps) => {
   const colorScheme = useColorScheme();
-  const bgColor = colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
-  const txtColor = colorScheme === "dark" ? Colors.light.accentBg : Colors.dark.background;
-  const inputBgColor = colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const bgColor =
+    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+  const txtColor =
+    colorScheme === "dark" ? Colors.light.accentBg : Colors.dark.background;
+  const inputBgColor =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
 
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
@@ -57,7 +61,7 @@ const LocalBankSendScreen = ({ onBack }: LocalBankSendScreenProps) => {
 
   return (
     <ScrollView>
-      <Navigator title="Send to Local Bank" onBack={onBack} />
+      <Navigator title={title} onBack={onBack} />
       <View style={styles.container}>
         <View style={[styles.recipientContainer, { backgroundColor: bgColor }]}>
           <Image
@@ -155,4 +159,4 @@ const LocalBankSendScreen = ({ onBack }: LocalBankSendScreenProps) => {
   );
 };
 
-export default LocalBankSendScreen;
+export default SendScreen;

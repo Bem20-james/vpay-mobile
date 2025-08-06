@@ -7,6 +7,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import CustomButton from "../CustomButton";
 import { Colors } from "@/constants/Colors";
 import getSymbolFromCurrency from "currency-symbol-map";
+import { btmSheetStyles } from "@/styles/bottomsheets";
 
 interface Currency {
   code: string;
@@ -71,17 +72,17 @@ const ReviewBottomSheet = ({
       >
         <BottomSheetView>
           <ThemedText
-            style={styles.title}
+            style={btmSheetStyles.title}
             lightColor="#252525"
             darkColor="#9B9B9B"
           >
             {title}
           </ThemedText>
-          <View style={styles.amountContainer}>
-            <ThemedText style={styles.amountText}>send</ThemedText>
-            <ThemedText style={styles.amount}>{amount}</ThemedText>
+          <View style={btmSheetStyles.amountContainer}>
+            <ThemedText style={btmSheetStyles.amountText}>send</ThemedText>
+            <ThemedText style={btmSheetStyles.amount}>{amount}</ThemedText>
           </View>
-          <View style={styles.container}>
+          <View style={btmSheetStyles.container}>
             {[
               { label: "Bank", value: bank },
               { label: "Account Number", value: accountNumber },
@@ -100,13 +101,18 @@ const ReviewBottomSheet = ({
               }
             ].map((item, index) => (
               <View
-                style={[styles.detailRow, { borderBottomColor: border }]}
+                style={[
+                  btmSheetStyles.detailRow,
+                  { borderBottomColor: border }
+                ]}
                 key={index}
               >
-                <ThemedText style={styles.label}>{item.label}</ThemedText>
+                <ThemedText style={btmSheetStyles.label}>
+                  {item.label}
+                </ThemedText>
                 <ThemedText
                   style={[
-                    styles.value,
+                    btmSheetStyles.value,
                     item.transform === "uppercase" && {
                       textTransform: "uppercase"
                     }
@@ -119,31 +125,33 @@ const ReviewBottomSheet = ({
 
             <View
               style={[
-                styles.paymentMethod,
+                btmSheetStyles.paymentMethod,
                 { backgroundColor: Colors.light.primaryDark3 }
               ]}
             >
-              <ThemedText style={styles.paymentText}>payment Method</ThemedText>
+              <ThemedText style={btmSheetStyles.paymentText}>
+                payment Method
+              </ThemedText>
               <TouchableOpacity
-                style={styles.item}
+                style={btmSheetStyles.item}
                 onPress={() => {
                   sheetRef.current?.close();
                 }}
               >
-                <View style={styles.flagWrapper}>
-                  <ThemedText style={styles.flag}>
+                <View style={btmSheetStyles.flagWrapper}>
+                  <ThemedText style={btmSheetStyles.flag}>
                     {selectedAsset.flag}
                   </ThemedText>
                 </View>
 
-                <View style={styles.labelWrapper}>
-                  <ThemedText style={styles.label}>
+                <View style={btmSheetStyles.labelWrapper}>
+                  <ThemedText style={btmSheetStyles.label}>
                     {selectedAsset.name} ({selectedAsset.code})
                   </ThemedText>
                 </View>
 
-                <View style={styles.amountWrapper}>
-                  <ThemedText style={styles.amount}>
+                <View style={btmSheetStyles.amountWrapper}>
+                  <ThemedText style={btmSheetStyles.amount}>
                     {getSymbolFromCurrency(selectedAsset.code) || "₦"}
                     {selectedAsset.balance.toFixed(2)}
                   </ThemedText>
@@ -173,83 +181,5 @@ const ReviewBottomSheet = ({
     </Portal>
   );
 };
-
-const styles = StyleSheet.create({
-  header: {
-    padding: 10,
-    alignItems: "center"
-  },
-  title: {
-    fontFamily: "Inter-Regular",
-    fontSize: 15,
-    textAlign: "center"
-  },
-  container: {
-    padding: 15
-  },
-  amountContainer: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 7,
-    paddingVertical: 10
-  },
-  amountText: {
-    fontSize: 20,
-    fontFamily: "Inter-Bold",
-    textTransform: "capitalize"
-  },
-  amount: {
-    fontSize: 20,
-    fontFamily: "Inter-Bold"
-  },
-  detailRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 10,
-    borderBottomWidth: 0.5
-  },
-  label: {
-    fontSize: 13,
-    fontFamily: "Questrial"
-  },
-  value: {
-    fontSize: 14,
-    fontFamily: "Inter-Medium"
-  },
-  paymentMethod: {
-    marginTop: 20,
-    padding: 10,
-    borderRadius: 7
-  },
-  paymentText: {
-    fontSize: 13,
-    fontFamily: "Questrial",
-    textTransform: "capitalize"
-  },
-  item: {
-    paddingVertical: 10,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center"
-  },
-  amountWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6
-  },
-  flagWrapper: {
-    backgroundColor: "#E5F9FF",
-    padding: 5,
-    borderRadius: 50,
-    marginRight: 12
-  },
-  flag: {
-    fontSize: 18
-  },
-  labelWrapper: {
-    flex: 1
-  }
-});
 
 export default ReviewBottomSheet;

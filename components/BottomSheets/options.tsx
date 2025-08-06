@@ -3,16 +3,15 @@ import {
   TouchableOpacity,
   View,
   ActivityIndicator,
-  StyleSheet
 } from "react-native";
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { Portal } from "@gorhom/portal";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { ThemedText } from "../ThemedText";
-import { ThemedView } from "../ThemedView";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Colors } from "@/constants/Colors";
+import { btmSheetStyles } from "@/styles/bottomsheets";
 
 export type OptionItem = {
   id?: number;
@@ -63,7 +62,7 @@ const OptionsBottomSheet = ({
         }}
       >
         <ThemedText
-          style={styles.title}
+          style={btmSheetStyles.title}
           lightColor="#252525"
           darkColor="#F8F8F8"
         >
@@ -77,7 +76,7 @@ const OptionsBottomSheet = ({
           renderItem={({ item }) => (
             <TouchableOpacity
               style={[
-                styles.sheetItem,
+                btmSheetStyles.sheetItem,
                 {
                   borderBottomColor:
                     colorScheme === "dark" ? "#333333" : "#F8F8F8"
@@ -93,7 +92,7 @@ const OptionsBottomSheet = ({
               {isLoading ? (
                 <ActivityIndicator size={20} />
               ) : (
-                <View style={styles.sheetCon}>
+                <View style={btmSheetStyles.sheetCon}>
                   {item.icon && (
                     <MaterialCommunityIcons
                       name={item.icon}
@@ -103,7 +102,7 @@ const OptionsBottomSheet = ({
                         (colorScheme === "dark" ? "#FFFFFF" : "#000000")
                       }
                       style={[
-                        styles.sheetIcon,
+                        btmSheetStyles.sheetIcon,
                         { backgroundColor: item.iconBg || "#EDFDFF" }
                       ]}
                     />
@@ -111,7 +110,7 @@ const OptionsBottomSheet = ({
                   <ThemedText
                     darkColor="#F8F8F8"
                     lightColor="#252525"
-                    style={styles.sheetLabel}
+                    style={btmSheetStyles.sheetLabel}
                   >
                     {item.label}
                   </ThemedText>
@@ -127,46 +126,11 @@ const OptionsBottomSheet = ({
               )}
             </TouchableOpacity>
           )}
-          contentContainerStyle={styles.bottomSheetContent}
+          contentContainerStyle={btmSheetStyles.bottomSheetContent}
         />
       </BottomSheet>
     </Portal>
   );
 };
-
-const styles = StyleSheet.create({
-  sheetHeader: {
-    padding: 10
-  },
-  title: {
-    textAlign: "center",
-    fontFamily: "Inter-Bold",
-    fontSize: 16,
-    borderBottomWidth: 0.7,
-    borderBottomColor: "#9B9B9B",
-    paddingBottom: 5
-  },
-  sheetItem: {
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1
-  },
-  sheetCon: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5
-  },
-  sheetIcon: {
-    borderRadius: 100,
-    padding: 10
-  },
-  sheetLabel: {
-    fontSize: 16,
-    fontFamily: "Inter-SemiBold"
-  },
-  bottomSheetContent: {
-    paddingBottom: 24
-  }
-});
 
 export default OptionsBottomSheet;

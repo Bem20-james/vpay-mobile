@@ -73,50 +73,55 @@ const AddressVerification = ({ onBack }: AddressProps) => {
             *Please ensure this address matches with the one on the document you
             are going to upload
           </ThemedText>
+          <View style={{flexDirection: "column", gap: 20}}>
+            <FormField
+              handleChangeText={() => {}}
+              isDropdown
+              onDropdownPress={() => {}}
+              placeholder="Select a country"
+              isIcon
+              iconName="public"
+            />
 
-          <FormField
-            handleChangeText={() => {}}
-            isDropdown
-            onDropdownPress={() => {}}
-            placeholder="Select a country"
-            isIcon
-            iconName="public"
-          />
+            <FormField
+              placeholder="State"
+              value={form.state}
+              handleChangeText={(value) => handleChange("state", value)}
+              keyboardType="default"
+            />
 
-          <FormField
-            placeholder="State"
-            value={form.state}
-            handleChangeText={(value) => handleChange("state", value)}
-            keyboardType="default"
-          />
+            <FormField
+              placeholder="City"
+              value={form.city}
+              handleChangeText={(value) => handleChange("city", value)}
+              keyboardType="default"
+            />
 
-          <FormField
-            placeholder="City"
-            value={form.city}
-            handleChangeText={(value) => handleChange("city", value)}
-            keyboardType="default"
-          />
+            <FormField
+              placeholder="Residential address"
+              value={form.street_address}
+              handleChangeText={(value) =>
+                handleChange("street_address", value)
+              }
+              keyboardType="default"
+            />
 
-          <FormField
-            placeholder="Residential address"
-            value={form.street_address}
-            handleChangeText={(value) => handleChange("street_address", value)}
-            keyboardType="default"
-          />
+            <FormField
+              placeholder="Office address (optional)"
+              value={form.street_address}
+              handleChangeText={(value) =>
+                handleChange("street_address", value)
+              }
+              keyboardType="default"
+            />
 
-          <FormField
-            placeholder="Office address (optional)"
-            value={form.street_address}
-            handleChangeText={(value) => handleChange("street_address", value)}
-            keyboardType="default"
-          />
-
-          <FormField
-            placeholder="Postal code"
-            value={form.postal_code}
-            handleChangeText={(value) => handleChange("postal_code", value)}
-            keyboardType="default"
-          />
+            <FormField
+              placeholder="Postal code"
+              value={form.postal_code}
+              handleChangeText={(value) => handleChange("postal_code", value)}
+              keyboardType="default"
+            />
+          </View>
         </View>
         <View style={{ position: "relative" }}>
           <View

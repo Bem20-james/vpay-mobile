@@ -129,12 +129,13 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   icon: {
     width: 20,
-    height: 19
+    height: 20
   },
   items: {
+    marginTop: 5,
     alignItems: "center",
     justifyContent: "center",
-    gap: 2,
+    gap: 1,
     width: 50
   }
 });

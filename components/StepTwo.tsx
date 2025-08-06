@@ -1,5 +1,3 @@
-// StepTwo.tsx
-
 import React from "react";
 import { View } from "react-native";
 import FormField from "@/components/FormFields";
@@ -24,7 +22,7 @@ interface StepTwoProps {
 
 const StepTwo: React.FC<StepTwoProps> = ({ form, errors, onFieldChange }) => {
   return (
-    <View>
+    <View style={{ flexDirection: "column", gap: 20 }}>
       <FormField
         placeholder="Email"
         keyboardType="email-address"

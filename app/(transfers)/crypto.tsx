@@ -3,29 +3,19 @@ import React from "react";
 import Navigator from "@/components/Navigator";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
-import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { ThemedText } from "@/components/ThemedText";
-import CustomButton from "@/components/CustomButton";
-import FormField from "@/components/FormFields";
 import { KycStyles as styles } from "@/styles/kyc";
+import Accounts from "../(user)/accounts";
+import { Colors } from "@/constants/Colors";
 
 const CryptoCurrency = () => {
   const colorScheme = useColorScheme();
-  const backgroundColor = colorScheme === "dark" ? "#000000" : "#EEF3FB";
-  const statusBarBg = colorScheme === "dark" ? "#000000" : "#EEF3FB";
-  const router = useRouter();
+  const backgroundColor =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const statusBarBg =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
 
-  return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
-      <ScrollView>
-        <Navigator title="Cryptocurrency" />
-        <View style={styles.container}></View>
-
-      </ScrollView>
-      <StatusBar style="dark" backgroundColor={statusBarBg} />
-    </SafeAreaView>
-  );
+  return <Accounts />;
 };
 
 export default CryptoCurrency;

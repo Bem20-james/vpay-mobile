@@ -159,7 +159,7 @@ const ResetPassword = () => {
             handleChangeText={(text) =>
               handleInputChange("confirmPassword", text)
             }
-            otherStyles={{ marginTop: 5 }}
+            otherStyles={{ marginTop: 20 }}
             keyboardType="default"
             isIcon
             iconName="shield"
@@ -179,7 +179,6 @@ const ResetPassword = () => {
           onClose={() => setShowModal(false)}
           isLoading={isSubmitting}
           onSubmit={submitForm}
-          methods={["sms", "authenticator"]}
         />
       </ScrollView>
       <Toast />

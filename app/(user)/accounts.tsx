@@ -1,16 +1,6 @@
-import React, { useState, useRef, useMemo, useCallback } from "react";
-import {
-  View,
-  ScrollView,
-  StyleSheet,
-  ImageSourcePropType,
-  Dimensions
-} from "react-native";
+import React, { useState } from "react";
+import { View, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  BottomSheetModal,
-  BottomSheetModalProvider
-} from "@gorhom/bottom-sheet";
 import { ThemedText } from "@/components/ThemedText";
 import Navigator from "@/components/Navigator";
 import images from "@/constants/Images";
@@ -22,14 +12,15 @@ import AccountBottomSheet from "@/components/BottomSheets/Accounts";
 import { Colors } from "@/constants/Colors";
 
 interface FiatAccount {
-  fiat_currency_label: string;
   fiat_currency_name: string;
   balance: string;
+  name: string;
   account_balance: string;
   account_name: string;
   bank_name: string;
   account_number: string;
   currency_code: string;
+  country_code: string;
 }
 
 interface CryptoAccount {
@@ -38,37 +29,32 @@ interface CryptoAccount {
   balance: string;
   address: string;
   price?: string;
+  token_image?: string;
 }
-
-const fiatImages: { [key: string]: ImageSourcePropType } = {
-  ngn: images.glo,
-  usd: images.airtel
-};
-
-const cryptoImages: { [key: string]: ImageSourcePropType } = {
-  BNB: images.tether,
-  USDT: images.matic
-};
 
 const Accounts: React.FC = () => {
   const colorScheme = useColorScheme();
-  const backgroundColor = colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
-  const boxBg = colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+  const backgroundColor =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const boxBg =
+    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
   const { assets, loading } = useFetchUserAssets();
+  console.log("User Assets:", assets);
 
-  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const [isSheetVisible, setIsSheetVisible] = useState(false);
+  const [selectedType, setSelectedType] = useState<"fiat" | "crypto">("fiat");
   const [selectedItem, setSelectedItem] = useState<
     FiatAccount | CryptoAccount | null
   >(null);
-  const [selectedType, setSelectedType] = useState<"fiat" | "crypto" | null>(
-    null
-  );
 
-  const handleItemPress = useCallback((item: any, type: "fiat" | "crypto") => {
-    setSelectedItem(item);
+  const openSheet = (
+    type: "fiat" | "crypto",
+    item: FiatAccount | CryptoAccount
+  ) => {
     setSelectedType(type);
-    bottomSheetRef.current?.present();
-  }, []);
+    setSelectedItem(item);
+    setIsSheetVisible(true);
+  };
 
   const renderSkeleton = () => (
     <MotiView
@@ -103,15 +89,15 @@ const Accounts: React.FC = () => {
                   bgColor={boxBg}
                   key={`fiat-${index}`}
                   name={item.fiat_currency_name}
-                  label={item.fiat_currency_label}
-                  image={fiatImages[item.fiat_currency_name] || images.logodark}
+                  label={item.currency_code}
+                  country_code={item.country_code}
                   balance={item.balance}
                   type="fiat"
                   account_balance={item.account_balance}
                   account_name={item.account_name}
                   bank_name={item.bank_name}
                   account_number={item.account_number}
-                  handlePress={() => handleItemPress(item, "fiat")}
+                  handlePress={() => openSheet("fiat", item)}
                 />
               ))}
 
@@ -128,19 +114,43 @@ const Accounts: React.FC = () => {
                   key={`crypto-${index}`}
                   name={item.token_symbol}
                   label={item.token_name}
-                  image={cryptoImages[item.token_name] || images.logodark}
+                  image={item.token_image || images.logodark}
                   balance={item.balance}
                   price={item.price}
                   type="crypto"
                   address={item.address}
-                  handlePress={() => handleItemPress(item, "crypto")}
+                  handlePress={() => openSheet("crypto", item)}
                 />
               ))}
         </View>
+
         <AccountBottomSheet
-          ref={bottomSheetRef}
-          selectedItem={selectedItem}
+          isVisible={isSheetVisible}
+          onClose={() => setIsSheetVisible(false)}
           selectedType={selectedType}
+          selectedItem={selectedItem}
+          title={selectedType === "fiat" ? "Bank Transfer" : "Fund with Crypto"}
+          label={
+            selectedType === "fiat" ? (
+              <>
+                Add cash to your{" "} 
+                <ThemedText style={styles.selectedText}>
+                  {selectedItem?.currency_code}
+                </ThemedText>
+                {" "}
+                wallet using the account details below
+              </>
+            ) : (
+              <>
+                Fund your{" "}
+                <ThemedText style={styles.selectedText}>
+                  {selectedItem?.token_name}
+                </ThemedText>
+                {" "}
+                wallet with the address below
+              </>
+            )
+          }
         />
       </ScrollView>
     </SafeAreaView>
@@ -157,7 +167,7 @@ const styles = StyleSheet.create({
     flexGrow: 1
   },
   content: {
-    marginHorizontal: 10,
+    marginHorizontal: 10
   },
   sectionHeader: {
     color: "#999",
@@ -193,6 +203,11 @@ const styles = StyleSheet.create({
   skeletonLineLong: {
     width: "80%",
     height: 10,
-    backgroundColor: Colors.dark.primaryBgDark,
+    backgroundColor: Colors.dark.primaryBgDark
+  },
+  selectedText: {
+    fontFamily: "Inter-SemiBold",
+    fontSize: 12,
+    color: "#208BC9"
   }
 });

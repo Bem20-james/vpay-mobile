@@ -6,17 +6,18 @@ import CustomButton from "../CustomButton";
 import { KycStyles as styles } from "@/styles/kyc";
 import { CameraView, useCameraPermissions } from "expo-camera";
 
-
 interface SelfieUploadProps {
-  onBack: () => void;
+  onNext: () => void;
   onSubmit: (selfieUri: string) => void;
   isLoading?: boolean;
+  isvalid?: boolean;
 }
 
 const SelfieUpload: React.FC<SelfieUploadProps> = ({
-  onBack,
+  onNext,
   onSubmit,
-  isLoading = false
+  isLoading = false,
+  isvalid
 }) => {
   const [permission, requestPermission] = useCameraPermissions();
   const [cameraActive, setCameraActive] = useState(false);
@@ -97,19 +98,6 @@ const SelfieUpload: React.FC<SelfieUploadProps> = ({
 
   return (
     <View style={styles.container}>
-      <View style={{ flexDirection: "row", gap: 3, alignItems: "center" }}>
-        <TouchableOpacity onPress={onBack}>
-          <MaterialIcons name="arrow-back" size={20} color={"#ffffff"} />
-        </TouchableOpacity>
-        <ThemedText type="defaultSemiBold">Identity Verification</ThemedText>
-      </View>
-      <ThemedText style={styles.title}>
-        Take a Selfie
-      </ThemedText>
-      <ThemedText style={styles.subtitle}>
-        Please take a selfie with a neutral expression
-      </ThemedText>
-
       <View style={styles.cameraContainer}>{renderCameraContent()}</View>
 
       {!photo && !cameraActive && (
@@ -132,13 +120,14 @@ const SelfieUpload: React.FC<SelfieUploadProps> = ({
             <MaterialIcons name="refresh" size={25} color="#7b7b9b" />
             <ThemedText type="default">Retake Selfie</ThemedText>
           </TouchableOpacity>
-          <CustomButton
-            title="Submit"
-            handlePress={handleSubmit}
-            btnStyles={styles.submitButton}
-            disabled={isLoading}
-            isLoading={isLoading}
-          />
+          {isvalid && (
+            <CustomButton
+              title="Continue to Review"
+              handlePress={onNext}
+              disabled={isLoading}
+              btnStyles={styles.submitButton}
+            />
+          )}
         </View>
       )}
     </View>

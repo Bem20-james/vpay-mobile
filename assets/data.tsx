@@ -259,7 +259,7 @@ export const recentActions: TransferItem[] = [
     amount: "8500",
     timestamp: "3 days ago"
   },
-    {
+  {
     label: "ADVANZTEK",
     subtitle: "0123456789 moniepoint",
     icon: "lightning-bolt",
@@ -299,7 +299,7 @@ export const beneficiaries: Beneficiaries[] = [
     backgroundColor: "#8B5CF6",
     iconColor: "#FFFFFF"
   },
-    {
+  {
     label: "ADVANZTEK",
     subtitle: "876543210 ACCESS BANK",
     icon: "account",
@@ -328,13 +328,13 @@ export const transferOptions: ActionItem[] = [
     icon: "cellphone-dock",
     backgroundColor: "#e0f7f4",
     iconColor: "#00bfa5",
-    route: "/local-bank"
+    route: "/mobile-money"
   },
   {
     label: "International",
     icon: "map-check",
-    backgroundColor: "#fff1eb",
-    iconColor: "#ff7043",
+    backgroundColor: "#c5e6faff",
+    iconColor: "#208BC9",
     route: "/international"
   },
   {
@@ -342,6 +342,69 @@ export const transferOptions: ActionItem[] = [
     icon: "bitcoin",
     route: "/crypto",
     backgroundColor: "#fff1eb",
-    iconColor: "#ff7043",
+    iconColor: "#ff7043"
+  }
+];
+
+export const countries = [
+  {
+    id: 1,
+    name: "USA",
+    countryCode: "US"
+  },
+  {
+    id: 2,
+    name: "UK",
+    countryCode: "UK"
+  },
+  {
+    id: 3,
+    name: "Nigeria",
+    countryCode: "NG"
+  },
+  {
+    id: 4,
+    name: "South Africa",
+    countryCode: "ZA"
+  },
+  {
+    id: 5,
+    name: "Kenya",
+    countryCode: "KE"
+  },
+  {
+    id: 6,
+    name: "Ghana",
+    countryCode: "GH"
+  },
+  {
+    id: 7,
+    name: "Egypt",
+    countryCode: "EG"
+  },
+  {
+    id: 8,
+    name: "Morocco",
+    countryCode: "MA"
+  },
+  {
+    id: 9,
+    name: "Ethiopia",
+    countryCode: "ET"
+  },
+  {
+    id: 10,
+    name: "Uganda",
+    countryCode: "UG"
+  },
+  {
+    id: 11,
+    name: "Tanzania",
+    countryCode: "TZ"
+  },
+  {
+    id: 12,
+    name: "Rwanda",
+    countryCode: "RW"
   }
 ];

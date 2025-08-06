@@ -1,24 +1,75 @@
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import Navigator from "@/components/Navigator";
 import { ThemedText } from "@/components/ThemedText";
-import React, { useState } from "react";
-import { View, StyleSheet, ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, StyleSheet, ScrollView, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SettingItem } from "@/components/SettingItem";
 import { useRouter } from "expo-router";
 import { useLogout } from "@/hooks/useAuthentication";
 import { useUser } from "@/contexts/UserContexts";
+import { getData, storeData, removeData } from "@/utils/store";
+import * as LocalAuthentication from "expo-local-authentication";
+import { Colors } from "@/constants/Colors";
 
 const SettingsScreen: React.FC = () => {
   const [hideBalance, setHideBalance] = useState(false);
   const [securityLock, setSecurityLock] = useState(false);
-  const [transactionPin, setTransactionPin] = useState(false);
   const [fingerprint, setFingerprint] = useState(false);
   const colorScheme = useColorScheme();
-  const boxBackgroundColor = colorScheme === "dark" ? "#000000" : "#EEF3FB";
+  const boxBackgroundColor =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
   const router = useRouter();
   const logout = useLogout();
   const { clearUser } = useUser();
+
+  const [isEnabled, setIsEnabled] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const enabled = await getData("useBiometrics");
+      setIsEnabled(Boolean(enabled));
+    })();
+  }, []);
+
+  const toggleBiometrics = async () => {
+    const hasHardware = await LocalAuthentication.hasHardwareAsync();
+    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+    if (!hasHardware || !isEnrolled) {
+      Alert.alert(
+        "Biometric not supported",
+        "Your device does not support biometrics."
+      );
+      return;
+    }
+
+    const result = await LocalAuthentication.authenticateAsync({
+      promptMessage: isEnabled
+        ? "Confirm to disable biometric login"
+        : "Authenticate to enable biometric login",
+      cancelLabel: "Cancel",
+      fallbackLabel: "Use PIN"
+    });
+
+    if (result.success) {
+      const newValue = !isEnabled;
+      setIsEnabled(newValue);
+
+      if (newValue) {
+        await storeData("useBiometrics", true);
+        Alert.alert("Enabled", "Biometric login is now enabled.");
+      } else {
+        await removeData("useBiometrics");
+        Alert.alert("Disabled", "Biometric login is now disabled.");
+      }
+    } else {
+      Alert.alert(
+        "Authentication failed",
+        "Unable to change biometric settings."
+      );
+    }
+  };
 
   const handleLogout = async () => {
     const success = await logout();
@@ -32,7 +83,7 @@ const SettingsScreen: React.FC = () => {
     <SafeAreaView
       style={[styles.safeArea, { backgroundColor: boxBackgroundColor }]}
     >
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
           <Navigator title="Settings" showBackIcon={false} />
 
@@ -47,6 +98,7 @@ const SettingsScreen: React.FC = () => {
             <View style={{ marginVertical: 10 }}>
               <SettingItem
                 title="Manage Devices"
+                label="Control which devices you are logged in to"
                 hasChevron
                 onPress={() => router.push("/(user)/devices")}
                 iconColor="#218DC9"
@@ -68,6 +120,7 @@ const SettingsScreen: React.FC = () => {
 
               <SettingItem
                 title="Hide Balance"
+                label="Hide your balance on the app"
                 hasSwitch
                 switchValue={hideBalance}
                 onSwitchChange={setHideBalance}
@@ -75,16 +128,17 @@ const SettingsScreen: React.FC = () => {
 
               <SettingItem
                 title="Enable Security Lock"
+                label="will require PIN when you leave the app"
                 hasSwitch
                 switchValue={securityLock}
                 onSwitchChange={setSecurityLock}
               />
-
               <SettingItem
-                title="Transaction PIN"
+                title="Enable Biometrics"
+                label="use your fingerprint/faceID to unlock the app"
                 hasSwitch
-                switchValue={transactionPin}
-                onSwitchChange={setTransactionPin}
+                switchValue={isEnabled}
+                onSwitchChange={toggleBiometrics}
               />
 
               <SettingItem
@@ -92,6 +146,12 @@ const SettingsScreen: React.FC = () => {
                 hasSwitch
                 switchValue={fingerprint}
                 onSwitchChange={setFingerprint}
+              />
+
+              <SettingItem
+                title="Change VPay PIN"
+                hasChevron
+                onPress={() => console.log("Change VPay PIN pressed")}
               />
 
               <SettingItem
@@ -142,6 +202,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 5
   },
+
   section: {
     paddingTop: 20
   },

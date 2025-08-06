@@ -255,7 +255,7 @@ const Register = () => {
         <View style={styles.container}>
           {stepTwoVisible && (
             <Pressable onPress={() => setStepTwoVisible(false)}>
-              <FontAwesome name="angle-left" size={30} color={"#9B9B9B"} />
+              <FontAwesome name="angle-left" size={25} color={"#9B9B9B"} />
             </Pressable>
           )}
           {colorScheme === "dark" ? (
@@ -278,7 +278,7 @@ const Register = () => {
           </View>
 
           {!stepTwoVisible ? (
-            <>
+            <View style={{flexDirection: "column", gap:20}}>
               <FormField
                 handleChangeText={(val) => handleFieldChange("country", val)}
                 value={form.country}
@@ -318,7 +318,7 @@ const Register = () => {
                 placeholder="Enter phone number"
                 error={errors.phone}
               />
-            </>
+            </View>
           ) : (
             <StepTwo
               form={form}
@@ -346,7 +346,7 @@ const Register = () => {
           <View style={styles.btmContent}>
             <View
               style={{
-                marginTop: 10,
+                marginTop: 5,
                 flexDirection: "row",
                 justifyContent: "center",
                 gap: 4
@@ -376,7 +376,7 @@ const Register = () => {
                 style={{
                   fontFamily: "Inter",
                   fontWeight: "bold",
-                  fontSize: 12,
+                  fontSize: 10,
                   color: "#218DC9"
                 }}
               >

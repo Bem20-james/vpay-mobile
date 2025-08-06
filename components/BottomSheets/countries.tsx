@@ -5,8 +5,8 @@ import { Portal } from "@gorhom/portal";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import CountryFlag from "react-native-country-flag";
 import { ThemedText } from "../ThemedText";
-import { ThemedView } from "../ThemedView";
 import { styles } from "../../styles/formfield";
+import { Colors } from "@/constants/Colors";
 
 export type CountryItem = {
   id?: number;
@@ -32,7 +32,7 @@ const CountryBottomSheet = ({
   onSelect,
   isLoading = false,
   title = "Select Country",
-  snapPoints = ["40%", "55%"]
+  snapPoints = ["30%", "50%"]
 }: CountryBottomSheetProps) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const colorScheme = useColorScheme();
@@ -48,12 +48,13 @@ const CountryBottomSheet = ({
         enablePanDownToClose
         onClose={onClose}
         backgroundStyle={{
-          backgroundColor: colorScheme === "dark" ? "#1A1A1A" : "#FFFFFF"
+          backgroundColor:
+            colorScheme === "dark"
+              ? Colors.dark.primaryBgDark
+              : Colors.light.accentBg
         }}
       >
-        <ThemedView style={styles.bottomSheetHeader}>
-          <ThemedText style={styles.bottomSheetTitle}>{title}</ThemedText>
-        </ThemedView>
+        <ThemedText style={styles.bottomSheetTitle}>{title}</ThemedText>
         <BottomSheetFlatList
           data={data}
           keyExtractor={(item, index) =>

@@ -21,6 +21,15 @@ export interface User {
   accessToken?: string;
   refreshToken?: string | null;
   expiresAt?: number;
+  country?: {
+    code: string;
+    dial_code: string;
+    name: string;
+  };
+  kyc?: {
+    address: number;
+    identity: number;
+  };
   [key: string]: any;
 }
 
@@ -79,16 +88,15 @@ export default function UserContextProvider({ children }: PropsWithChildren) {
   // }, []);
 
   const updateUser = useCallback(async (data: User) => {
-  try {
-    await storeData("auth", data);
-    setUser(data);
-    console.log("✅ user updated in context:", data);
-  } catch (error) {
-    console.error("❌ Failed to update user data:", error);
-    throw error;
-  }
-}, []);
-
+    try {
+      await storeData("auth", data);
+      setUser(data);
+      console.log("user updated in context:", data);
+    } catch (error) {
+      console.error("Failed to update user data:", error);
+      throw error;
+    }
+  }, []);
 
   const clearUser = useCallback(async () => {
     try {

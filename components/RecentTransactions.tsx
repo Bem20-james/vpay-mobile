@@ -34,7 +34,8 @@ const RecentTransaction: React.FC<Props> = ({
 }) => {
   const router = useRouter();
   const colorScheme = useColorScheme();
-  const bgColor = colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+  const bgColor =
+    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
 
   return (
     <View style={styles.container}>
@@ -64,6 +65,8 @@ const RecentTransaction: React.FC<Props> = ({
         data={actions}
         keyExtractor={(item) => item.id}
         numColumns={1}
+        nestedScrollEnabled={true}
+        scrollEnabled={false}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={[{ backgroundColor: bgColor }, styles.actionBox]}

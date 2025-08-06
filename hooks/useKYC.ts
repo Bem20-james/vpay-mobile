@@ -22,12 +22,18 @@ interface KYCFormData {
 interface RegisterData {
   firstname?: string;
   lastname?: string;
-  username?: string;
   email: string;
-  password: string;
   country_id?: string;
   phone?: string;
-  referral?: string;
+  gender?: string;
+  marital_status?: string;
+  occupation?: string;
+  postal_code?: string;
+  state?: string;
+  city?: string;
+  dob?: string;
+  address?: string;
+  selfie_image?: string;
 }
 
 function usePersonalVerification() {
@@ -104,6 +110,6 @@ const useIdVerification = () => {
 };
 
 export  {
-useIdVerification,
-usePersonalVerification
+  useIdVerification,
+  usePersonalVerification
 };

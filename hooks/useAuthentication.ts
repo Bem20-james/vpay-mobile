@@ -422,20 +422,25 @@ const useVerifyLogin = () => {
 
       if (response.status === 200) {
 
-        const { token, user } = result.result;
+        const { token, user, country, kyc } = result.result;
         const tokenPayload: JwtPayload = jwtDecode(token);
         const expiresAt = tokenPayload.exp * 1000;
 
         const userData = {
           ...user,
+          country,
+          kyc,
           accessToken: token,
           refreshToken: null,
           expiresAt,
         };
         console.log("logged userdata:", userData)
         await updateUser(userData);
-        await storeData("lastUser", user.email);
-        await storeData("user_" + user.email, userData);
+        await storeData("lastUser", {
+          username: user.username,
+          email: user.email,
+        });
+
         router.push("/(tabs)/home");
       }
     } catch (err: any) {
@@ -491,13 +496,14 @@ const useVerifyForgotPwd = () => {
 
 function useLogout() {
   const { config } = useUser();
+
   return async (): Promise<boolean> => {
     try {
       const response = await axios.post<AuthResponse>(
         `${SERVER_BASE_URL}/auth/user/logout`,
-        config
+        {config}
       );
-
+  
       const result = response?.data;
       console.log("Logout Response:", result);
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, TouchableOpacity, Text, ScrollView } from "react-native";
+import { View, TouchableOpacity, ScrollView } from "react-native";
 import { ThemedText } from "../ThemedText";
 import { Entypo } from "@expo/vector-icons";
 import FormField from "../FormFields";
@@ -8,9 +8,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Navigator from "../Navigator";
 import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
-import { useRouter } from "expo-router";
 import { KycStyles as styles } from "@/styles/kyc";
-import SelfieUpload from "./SelfieUpload";
+import { Colors } from "@/constants/Colors";
 
 const IdTypes = [
   { id: "1", label: "NIN" },
@@ -24,28 +23,21 @@ interface IDProps {
 const IdentityVerifiaction = ({ onBack }: IDProps) => {
   const [idNumber, setIdNumber] = useState("");
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
-  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const colorScheme = useColorScheme();
-  const backgroundColor = colorScheme === "dark" ? "#000000" : "#EEF3FB";
-  const bgColor = colorScheme === "dark" ? "#161622" : "#ffffff";
-  const statusBarBg = colorScheme === "dark" ? "#000000" : "#EEF3FB";
-  const router = useRouter();
-  const [showSelfieUpload, setShowSelfieUpload] = useState(false);
+  const backgroundColor =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const bgColor =
+    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+  const statusBarBg =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
 
   const handlePress = (typeId: string) => {
     setSelectedMethod(typeId);
     setIdNumber("");
-  };
+  }        
   const selectedIdType = IdTypes.find((type) => type.id === selectedMethod);
-
-  if (showSelfieUpload) {
-    return (
-      <SelfieUpload
-        onBack={() => setShowSelfieUpload(false)}
-        isLoading
-        onSubmit={() => {}}
-      />
-    );
+  const handleSubmit = () =>{
+    
   }
 
   return (
@@ -116,7 +108,7 @@ const IdentityVerifiaction = ({ onBack }: IDProps) => {
           <View style={styles.btnCon}>
             <CustomButton
               title="Submit"
-              handlePress={() => setShowSelfieUpload(true)}
+              handlePress={handleSubmit}
               btnStyles={{ width: "100%" }}
             />
           </View>
