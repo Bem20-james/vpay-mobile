@@ -1,5 +1,4 @@
-import { StyleSheet, Dimensions } from "react-native";
-  const screenHeight = Dimensions.get("window").height;
+import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
@@ -53,7 +52,7 @@ export const styles = StyleSheet.create({
     position: "absolute",
     top: 130,
     left: 20,
-    right: 20,
+    right: 20
   },
   forgotPwd: {
     display: "flex",

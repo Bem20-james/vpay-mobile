@@ -1,10 +1,15 @@
-import React, { useState } from "react";
-import { TouchableOpacity, StyleSheet } from "react-native";
+import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import React, { useState } from "react";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import { ThemedText } from "./ThemedText";
 import { ThemedView } from "./ThemedView";
 
-const CustomTab = ({ tabs, onTabChange }: { tabs: any; onTabChange: any }) => {
+interface CustomTabProps {
+  tabs: string[];
+  onTabChange: (tab: string) => void;
+}
+const CustomTab = ({ tabs, onTabChange }: CustomTabProps) => {
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark";
@@ -13,7 +18,11 @@ const CustomTab = ({ tabs, onTabChange }: { tabs: any; onTabChange: any }) => {
     <ThemedView
       style={[
         styles.tabContainer,
-        { backgroundColor: isDarkMode ? "#F8F8F8" : "#F8F8F8" }
+        {
+          backgroundColor: isDarkMode
+            ? Colors.dark.accentBg
+            : Colors.light.accentBg
+        }
       ]}
     >
       {tabs.map((tab: any) => (
@@ -25,8 +34,8 @@ const CustomTab = ({ tabs, onTabChange }: { tabs: any; onTabChange: any }) => {
               backgroundColor:
                 activeTab === tab
                   ? isDarkMode
-                    ? "#FFFFFF"
-                    : "#DDD"
+                    ? Colors.dark.primaryDark2
+                    : Colors.dark.primaryDark1
                   : "transparent"
             }
           ]}
@@ -40,15 +49,15 @@ const CustomTab = ({ tabs, onTabChange }: { tabs: any; onTabChange: any }) => {
               color:
                 activeTab === tab
                   ? isDarkMode
-                    ? "#242424"
-                    : "#000"
+                    ? "#ffffff"
+                    : "#ffffff"
                   : isDarkMode
-                  ? "#BBB"
-                  : "#666",
+                  ? "#ffffff"
+                  : "#000000",
               textAlign: "center",
-              fontFamily: "Inter-SemiBold",
-              fontSize: 16,
-              padding: 2
+              padding: 5,
+              fontFamily: activeTab === tab ? "Inter-Bold" : "Inter-SemiBold",
+              fontSize: 15
             }}
           >
             {tab}
@@ -68,14 +77,15 @@ const styles = StyleSheet.create({
     marginTop: 20,
     justifyContent: "space-between",
     alignItems: "center",
-    borderRadius: 100,
-    padding: 6,
-    margin: 5
+    borderRadius: 50,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    margin: 8
   },
   tabItem: {
     flex: 1,
     padding: 7,
-    borderRadius: 100,
+    borderRadius: 50,
     alignItems: "center"
   }
 });

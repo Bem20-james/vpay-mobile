@@ -5,7 +5,7 @@ import { Portal } from "@gorhom/portal";
 import { ThemedText } from "../ThemedText";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import getSymbolFromCurrency from "currency-symbol-map";
-import { MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 
 interface Currency {
@@ -94,7 +94,11 @@ const AssetsBottomSheet = ({
                     {item.balance.toFixed(2)}
                   </ThemedText>
                   {isSelected && (
-                    <MaterialIcons name="check" size={20} color="#208BC9" />
+                    <FontAwesome
+                      name="dot-circle-o"
+                      size={15}
+                      color="#208BC9"
+                    />
                   )}
                 </View>
               </TouchableOpacity>
@@ -126,7 +130,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 15,
-    fontFamily: "Inter-SemiBold"
+    fontFamily: "Inter-Medium"
   },
   amount: {
     fontSize: 14,

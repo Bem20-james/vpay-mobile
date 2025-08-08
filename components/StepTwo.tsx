@@ -22,13 +22,12 @@ interface StepTwoProps {
 
 const StepTwo: React.FC<StepTwoProps> = ({ form, errors, onFieldChange }) => {
   return (
-    <View style={{ flexDirection: "column", gap: 20 }}>
+    <View style={{ flexDirection: "column" }}>
       <FormField
         placeholder="Email"
         keyboardType="email-address"
         handleChangeText={(val) => onFieldChange("email", val)}
         value={form.email}
-        otherStyles={{ marginTop: 5 }}
         isIcon
         iconName="mail"
         error={errors.email}
@@ -38,7 +37,6 @@ const StepTwo: React.FC<StepTwoProps> = ({ form, errors, onFieldChange }) => {
         placeholder="Username"
         handleChangeText={(val) => onFieldChange("username", val)}
         value={form.username}
-        otherStyles={{ marginTop: 5 }}
         isIcon
         iconName="person"
         error={errors.username}
@@ -48,7 +46,6 @@ const StepTwo: React.FC<StepTwoProps> = ({ form, errors, onFieldChange }) => {
         placeholder="Password"
         handleChangeText={(val) => onFieldChange("password", val)}
         value={form.password}
-        otherStyles={{ marginTop: 5 }}
         isIcon
         iconName="lock"
         error={errors.password}
@@ -58,7 +55,6 @@ const StepTwo: React.FC<StepTwoProps> = ({ form, errors, onFieldChange }) => {
         placeholder="Referral Code (optional)"
         handleChangeText={(val) => onFieldChange("referralCode", val)}
         value={form.referralCode || ""}
-        otherStyles={{ marginTop: 5 }}
         isIcon
         iconName="card-giftcard"
       />

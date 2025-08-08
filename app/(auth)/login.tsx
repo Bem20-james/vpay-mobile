@@ -164,7 +164,6 @@ const Login = () => {
             error={errors.password}
             isIcon
             iconName="shield"
-            otherStyles={{ marginTop: 20 }}
           />
 
           <Pressable

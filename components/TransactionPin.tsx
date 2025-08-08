@@ -5,12 +5,22 @@ import {
   TouchableOpacity,
   StyleSheet,
   StatusBar,
-  Platform
+  Image,
+  ScrollView
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Navigator from "./Navigator";
+import { useColorScheme } from "@/hooks/useColorScheme.web";
+import { Colors } from "@/constants/Colors";
+import images from "@/constants/Images";
+import { ThemedText } from "./ThemedText";
 
 const TransactionPinScreen: React.FC = () => {
+  const colorScheme = useColorScheme();
+  const bgColor =
+    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+
   const [pin, setPin] = useState<string>("");
   const maxPinLength: number = 4;
 
@@ -22,11 +32,6 @@ const TransactionPinScreen: React.FC = () => {
 
   const handleDelete = (): void => {
     setPin(pin.slice(0, -1));
-  };
-
-  const handleBack = (): void => {
-    // Handle back navigation (can integrate with React Navigation)
-    console.log("Back pressed");
   };
 
   const renderPinDots = (): JSX.Element[] => {
@@ -52,127 +57,93 @@ const TransactionPinScreen: React.FC = () => {
       onPress={() => onPress(number)}
       activeOpacity={0.7}
     >
-      <Text style={styles.numberText}>{number}</Text>
+      <ThemedText style={styles.numberText}>{number}</ThemedText>
     </TouchableOpacity>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+    <SafeAreaView style={{ backgroundColor: bgColor, height: "100%" }}>
+      <ScrollView
+        style={{ paddingHorizontal: 7 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <Navigator />
+        <View style={styles.container}>
+          {colorScheme === "dark" ? (
+            <Image source={images.logolight} style={styles.logo} />
+          ) : (
+            <Image source={images.logodark} style={styles.logo} />
+          )}
+          {/* Content */}
+          <View style={styles.content}>
+            {/* Title */}
+            <ThemedText style={styles.title}>
+              Create a transaction PIN
+            </ThemedText>
 
-      {/* Header with back button */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={handleBack}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="arrow-back" size={24} color="#3B82F6" />
-        </TouchableOpacity>
-      </View>
+            {/* PIN dots */}
+            <View style={styles.pinDotsContainer}>{renderPinDots()}</View>
 
-      {/* Content */}
-      <View style={styles.content}>
-        {/* Logo */}
-        <View style={styles.logoContainer}>
-          <View style={styles.logo}>
-            <View style={[styles.logoSquare, styles.logoSquare1]} />
-            <View style={[styles.logoSquare, styles.logoSquare2]} />
+            {/* Keypad */}
+            <View style={styles.keypad}>
+              {/* Row 1 */}
+              <NumberButton number="1" onPress={handleNumberPress} />
+              <NumberButton number="2" onPress={handleNumberPress} />
+              <NumberButton number="3" onPress={handleNumberPress} />
+              {/* Row 2 */}
+              <NumberButton number="4" onPress={handleNumberPress} />
+              <NumberButton number="5" onPress={handleNumberPress} />
+              <NumberButton number="6" onPress={handleNumberPress} />
+              {/* Row 3 */}
+              <NumberButton number="7" onPress={handleNumberPress} />
+              <NumberButton number="8" onPress={handleNumberPress} />
+              <NumberButton number="9" onPress={handleNumberPress} />
+              {/* Row 4 */}
+              <View style={styles.dumNumberButton} />
+              <NumberButton number="0" onPress={handleNumberPress} />
+              <TouchableOpacity
+                style={[
+                  styles.deleteButton,
+                  { opacity: pin.length === 0 ? 0.5 : 1 }
+                ]}
+                onPress={handleDelete}
+                disabled={pin.length === 0}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="backspace" size={24} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
           </View>
-          <Text style={styles.logoText}>Pay</Text>
         </View>
-
-        {/* Title */}
-        <Text style={styles.title}>Create a transaction PIN</Text>
-
-        {/* PIN dots */}
-        <View style={styles.pinDotsContainer}>{renderPinDots()}</View>
-
-        {/* Keypad */}
-        <View style={styles.keypad}>
-          {/* Row 1 */}
-          <NumberButton number="1" onPress={handleNumberPress} />
-          <NumberButton number="2" onPress={handleNumberPress} />
-          <NumberButton number="3" onPress={handleNumberPress} />
-          {/* Row 2 */}
-          <NumberButton number="4" onPress={handleNumberPress} />
-          <NumberButton number="5" onPress={handleNumberPress} />
-          <NumberButton number="6" onPress={handleNumberPress} />
-          {/* Row 3 */}
-          <NumberButton number="7" onPress={handleNumberPress} />
-          <NumberButton number="8" onPress={handleNumberPress} />
-          <NumberButton number="9" onPress={handleNumberPress} />
-          {/* Row 4 */}
-          <View /> {/* Empty space */}
-          <NumberButton number="0" onPress={handleNumberPress} />
-          <TouchableOpacity
-            style={[
-              styles.deleteButton,
-              { opacity: pin.length === 0 ? 0.5 : 1 }
-            ]}
-            onPress={handleDelete}
-            disabled={pin.length === 0}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="backspace" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-        </View>
-      </View>
+        <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      </ScrollView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#FFFFFF"
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    paddingHorizontal: 20
   },
-  header: {
-    paddingHorizontal: 24,
-    paddingVertical: 16
-  },
-  backButton: {
-    padding: 8,
-    borderRadius: 12
+  logo: {
+    width: 106,
+    height: 50,
+    resizeMode: "contain",
+    marginHorizontal: "auto",
+    marginVertical: 10
   },
   content: {
     flex: 1,
     alignItems: "center",
-    paddingHorizontal: 24
-  },
-  logoContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 64
-  },
-  logo: {
-    flexDirection: "row",
-    alignItems: "center"
-  },
-  logoSquare: {
-    width: 32,
-    height: 32,
-    transform: [{ rotate: "45deg" }],
-    borderRadius: 4
-  },
-  logoSquare1: {
-    backgroundColor: "#3B82F6"
-  },
-  logoSquare2: {
-    backgroundColor: "#93C5FD",
-    marginLeft: -8
-  },
-  logoText: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#111827",
-    marginLeft: 8
+    paddingHorizontal: 0
   },
   title: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#111827",
-    marginBottom: 48
+    fontSize: 16,
+    fontFamily: "Questrial",
+    marginBottom: 50
   },
   pinDotsContainer: {
     flexDirection: "row",
@@ -197,20 +168,27 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "#F9FAFB",
+    borderColor: "#c2c2c3ff",
+    borderWidth: 1,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  dumNumberButton: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     justifyContent: "center",
     alignItems: "center"
   },
   numberText: {
     fontSize: 24,
-    fontWeight: "500",
-    color: "#1F2937"
+    fontWeight: "500"
   },
   deleteButton: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#208BC9",
     justifyContent: "center",
     alignItems: "center"
   }

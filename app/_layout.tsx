@@ -63,7 +63,10 @@ export default function RootLayout() {
                   options={{ headerShown: false }}
                 />
                 <Stack.Screen name="(user)" options={{ headerShown: false }} />
-                <Stack.Screen name="(transfers)" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="(transfers)"
+                  options={{ headerShown: false }}
+                />
 
                 <Stack.Screen
                   name="notifications"
@@ -77,7 +80,10 @@ export default function RootLayout() {
                   name="verification"
                   options={{ headerShown: false }}
                 />
-
+                <Stack.Screen
+                  name="transaction-limit"
+                  options={{ headerShown: false }}
+                />
                 <Stack.Screen name="+not-found" />
               </Stack>
 

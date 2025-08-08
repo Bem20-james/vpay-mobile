@@ -12,17 +12,15 @@ import CustomChip from "@/components/CustomChips";
 import images from "@/constants/Images";
 import CustomTab from "@/components/CustomTabs";
 import TabContent from "@/components/TabContents";
-
-const methods = [
-  { id: "mtn", text: "DSTV", image: images.dstv },
-  { id: "ninemobile", text: "GOTV", image: images.gotv },
-  { id: "glo", text: "SHOWMAX", image: images.showmax }
-];
+import { Colors } from "@/constants/Colors";
+import CurrencyField from "@/components/CurrencyField";
 
 const ElectricityScreen = () => {
   const colorScheme = useColorScheme();
-  const boxBackgroundColor = colorScheme === "dark" ? "#000000" : "#FFFFFF";
-  const statusBarBg = colorScheme === "dark" ? "#000000" : "#FFFFFF";
+  const boxBackgroundColor =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const statusBarBg =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("Airtime");
 
@@ -51,36 +49,23 @@ const ElectricityScreen = () => {
               handleChangeText={(value) => {}}
               isDropdown
               onDropdownPress={() => {}}
-              placeholder="Currency"
-            />
-            <FormField
-              handleChangeText={(value) => {}}
-              isDropdown
-              onDropdownPress={() => {}}
-              placeholder="Select plan power company"
+              placeholder="Select power company"
             />
             <FormField
               placeholder={"Meter number"}
               handleChangeText={() => {}}
-              otherStyles={{ marginTop: 5 }}
               keyboardType="phone-pad"
               isIcon
               iconName="developer-board"
             />
-            <FormField
-              placeholder={"Amount"}
-              handleChangeText={() => {}}
-              otherStyles={{ marginTop: 5 }}
-              keyboardType="phone-pad"
-              isIcon
-              iconName="bolt"
-            />
+
+            <CurrencyField />
           </View>
 
           <CustomButton
             title={"Continue"}
             handlePress={() => router.push("/(tabs)/home")}
-            btnStyles={{ marginTop: 50 }}
+            btnStyles={{ marginTop: 20 }}
             variant="primary"
             size="medium"
           />

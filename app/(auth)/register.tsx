@@ -278,7 +278,7 @@ const Register = () => {
           </View>
 
           {!stepTwoVisible ? (
-            <View style={{flexDirection: "column", gap:20}}>
+            <View style={{ flexDirection: "column" }}>
               <FormField
                 handleChangeText={(val) => handleFieldChange("country", val)}
                 value={form.country}
@@ -293,7 +293,6 @@ const Register = () => {
                 placeholder="First Name"
                 handleChangeText={(val) => handleFieldChange("fname", val)}
                 value={form.fname}
-                otherStyles={{ marginTop: 5 }}
                 keyboardType="default"
                 isIcon
                 iconName="person"
@@ -303,7 +302,6 @@ const Register = () => {
                 placeholder="Last Name"
                 handleChangeText={(val) => handleFieldChange("lname", val)}
                 value={form.lname}
-                otherStyles={{ marginTop: 5 }}
                 keyboardType="default"
                 isIcon
                 iconName="person"

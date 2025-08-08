@@ -10,6 +10,8 @@ import FormField from "@/components/FormFields";
 import CustomButton from "@/components/CustomButton";
 import CustomChip from "@/components/CustomChips";
 import images from "@/constants/Images";
+import { Colors } from "@/constants/Colors";
+import CurrencyField from "@/components/CurrencyField";
 
 const methods = [
   { id: "mtn", text: "MTN", image: images.mtn },
@@ -20,8 +22,10 @@ const methods = [
 
 const DataScreen = () => {
   const colorScheme = useColorScheme();
-  const boxBackgroundColor = colorScheme === "dark" ? "#000000" : "#FFFFFF";
-  const statusBarBg = colorScheme === "dark" ? "#000000" : "#FFFFFF";
+  const boxBackgroundColor =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const statusBarBg =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState<
     number | string | null
@@ -54,28 +58,23 @@ const DataScreen = () => {
               handleChangeText={(value) => {}}
               isDropdown
               onDropdownPress={() => {}}
-              placeholder="Currency"
-            />
-            <FormField
-              handleChangeText={(value) => {}}
-              isDropdown
-              onDropdownPress={() => {}}
               placeholder="Select plan"
             />
             <FormField
               placeholder={"Phone number"}
               handleChangeText={() => {}}
-              otherStyles={{ marginTop: 5 }}
               keyboardType="default"
               isLeftIcon
               iconName="person"
             />
+
+            <CurrencyField />
           </View>
 
           <CustomButton
             title={"Continue"}
             handlePress={() => router.push("/(tabs)/home")}
-            btnStyles={{ marginTop: 50 }}
+            btnStyles={{ marginTop: 20 }}
             variant="primary"
             size="medium"
           />

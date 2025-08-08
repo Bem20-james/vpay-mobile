@@ -126,7 +126,7 @@ const FormField = ({
         )}
 
         {isIcon && iconName && (
-          <View>
+          <View style={{paddingRight: 5}}>
             <MaterialIcons name={iconName} size={20} color="#208BC9" />
           </View>
         )}

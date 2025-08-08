@@ -21,7 +21,6 @@ const OTPInputField: React.FC<OTPInputFieldProps> = ({
   onComplete
 }) => {
   const [isFull, setIsFull] = useState<boolean>(false);
-
   const ref = useBlurOnFulfill({ value, cellCount: CELL_COUNT });
 
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({

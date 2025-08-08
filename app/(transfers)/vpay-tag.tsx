@@ -9,6 +9,8 @@ import { Feather } from "@expo/vector-icons";
 import { TransferStyles as styles } from "@/styles/transfers";
 import { RenderItem } from "@/components/RenderItems";
 import { Colors } from "@/constants/Colors";
+import SendScreen from "@/components/Transfers/SendScreen";
+import { SendScreenProps } from "@/types/transfers";
 
 export type Contact = {
   name: string;
@@ -38,7 +40,7 @@ const sampleData: Contact[] = [
   { name: "Jimie Doe", handle: "@jimie", flag: "NG" }
 ];
 
-const VpayTag = () => {
+const VpayTag = ({ onBack }: SendScreenProps) => {
   const colorScheme = useColorScheme();
   const backgroundColor =
     colorScheme === "dark" ? Colors.dark.background : Colors.light.background;

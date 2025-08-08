@@ -532,6 +532,38 @@ function useLogout() {
   };
 }
 
+const useChangePwd = () => { 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+    
+  const changePwd = async (email: any): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await axios.post(`${SERVER_BASE_URL}/auth/user/forgot/password/mobile`,email );
+
+      const result = response?.data;
+
+      if (result.success) {
+        Toast.show({ type: "success", text1: result.message || "OTP sent successfully!" });
+        return true; 
+      }
+    } catch (err: any) {
+      const errMsg = err.response?.data?.message || err.message || "Network or server error";
+      setError(errMsg);
+      Toast.show({ type: "error", text1: errMsg });
+      console.error("Error Response:", errMsg);
+    } finally {
+      setLoading(false);
+    }
+    
+    return false;
+  };
+  
+  return { changePwd, loading, error };
+};
+
 export  {
   useRegister, 
   useVerifyEmail, 
@@ -544,5 +576,6 @@ export  {
   useResetPwd, 
   useVerifyForgotPwd,
   useSendResetPwdOTP,
-  useLogout
+  useLogout,
+  useChangePwd
 };

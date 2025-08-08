@@ -151,19 +151,19 @@ const SettingsScreen: React.FC = () => {
               <SettingItem
                 title="Change VPay PIN"
                 hasChevron
-                onPress={() => console.log("Change VPay PIN pressed")}
+                onPress={() => router.push("/(auth)/change-pin")}
               />
 
               <SettingItem
                 title="Change VPay Password"
                 hasChevron
-                onPress={() => console.log("Change VPay PIN pressed")}
+                onPress={() => router.push("/(auth)/change-password")}
               />
 
               <SettingItem
                 title="Transaction Limit"
                 hasChevron
-                onPress={() => console.log("Change VPay PIN pressed")}
+                onPress={() => router.push("/transaction-limit")}
               />
             </View>
           </View>
@@ -184,7 +184,11 @@ const SettingsScreen: React.FC = () => {
               iconColor="#D92D20"
               onPress={handleLogout}
               bgColor="#D92D2014"
-              background={colorScheme === "dark" ? "#161622" : "#FFFFFF"}
+              background={
+                colorScheme === "dark"
+                  ? Colors.dark.accentBg
+                  : Colors.light.accentBg
+              }
               itemStyles={{ marginHorizontal: 7, borderRadius: 6 }}
             />
           </View>

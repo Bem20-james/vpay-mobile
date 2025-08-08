@@ -87,7 +87,7 @@ const BasicInformation: React.FC<BasicInformationProps> = ({
               placeholder="First Name"
               value={formData.firstname}
               handleChangeText={(value) => updateFormData({ firstname: value })}
-              editable={!formData.firstname || formData.firstname === ""}
+              editable={!formData.firstname}
               error={getFieldError("firstname")}
             />
           </View>
@@ -96,7 +96,7 @@ const BasicInformation: React.FC<BasicInformationProps> = ({
               placeholder="Last Name"
               value={formData.lastname}
               handleChangeText={(value) => updateFormData({ lastname: value })}
-              editable={!formData.lastname || formData.lastname === ""}
+              editable={!formData.lastname }
               error={getFieldError("lastname")}
             />
           </View>

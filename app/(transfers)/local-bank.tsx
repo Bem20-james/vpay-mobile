@@ -56,9 +56,7 @@ const LocalBank = () => {
               title="Account Number"
               handleChangeText={() => {}}
               placeholder="123456789"
-              otherStyles={{ paddingVertical: 18 }}
             />
-
             <View>
               <ThemedText type="default" style={{ marginLeft: 6 }}>
                 Account Name

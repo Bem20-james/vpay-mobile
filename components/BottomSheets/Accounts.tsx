@@ -6,7 +6,7 @@ import { ThemedText } from "../ThemedText";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import CustomButton from "../CustomButton";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import QRCode from "react-native-qrcode-svg";
 
 interface FiatItem {
@@ -84,15 +84,29 @@ const AccountsBottomSheet: React.FC<Props> = ({
           >
             {selectedType === "fiat" ? (
               <View style={{ gap: 5 }}>
-                <ThemedText style={styles.option}>Account Number.</ThemedText>
-                <ThemedText style={styles.value}>
-                  {selectedItem?.account_number}
-                </ThemedText>
+                <ThemedText style={styles.option}>Account Number</ThemedText>
+                <View style={styles.icon}>
+                  <ThemedText style={styles.value}>
+                    {selectedItem?.account_number}
+                  </ThemedText>
+                  <MaterialIcons
+                    name="content-copy"
+                    size={20}
+                    color={"#208BC9"}
+                  />
+                </View>
 
                 <ThemedText style={styles.option}>Bank</ThemedText>
-                <ThemedText style={styles.value}>
-                  {selectedItem?.bank}
-                </ThemedText>
+                <View style={styles.icon}>
+                  <ThemedText style={styles.value}>
+                    {selectedItem?.bank}
+                  </ThemedText>
+                  <MaterialIcons
+                    name="content-copy"
+                    size={20}
+                    color={"#208BC9"}
+                  />
+                </View>
 
                 <ThemedText style={styles.option}>Account Name</ThemedText>
                 <ThemedText style={styles.value}>
@@ -151,6 +165,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Inter-SemiBold",
     color: "#999"
+  },
+  icon: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
   },
   value: {
     fontSize: 15,

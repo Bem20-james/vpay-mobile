@@ -16,11 +16,7 @@ import FormField from "@/components/FormFields";
 import CustomButton from "@/components/CustomButton";
 import { styles as formStyles } from "@/styles/formfield";
 import SendScreen from "./SendScreen";
-
-type SendScreenProps = {
-  onBack: () => void;
-  selectedCountry?: string;
-};
+import { SendScreenProps } from "@/types/transfers";
 
 const SendInternational = ({ onBack, selectedCountry }: SendScreenProps) => {
   const colorScheme = useColorScheme();
@@ -83,7 +79,6 @@ const SendInternational = ({ onBack, selectedCountry }: SendScreenProps) => {
                 title="Account Number"
                 handleChangeText={() => {}}
                 placeholder="123456789"
-                otherStyles={{ paddingVertical: 18 }}
               />
 
               <View>
@@ -120,9 +115,9 @@ const SendInternational = ({ onBack, selectedCountry }: SendScreenProps) => {
                 handlePress={() => setShowSendScreen(true)}
                 btnStyles={{
                   position: "absolute",
-                  top: screenHeight - 180,
-                  left: 0,
-                  right: 0,
+                  top: screenHeight - 200,
+                  left: 10,
+                  right: 10,
                   width: "100%",
                   marginTop: 7
                 }}

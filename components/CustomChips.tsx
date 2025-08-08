@@ -10,6 +10,7 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import { ThemedText } from "./ThemedText";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/constants/Colors";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -36,13 +37,15 @@ const CustomChip: React.FC<CustomChipProps> = ({
   itemStyle
 }) => {
   const colorScheme = useColorScheme();
-  const BgColor = colorScheme === "dark" ? "#161622" : "#F8F8F8";
+  const BgColor =
+    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
 
   const renderItem = ({ item }: { item: Item }) => {
     const isSelected = selectedItem === item.id;
     return (
       <TouchableOpacity
-        style={[{backgroundColor: BgColor},
+        style={[
+          { backgroundColor: BgColor },
           styles.itemContainer,
           isSelected && styles.selectedItem,
           itemStyle
@@ -58,13 +61,17 @@ const CustomChip: React.FC<CustomChipProps> = ({
           />
         ) : item.image ? (
           <Image
-            source={item.image }
+            source={item.image}
             style={styles.image}
             resizeMode="contain"
           />
         ) : null}
 
-        <ThemedText lightColor="#252525" darkColor="#F8F8F8" style={styles.text}>
+        <ThemedText
+          lightColor="#252525"
+          darkColor="#F8F8F8"
+          style={styles.text}
+        >
           {item.text}
         </ThemedText>
 
@@ -85,11 +92,12 @@ const CustomChip: React.FC<CustomChipProps> = ({
       data={items}
       renderItem={renderItem}
       keyExtractor={(item) => String(item.id)}
-      numColumns={2} // 2-column grid
-      key={"grid"} // Ensure re-render when numColumns changes
-      showsVerticalScrollIndicator={false}
+      numColumns={2}
+      key={"grid"}
       style={[styles.list, containerStyle]}
       contentContainerStyle={styles.gridContent}
+      nestedScrollEnabled={true}
+      scrollEnabled={false}
     />
   );
 };
@@ -116,7 +124,7 @@ const styles = StyleSheet.create({
   selectedItem: {
     borderWidth: 1,
     borderColor: "#208BC9",
-    backgroundColor:  "#0A3A52",
+    backgroundColor: "#0A3A52"
   },
   icon: {
     marginRight: 10
@@ -125,7 +133,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     marginRight: 10,
-    borderRadius:100,
+    borderRadius: 100,
     resizeMode: "contain"
   },
   text: {

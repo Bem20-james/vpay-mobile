@@ -16,10 +16,7 @@ import FormField from "@/components/FormFields";
 import CustomButton from "@/components/CustomButton";
 import { styles as formStyles } from "@/styles/formfield";
 import SendScreen from "./SendScreen";
-
-type SendScreenProps = {
-  onBack: () => void;
-};
+import { SendScreenProps } from "@/types/transfers";
 
 const SendMobileMoney = ({ onBack }: SendScreenProps) => {
   const colorScheme = useColorScheme();
@@ -45,7 +42,6 @@ const SendMobileMoney = ({ onBack }: SendScreenProps) => {
               title="Phone Number"
               handleChangeText={() => {}}
               placeholder="123456789"
-              otherStyles={{ paddingVertical: 18 }}
             />
 
             <View>
@@ -81,9 +77,9 @@ const SendMobileMoney = ({ onBack }: SendScreenProps) => {
               handlePress={() => setShowSendScreen(true)}
               btnStyles={{
                 position: "absolute",
-                top: screenHeight - 180,
-                left: 0,
-                right: 0,
+                top: screenHeight - 200,
+                left: 10,
+                right: 10,
                 width: "100%",
                 marginTop: 7
               }}

@@ -28,7 +28,7 @@ import { Colors } from "@/constants/Colors";
 interface OtpVerificationProps {
   email?: string;
   onBack?: () => void;
-  mode?: "verify-email" | "forgot-password" | "reset-password" | "login";
+  mode?: "verify-email" | "forgot-password" | "reset-password" | "login" | "change-password";
   otp_medium?: string;
   password?: string;
 }

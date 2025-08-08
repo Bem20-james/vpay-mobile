@@ -10,6 +10,8 @@ import Navigator from "@/components/Navigator";
 import FormField from "@/components/FormFields";
 import CustomButton from "@/components/CustomButton";
 import CustomChip from "@/components/CustomChips";
+import { Colors } from "@/constants/Colors";
+import CurrencyField from "@/components/CurrencyField";
 
 const methods = [
   { id: "1", text: "Betnaija", image: images.mtn },
@@ -17,11 +19,13 @@ const methods = [
   { id: "3", text: "BetBaba", image: images.glo },
   { id: "4", text: "PariPesa", image: images.airtel }
 ];
- 
+
 const BettingScreen = () => {
   const colorScheme = useColorScheme();
-  const boxBackgroundColor = colorScheme === "dark" ? "#000000" : "#FFFFFF";
-  const statusBarBg = colorScheme === "dark" ? "#000000" : "#FFFFFF";
+  const boxBackgroundColor =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const statusBarBg =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState<
     number | string | null
@@ -50,31 +54,20 @@ const BettingScreen = () => {
 
           <View>
             <FormField
-              handleChangeText={(value) => {}}
-              isDropdown
-              onDropdownPress={() => {}}
-              placeholder="Currency"
-            />
-            <FormField
-              placeholder={"Amount"}
-              handleChangeText={() => {}}
-              otherStyles={{ marginTop: 5 }}
-              keyboardType="phone-pad"
-            />
-            <FormField
               placeholder={"Phone number"}
               handleChangeText={() => {}}
-              otherStyles={{ marginTop: 5 }}
               keyboardType="default"
               isLeftIcon
               iconName="person"
             />
+
+            <CurrencyField />
           </View>
 
           <CustomButton
             title={"Continue"}
             handlePress={() => router.push("/(tabs)/home")}
-            btnStyles={{ marginTop: 50 }}
+            btnStyles={{ marginTop: 20 }}
             variant="primary"
             size="medium"
           />

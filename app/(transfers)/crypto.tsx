@@ -7,6 +7,7 @@ import { StatusBar } from "expo-status-bar";
 import { KycStyles as styles } from "@/styles/kyc";
 import Accounts from "../(user)/accounts";
 import { Colors } from "@/constants/Colors";
+import SendCrypto from "@/components/Transfers/SendCrypto";
 
 const CryptoCurrency = () => {
   const colorScheme = useColorScheme();
@@ -15,7 +16,7 @@ const CryptoCurrency = () => {
   const statusBarBg =
     colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
 
-  return <Accounts />;
+  return <SendCrypto onBack={() => {}} />;
 };
 
 export default CryptoCurrency;

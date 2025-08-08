@@ -10,17 +10,21 @@ import FormField from "@/components/FormFields";
 import CustomButton from "@/components/CustomButton";
 import CustomChip from "@/components/CustomChips";
 import images from "@/constants/Images";
+import { Colors } from "@/constants/Colors";
+import CurrencyField from "@/components/CurrencyField";
 
 const methods = [
   { id: "mtn", text: "DSTV", image: images.dstv },
   { id: "ninemobile", text: "GOTV", image: images.gotv },
-  { id: "glo", text: "SHOWMAX", image: images.showmax },
+  { id: "glo", text: "SHOWMAX", image: images.showmax }
 ];
 
 const CableTVScreen = () => {
   const colorScheme = useColorScheme();
-  const boxBackgroundColor = colorScheme === "dark" ? "#000000" : "#FFFFFF";
-  const statusBarBg = colorScheme === "dark" ? "#000000" : "#FFFFFF";
+  const boxBackgroundColor =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const statusBarBg =
+    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState<
     number | string | null
@@ -53,12 +57,6 @@ const CableTVScreen = () => {
               handleChangeText={(value) => {}}
               isDropdown
               onDropdownPress={() => {}}
-              placeholder="Currency"
-            />
-            <FormField
-              handleChangeText={(value) => {}}
-              isDropdown
-              onDropdownPress={() => {}}
               placeholder="Select plan"
             />
             <FormField
@@ -69,12 +67,14 @@ const CableTVScreen = () => {
               isIcon
               iconName="credit-card"
             />
+
+            <CurrencyField />
           </View>
 
           <CustomButton
             title={"Continue"}
             handlePress={() => router.push("/(tabs)/home")}
-            btnStyles={{ marginTop: 50 }}
+            btnStyles={{ marginTop: 20 }}
             variant="primary"
             size="medium"
           />
