@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { ThemedText } from "@/components/ThemedText";
 import CustomButton from "@/components/CustomButton";
-import { useFetchSessions } from "@/hooks/useUser";
+import { useFetchSessions, useRemoveSessions } from "@/hooks/useUser";
 import Navigator from "@/components/Navigator";
 import { Colors } from "@/constants/Colors";
 
@@ -22,13 +22,21 @@ const ManageDevices: React.FC = () => {
   const colorScheme = useColorScheme();
   const boxBackgroundColor =
     colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
-  const { sessions } = useFetchSessions();
+  const { sessions, refetch } = useFetchSessions();
+  const { removeSession, loadingIds } = useRemoveSessions();
 
-  const handleLogoutDevice = (deviceId: string) => {
-    console.log("Logging out device:", deviceId);
+  const handleLogoutDevice = async (deviceId: string) => {
+    try {
+      await removeSession(deviceId);
+      await refetch();
+    } catch (error) {
+      console.error("Status update failed:", error);
+    }
   };
 
   const renderItem = ({ item }: { item: Device }) => {
+    const isLoading = loadingIds.has(item.id);
+
     return (
       <View
         style={[
@@ -44,7 +52,7 @@ const ManageDevices: React.FC = () => {
       >
         <View style={styles.deviceInfo}>
           <Ionicons
-            name={"phone-portrait"}
+            name="phone-portrait"
             size={24}
             color="#007AFF"
             style={{ marginRight: 12 }}
@@ -61,11 +69,12 @@ const ManageDevices: React.FC = () => {
         </View>
         {!item.isCurrentDevice && (
           <CustomButton
-            title="Remove"
+            title="Terminate"
             handlePress={() => handleLogoutDevice(item.id)}
             btnStyles={styles.logoutButton}
             variant="danger"
             size="small"
+            isLoading={isLoading}
           />
         )}
       </View>

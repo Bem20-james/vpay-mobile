@@ -40,7 +40,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
       <ThemedText
         lightColor="#00000"
         darkColor="#FFFFFF"
-        style={[styles.heroTxt, { marginBottom: 10 }]}
+        style={[styles.heroTxt]}
       >
         Take a selfie to verify your identity
       </ThemedText>
@@ -80,16 +80,16 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
         </ThemedText>
         <View style={{ gap: 6 }}>
           <ThemedText style={styles.listI}>
-            • Face the camera directly with good lighting
+            Face the camera directly with good lighting
           </ThemedText>
           <ThemedText style={styles.listI}>
-            • Remove sunglasses and ensure face is clearly visible
+            Remove sunglasses and ensure face is clearly visible
           </ThemedText>
           <ThemedText style={styles.listI}>
-            • Use a neutral expression (no smiling)
+            Use a neutral expression (no smiling)
           </ThemedText>
           <ThemedText style={styles.listI}>
-            • Make sure the photo is clear and not blurry
+            Make sure the photo is clear and not blurry
           </ThemedText>
         </View>
       </View>
@@ -105,7 +105,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
           }}
         >
           <ThemedText
-            style={{ color: "#EF4444", fontSize: 13, textAlign: "center" }}
+            style={{ color: "#EF4444", fontSize: 12, fontFamily: "Questrial", textAlign: "center" }}
           >
             {getFieldError("selfie_image")}
           </ThemedText>
@@ -124,7 +124,7 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
         <ThemedText
           style={{ fontSize: 14, fontFamily: "Inter-Regular", marginBottom: 5 }}
         >
-          🔒 Privacy & Security
+          Privacy & Security
         </ThemedText>
         <ThemedText
           style={{

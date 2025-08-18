@@ -44,9 +44,9 @@ export const KycStyles = StyleSheet.create({
     fontFamily: "Inter-Regular"
   },
   option: {
-    marginTop: 0,
     borderRadius: 10,
     height: 45,
+    width: "100%",
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
@@ -82,10 +82,6 @@ export const KycStyles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     gap: 10,
-    marginTop: 20
-  },
-  submitButton: {
-    flex: 1
   },
   title: {
     marginTop: 10

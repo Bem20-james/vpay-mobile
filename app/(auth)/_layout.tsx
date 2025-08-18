@@ -26,7 +26,7 @@ const AuthLayout = () => {
         <Stack.Screen name="reset-password" options={{ headerShown: false }} />
         <Stack.Screen name="login-index" options={{ headerShown: false }} />
 
-                <Stack.Screen name="change-password" options={{ headerShown: false }} />
+        <Stack.Screen name="change-password" options={{ headerShown: false }} />
         <Stack.Screen name="change-pin" options={{ headerShown: false }} />
       </Stack>
 

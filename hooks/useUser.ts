@@ -5,6 +5,11 @@ import Toast from "react-native-toast-message";
 import { SERVER_BASE_URL } from "../constants/Paths";
 import { useUser } from "@/contexts/UserContexts";
 
+// Expected API response type
+interface RemoveSessionResponse {
+  message: string;
+}
+
 function useFetchAuthUser() {
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -49,11 +54,7 @@ function useFetchUserAssets() {
         `${SERVER_BASE_URL}/user/assets`,
         config
       );
-
-    const result = response.data;
-
-    console.log("Response data:", result);
-    console.log("Response data:", assets);
+      const result = response.data;
 
       if (result.code === 0) {
         setAssets(result.result);
@@ -89,9 +90,6 @@ function useFetchSessions() {
       const response = await axios.get(`${SERVER_BASE_URL}/auth/sessions`, config);
       const result = response.data;
 
-        console.log("response:", result)
-      console.log("sessions res:", sessions)
-
       if (result.success && result.code === 0) {
         setSessions(result.result);
       } else {
@@ -112,5 +110,54 @@ function useFetchSessions() {
   return { sessions, loading, refetch: fetchData };
 }
 
+function useRemoveSessions() {
+  const { config } = useUser();
+  const [loadingIds, setLoadingIds] = useState<Set<string>>(new Set());
 
-export { useFetchAuthUser, useFetchUserAssets, useFetchSessions };
+  const removeSession = async (id: string): Promise<RemoveSessionResponse> => {
+    setLoadingIds((prev) => new Set(prev).add(id));
+
+    try {
+      const response = await axios.delete<RemoveSessionResponse>(
+        `${SERVER_BASE_URL}/auth/user/terminate/session/${id}`,
+        config
+      );
+
+      console.log("FRONTEND-RESP::", response)
+      console.log("FRONTEND-DATA::", response.data)
+      const { data } = response;
+
+      Toast.show({
+        type: "success",
+        text1: data.message,
+      });
+
+      return data;
+    } catch (err) {
+      const error = err as AxiosError<{ message?: string }>;
+      console.error("Error removing session:", error.response?.data || error.message);
+
+      Toast.show({
+        type: "error",
+        text1: "Oops! Failed to remove session.",
+      });
+
+      throw error;
+    } finally {
+      setLoadingIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(id);
+        return newSet;
+      });
+    }
+  };
+
+  return { removeSession, loadingIds };
+}
+
+export { 
+  useFetchAuthUser, 
+  useFetchUserAssets, 
+  useFetchSessions, 
+  useRemoveSessions 
+};

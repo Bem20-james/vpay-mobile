@@ -149,13 +149,13 @@ const SettingsScreen: React.FC = () => {
               />
 
               <SettingItem
-                title="Change VPay PIN"
+                title="Change PIN"
                 hasChevron
                 onPress={() => router.push("/(auth)/change-pin")}
               />
 
               <SettingItem
-                title="Change VPay Password"
+                title="Change Password"
                 hasChevron
                 onPress={() => router.push("/(auth)/change-password")}
               />
@@ -173,7 +173,7 @@ const SettingsScreen: React.FC = () => {
               title="Feedback"
               hasChevron
               icon="chatbubble-ellipses"
-              iconColor="#5AB4E6"
+              iconColor="#406f88ff"
               onPress={() => console.log("Feedback pressed")}
               bgColor="#218DC947"
             />

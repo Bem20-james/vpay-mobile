@@ -98,7 +98,14 @@ const PersonalInformation: React.FC<PersonalInfoProps> = ({
           <ThemedText style={{ fontSize: 16, fontFamily: "Inter-SemiBold" }}>
             Address Information
           </ThemedText>
-          <ThemedText style={{ fontSize: 13, fontFamily: "Questrial", opacity: 0.7, marginTop: 2 }}>
+          <ThemedText
+            style={{
+              fontSize: 13,
+              fontFamily: "Questrial",
+              opacity: 0.7,
+              marginTop: 2
+            }}
+          >
             Your current residential address
           </ThemedText>
         </View>
@@ -170,48 +177,46 @@ const PersonalInformation: React.FC<PersonalInfoProps> = ({
           }}
         >
           <ThemedText style={{ fontSize: 13, lineHeight: 18 }}>
-            🏠 This address will be used for identity verification purposes.
-            Make sure it matches your official documents.
+            This address will be used for identity verification purposes. Make
+            sure it matches your official documents.
           </ThemedText>
         </View>
       </View>
 
       {/* Navigation Buttons */}
-      <View style={{ marginTop: 32, gap: 12 }}>
+      <View style={{ flexDirection: "row", marginTop: 32, gap: 5 }}>
+        <CustomButton
+          title="Back"
+          handlePress={onPrevious}
+          btnStyles={{
+            width: "50%",
+            backgroundColor: "transparent",
+            borderWidth: 1,
+            borderColor: "#208BC9"
+          }}
+        />
+
         <CustomButton
           title="Continue"
           handlePress={onNext}
           disabled={!isStepValid || isLoading}
           btnStyles={{
-            width: "100%",
+            width: "50%",
             opacity: isStepValid ? 1 : 0.6
           }}
         />
-
-        <CustomButton
-          title="Back"
-          handlePress={onPrevious}
-          btnStyles={{
-            width: "100%",
-            backgroundColor: "transparent",
-            borderWidth: 1,
-            borderColor: "#E5E7EB"
-          }}
-          textStyles={{ color: "#6B7280" }}
-        />
-
-        {!isStepValid && touchedFields.size > 0 && (
-          <ThemedText
-            style={{
-              textAlign: "center",
-              color: "#EF4444",
-              fontSize: 13
-            }}
-          >
-            Please complete all address fields
-          </ThemedText>
-        )}
       </View>
+      {!isStepValid && touchedFields.size > 0 && (
+        <ThemedText
+          style={{
+            textAlign: "center",
+            color: "#EF4444",
+            fontSize: 13
+          }}
+        >
+          Please complete all address fields
+        </ThemedText>
+      )}
 
       {/* Marital Status Selection Sheet */}
       <CustomSheet

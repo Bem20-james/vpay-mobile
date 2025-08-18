@@ -15,7 +15,6 @@ interface SelfieUploadProps {
 
 const SelfieUpload: React.FC<SelfieUploadProps> = ({
   onNext,
-  onSubmit,
   isLoading = false,
   isvalid
 }) => {
@@ -52,12 +51,6 @@ const SelfieUpload: React.FC<SelfieUploadProps> = ({
     setPhoto(null);
     setCameraActive(true);
   }, []);
-
-  const handleSubmit = useCallback(() => {
-    if (photo) {
-      onSubmit(photo);
-    }
-  }, [photo, onSubmit]);
 
   const renderCameraContent = () => {
     if (photo) {
@@ -117,17 +110,9 @@ const SelfieUpload: React.FC<SelfieUploadProps> = ({
       {photo && (
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.option} onPress={retakeSelfie}>
-            <MaterialIcons name="refresh" size={25} color="#7b7b9b" />
+            <MaterialIcons name="refresh" size={20} color="#7b7b9b" />
             <ThemedText type="default">Retake Selfie</ThemedText>
           </TouchableOpacity>
-          {isvalid && (
-            <CustomButton
-              title="Continue to Review"
-              handlePress={onNext}
-              disabled={isLoading}
-              btnStyles={styles.submitButton}
-            />
-          )}
         </View>
       )}
     </View>
