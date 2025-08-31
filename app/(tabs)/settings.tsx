@@ -16,6 +16,8 @@ const SettingsScreen: React.FC = () => {
   const [hideBalance, setHideBalance] = useState(false);
   const [securityLock, setSecurityLock] = useState(false);
   const [fingerprint, setFingerprint] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(false);
+
   const colorScheme = useColorScheme();
   const boxBackgroundColor =
     colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
@@ -23,7 +25,6 @@ const SettingsScreen: React.FC = () => {
   const logout = useLogout();
   const { clearUser } = useUser();
 
-  const [isEnabled, setIsEnabled] = useState(false);
 
   useEffect(() => {
     (async () => {

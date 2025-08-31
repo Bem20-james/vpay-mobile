@@ -39,7 +39,7 @@ const Register = () => {
     countryId: string;
     countryObj: CountryItem | null;
     phone: string;
-    referralCode: string;
+    referrer: string;
   }>({
     fname: "",
     lname: "",
@@ -50,7 +50,7 @@ const Register = () => {
     countryId: "",
     countryObj: null,
     phone: "",
-    referralCode: ""
+    referrer: ""
   });
 
   const [errors, setErrors] = useState({
@@ -74,6 +74,7 @@ const Register = () => {
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
     return passwordRegex.test(password);
   };
+
   const handleFieldChange = (field: string, value: string) => {
     if (field === "phone") {
       value = value.trim().slice(0, 11);
@@ -85,25 +86,48 @@ const Register = () => {
 
     const newForm = { ...form, [field]: value };
     setForm(newForm);
+
     let newErrors = { ...errors };
 
     switch (field) {
       case "fname":
       case "lname":
-        if (value && isOnlyLetters(value)) newErrors[field] = "";
+        if (value && isOnlyLetters(value)) {
+          newErrors[field] = "";
+        }
         break;
+
       case "username":
-        if (value && isOnlyLetters(value.trim())) newErrors.username = "";
+        if (!value.trim()) {
+          newErrors.username = "Username is required";
+        } else if (!isOnlyLetters(value.trim())) {
+          newErrors.username = "Username must contain only letters";
+        } else {
+          newErrors.username = "";
+        }
         break;
+
       case "email":
-        if (validateEmail(value)) newErrors.email = "";
+        if (validateEmail(value)) {
+          newErrors.email = "";
+        }
         break;
+
       case "password":
-        if (validatePassword(value)) newErrors.password = "";
+        if (!value) {
+          newErrors.password = "Password is required";
+        } else if (!validatePassword(value)) {
+          newErrors.password =
+            "8-20 characters, one uppercase, one number, one special character";
+        } else {
+          newErrors.password = "";
+        }
         break;
+
       case "phone":
         if (value.trim()) newErrors.phone = "";
         break;
+
       case "country":
         if (value) newErrors.country = "";
         break;
@@ -180,26 +204,27 @@ const Register = () => {
   };
 
   const isStepOneValid = () => {
-    return (
+    return Boolean(
       form.country &&
-      form.fname.trim() &&
-      isOnlyLetters(form.fname) &&
-      form.lname.trim() &&
-      isOnlyLetters(form.lname) &&
-      form.phone.trim()
+        form.fname.trim() &&
+        isOnlyLetters(form.fname) &&
+        form.lname.trim() &&
+        isOnlyLetters(form.lname) &&
+        form.phone.trim()
     );
   };
 
   const isStepTwoValid = () => {
-    return (
+    return Boolean(
       form.email.trim() &&
-      validateEmail(form.email) &&
-      form.username.trim() &&
-      isOnlyLetters(form.username) &&
-      form.password &&
-      validatePassword(form.password)
+        validateEmail(form.email) &&
+        form.username.trim() &&
+        isOnlyLetters(form.username) && // maybe relax this rule?
+        form.password &&
+        validatePassword(form.password)
     );
   };
+
   const canSubmit = stepTwoVisible ? isStepTwoValid() : isStepOneValid();
 
   const handleNextStep = async () => {
@@ -217,7 +242,7 @@ const Register = () => {
             password: form.password,
             country_id: form.countryId,
             phone: form.phone,
-            referral: form.referralCode
+            referrer: form.referrer
           });
           if (success) {
             setShowOtpScreen(true);
@@ -328,7 +353,7 @@ const Register = () => {
           )}
 
           {errors.general && (
-            <ThemedText style={{ color: "red", marginTop: 10 }}>
+            <ThemedText style={{ color: "red", marginTop: 5 }}>
               {errors.general}
             </ThemedText>
           )}

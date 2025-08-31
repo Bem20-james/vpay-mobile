@@ -15,18 +15,58 @@ import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { Colors } from "@/constants/Colors";
 import images from "@/constants/Images";
 import { ThemedText } from "./ThemedText";
+import { useSetTransactionPin } from "@/hooks/useAuthentication";
+import Toast from "react-native-toast-message";
+import { useLoader } from "@/contexts/LoaderContext";
+import { useLocalSearchParams } from "expo-router";
 
-const TransactionPinScreen: React.FC = () => {
+interface TransactionPinProps {
+  showBack?: boolean;
+}
+interface NumberButtonProps {
+  number: string;
+  onPress: (number: string) => void;
+}
+
+const TransactionPinScreen: React.FC<TransactionPinProps> = ({
+  showBack = true
+}) => {
   const colorScheme = useColorScheme();
   const bgColor =
     colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
 
   const [pin, setPin] = useState<string>("");
+  const [firstPin, setFirstPin] = useState<string | null>(null);
+  const [step, setStep] = useState<"create" | "confirm">("create");
   const maxPinLength: number = 4;
+  const { setTransactionPin, loading, error } = useSetTransactionPin();
+  const { showLoader, hideLoader } = useLoader();
+  const { email } = useLocalSearchParams<{ email: string }>();
 
   const handleNumberPress = (number: string): void => {
     if (pin.length < maxPinLength) {
-      setPin(pin + number);
+      const newPin = pin + number;
+      setPin(newPin);
+
+      if (newPin.length === maxPinLength) {
+        if (step === "create") {
+          setFirstPin(newPin);
+          setPin(""); // clear for confirmation
+          setStep("confirm");
+        } else if (step === "confirm") {
+          if (newPin === firstPin) {
+            handleSetTransactionPin(newPin);
+          } else {
+            Toast.show({
+              type: "error",
+              text1: "Oopps! Transaction Pin mismatch, try again"
+            });
+            setFirstPin(null);
+            setPin("");
+            setStep("create");
+          }
+        }
+      }
     }
   };
 
@@ -46,11 +86,6 @@ const TransactionPinScreen: React.FC = () => {
     ));
   };
 
-  interface NumberButtonProps {
-    number: string;
-    onPress: (number: string) => void;
-  }
-
   const NumberButton: React.FC<NumberButtonProps> = ({ number, onPress }) => (
     <TouchableOpacity
       style={styles.numberButton}
@@ -61,27 +96,48 @@ const TransactionPinScreen: React.FC = () => {
     </TouchableOpacity>
   );
 
+  console.log("Current PIN:", pin, "email:", email); // Debugging line
+
+  const handleSetTransactionPin = async (finalPin: string) => {
+    showLoader();
+    try {
+      await setTransactionPin({
+        transaction_pin: finalPin,
+        email
+      });
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1:
+          error && typeof error === "object" && "message" in error
+            ? (error as { message: string }).message
+            : "Failed to set Transaction Pin"
+      });
+    } finally {
+      hideLoader();
+    }
+  };
+
   return (
     <SafeAreaView style={{ backgroundColor: bgColor, height: "100%" }}>
       <ScrollView
-        style={{ paddingHorizontal: 7 }}
+        style={{ paddingHorizontal: 7, marginTop: showBack === true ? 0 : 50 }}
         showsVerticalScrollIndicator={false}
       >
-        <Navigator />
+        {showBack && <Navigator />}
         <View style={styles.container}>
           {colorScheme === "dark" ? (
             <Image source={images.logolight} style={styles.logo} />
           ) : (
             <Image source={images.logodark} style={styles.logo} />
           )}
-          {/* Content */}
           <View style={styles.content}>
-            {/* Title */}
             <ThemedText style={styles.title}>
-              Create a transaction PIN
+              {step === "create"
+                ? "Create a transaction PIN"
+                : "Confirm your transaction PIN"}
             </ThemedText>
 
-            {/* PIN dots */}
             <View style={styles.pinDotsContainer}>{renderPinDots()}</View>
 
             {/* Keypad */}

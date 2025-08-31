@@ -68,11 +68,12 @@ export const styles = StyleSheet.create({
     fontSize: 16
   },
   errorText: {
-    marginTop: 2,
+    marginTop: 0,
     fontFamily: "Questrial",
     fontWeight: 500,
     fontSize: 11,
-    lineHeight: 20,
+    lineHeight: 11,
+    marginLeft: 4,
     letterSpacing: 0
   }
 });

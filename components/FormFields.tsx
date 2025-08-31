@@ -126,7 +126,7 @@ const FormField = ({
         )}
 
         {isIcon && iconName && (
-          <View style={{paddingRight: 5}}>
+          <View style={{ paddingRight: 5 }}>
             <MaterialIcons name={iconName} size={20} color="#208BC9" />
           </View>
         )}
@@ -187,11 +187,6 @@ const FormField = ({
           </View>
         )}
       </ThemedView>
-      <ThemedText
-        style={{ fontFamily: "Questrial", fontSize: 11, color: "#9B9B9B" }}
-      >
-        {helpText}
-      </ThemedText>
       {error && (
         <ThemedText
           style={styles.errorText}
@@ -201,6 +196,11 @@ const FormField = ({
           {error}
         </ThemedText>
       )}
+      <ThemedText
+        style={{ fontFamily: "Questrial", fontSize: 11, color: "#9B9B9B" }}
+      >
+        {helpText}
+      </ThemedText>
     </ThemedView>
   );
 };

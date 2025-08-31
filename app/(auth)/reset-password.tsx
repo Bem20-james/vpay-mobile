@@ -11,9 +11,12 @@ import { styles } from "@/styles/auth";
 import Navigator from "@/components/Navigator";
 import { useSendResetPwdOTP } from "@/hooks/useAuthentication";
 import Toast from "react-native-toast-message";
-import OtpMediumModal from "@/components/OtpMediumModal";
 import OtpVerification from "./otp-verification";
 import { Colors } from "@/constants/Colors";
+import toastConfig from "@/config/toastConfig";
+
+import type { OtpMethod } from "@/components/OtpMediumModal";
+import OtpMediumModal, { OTP_METHODS } from "@/components/OtpMediumModal";
 
 const ResetPassword = () => {
   const colorScheme = useColorScheme();
@@ -32,8 +35,10 @@ const ResetPassword = () => {
   const [showModal, setShowModal] = useState(false);
   type OtpMethod = "sms" | "authenticator" | "email";
 
-  const [otpMedium, setOtpMedium] = useState<OtpMethod>("sms");
   const [showOtpScreen, setShowOtpScreen] = useState(false);
+  const allowedMethods = ["sms", "authenticator"] as const;
+  type AllowedMethod = (typeof allowedMethods)[number];
+  const [otpMedium, setOtpMedium] = useState<AllowedMethod>(allowedMethods[0]);
 
   const handleInputChange = (key: string, value: string) => {
     setForm((prevForm) => ({ ...prevForm, [key]: value }));
@@ -55,7 +60,7 @@ const ResetPassword = () => {
     return null;
   };
 
-  const submitForm = async (method: OtpMethod) => {
+  const submitForm = async (method: AllowedMethod) => {
     if (!form.password || !form.confirmPassword) {
       Toast.show({ type: "error", text1: "All fields are required" });
       return;
@@ -148,7 +153,6 @@ const ResetPassword = () => {
             placeholder="Password"
             value={form.password}
             handleChangeText={(text) => handleInputChange("password", text)}
-            otherStyles={{ marginTop: 5 }}
             keyboardType="default"
             isIcon
             iconName="shield"
@@ -159,7 +163,6 @@ const ResetPassword = () => {
             handleChangeText={(text) =>
               handleInputChange("confirmPassword", text)
             }
-            otherStyles={{ marginTop: 20 }}
             keyboardType="default"
             isIcon
             iconName="shield"
@@ -168,7 +171,7 @@ const ResetPassword = () => {
           <CustomButton
             title={isSubmitting ? "Resetting..." : "Reset Password"}
             handlePress={() => setShowModal(true)}
-            btnStyles={{ width: "100%", marginTop: 100 }}
+            btnStyles={{ width: "100%", marginTop: 50 }}
             disabled={isSubmitting}
             isLoading={isSubmitting}
           />
@@ -179,9 +182,18 @@ const ResetPassword = () => {
           onClose={() => setShowModal(false)}
           isLoading={isSubmitting}
           onSubmit={submitForm}
+          methods={allowedMethods} // ✅ narrowed, readonly
+          // autoSubmitIfSingle={true}    // optional (default true)
         />
       </ScrollView>
-      <Toast />
+      <Toast
+        position="bottom"
+        bottomOffset={50}
+        visibilityTime={6000}
+        autoHide
+        topOffset={50}
+        config={toastConfig}
+      />
     </SafeAreaView>
   );
 };

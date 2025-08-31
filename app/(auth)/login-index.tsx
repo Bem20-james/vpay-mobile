@@ -9,14 +9,13 @@ import FormField from "@/components/FormFields";
 import CustomButton from "@/components/CustomButton";
 import { styles } from "@/styles/auth";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
-import OtpVerification from "./otp-verification";
-import { useLogin } from "@/hooks/useAuthentication";
 import Toast from "react-native-toast-message";
 import OtpMediumModal from "@/components/OtpMediumModal";
 import { getData } from "@/utils/store";
 import { Colors } from "@/constants/Colors";
 import * as LocalAuthentication from "expo-local-authentication";
 import { Alert } from "react-native";
+import { useLoginWithBiometrics } from "@/hooks/useAuthentication";
 
 const IndexLogin = () => {
   const colorScheme = useColorScheme();
@@ -25,18 +24,14 @@ const IndexLogin = () => {
     colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ identifier: "", password: "" });
-  const [showOtpScreen, setShowOtpScreen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [otpMedium, setOtpMedium] = useState<"email" | "sms" | "authenticator">(
-    "email"
-  );
-  const login = useLogin();
   const [showModal, setShowModal] = useState(false);
   const [showBiometricIcon, setShowBiometricIcon] = useState(false);
   const screenHeight = Dimensions.get("window").height;
 
   const [username, setUsername] = useState<string | null>(null);
   const [email, setEmail] = useState("");
+  const loginWithBiometrics = useLoginWithBiometrics();
 
   useEffect(() => {
     const loadLastUser = async () => {
@@ -63,40 +58,19 @@ const IndexLogin = () => {
     })();
   }, []);
 
-  if (showOtpScreen) {
-    return (
-      <OtpVerification
-        mode="login"
-        email={email}
-        onBack={() => setShowOtpScreen(false)}
-        otp_medium={otpMedium}
-        password={password}
-      />
-    );
-  }
-
-  const handleSubmit = async (method: "email" | "sms" | "authenticator") => {
-    setOtpMedium(method);
-
-    if (method === "authenticator") {
-      setShowOtpScreen(true);
-      return;
-    }
-
+  const handleSubmit = async () => {
     setIsLoading(true);
 
     try {
       const payload = {
         email: email,
-        password: password,
-        otp_medium: method
+        password: password
       };
       console.log("payload", payload);
 
-      const success = await login(payload);
+      const success = await loginWithBiometrics(payload);
       if (success) {
         setIsLoading(false);
-        setShowOtpScreen(true);
       }
     } catch (error) {
       Toast.show({
@@ -114,7 +88,7 @@ const IndexLogin = () => {
     const enrolled = await LocalAuthentication.isEnrolledAsync();
 
     if (!compatible || !enrolled) {
-      Alert.alert("Biometrics not available");
+      Toast.show({ type: "error", text1: "Biometrics not available"});
       return;
     }
 
@@ -142,7 +116,7 @@ const IndexLogin = () => {
         };
         console.log("bio payload:", payload);
         // Auto-login using stored credentials
-        await login(payload);
+        await loginWithBiometrics(payload);
       } else {
         Alert.alert("No stored credentials found");
       }

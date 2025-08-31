@@ -50,7 +50,7 @@ export const styles = StyleSheet.create({
     letterSpacing: 0,
     textAlign: "center",
     position: "absolute",
-    top: 130,
+    top: 100,
     left: 20,
     right: 20
   },

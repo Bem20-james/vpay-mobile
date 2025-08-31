@@ -7,14 +7,14 @@ interface StepTwoProps {
     email: string;
     username: string;
     password: string;
-    referralCode?: string;
+    referrer?: string;
   };
   setForm: React.Dispatch<React.SetStateAction<any>>;
   errors: {
     email?: string;
     username?: string;
     password?: string;
-    referralCode?: string;
+    referrer?: string;
   };
   setErrors: React.Dispatch<React.SetStateAction<any>>;
   onFieldChange: (field: string, value: string) => void;
@@ -53,8 +53,8 @@ const StepTwo: React.FC<StepTwoProps> = ({ form, errors, onFieldChange }) => {
 
       <FormField
         placeholder="Referral Code (optional)"
-        handleChangeText={(val) => onFieldChange("referralCode", val)}
-        value={form.referralCode || ""}
+        handleChangeText={(val) => onFieldChange("referrer", val)}
+        value={form.referrer || ""}
         isIcon
         iconName="card-giftcard"
       />

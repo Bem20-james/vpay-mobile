@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Modal,
   View,
@@ -11,30 +11,59 @@ import { ThemedText } from "./ThemedText";
 import { Colors } from "@/constants/Colors";
 import { AntDesign } from "@expo/vector-icons";
 
-const methods = ["email", "sms", "authenticator"] as const;
+// ---- shared canonical type ----
+export const OTP_METHODS = ["email", "sms", "authenticator"] as const;
+export type OtpMethod = (typeof OTP_METHODS)[number];
 
-type OtpMethod = (typeof methods)[number];
+// Make methods generic so onSubmit is narrowed to the subset
+type OtpMethodModalProps<T extends readonly OtpMethod[] = typeof OTP_METHODS> =
+  {
+    visible: boolean;
+    onClose: () => void;
+    onSubmit: (method: T[number]) => void;
+    isLoading: boolean;
+    methods?: T;
+    autoSubmitIfSingle?: boolean;
+  };
 
-interface OtpMethodModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onSubmit: (method: OtpMethod) => void;
-  isLoading: boolean;
-}
-
-const OtpMediumModal = ({
+function OtpMediumModal<T extends readonly OtpMethod[] = typeof OTP_METHODS>({
   visible,
   onClose,
   onSubmit,
-  isLoading
-}: OtpMethodModalProps) => {
-  const [selectedMethod, setSelectedMethod] = useState<OtpMethod>("email");
+  isLoading,
+  methods,
+  autoSubmitIfSingle = true
+}: OtpMethodModalProps<T>) {
+  // If none provided or empty, fall back to all
+  const effectiveMethods = useMemo(() => {
+    const list = (methods && methods.length
+      ? methods
+      : OTP_METHODS) as unknown as readonly T[number][];
+    return list;
+  }, [methods]);
+
+  const [selectedMethod, setSelectedMethod] = useState<T[number]>(
+    effectiveMethods[0]
+  );
+
+  useEffect(() => {
+    setSelectedMethod(effectiveMethods[0]);
+  }, [effectiveMethods]);
+
   const colorScheme = useColorScheme();
   const bgColor =
     colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
   const isDark = colorScheme === "dark";
 
-  const handleSelect = (method: OtpMethod) => {
+  // Auto-submit if only one method (skip UI)
+  useEffect(() => {
+    if (autoSubmitIfSingle && visible && effectiveMethods.length === 1) {
+      onSubmit(effectiveMethods[0]);
+      onClose();
+    }
+  }, [autoSubmitIfSingle, visible, effectiveMethods, onSubmit, onClose]);
+
+  const handleSelect = (method: T[number]) => {
     setSelectedMethod(method);
     onClose();
     onSubmit(method);
@@ -45,15 +74,20 @@ const OtpMediumModal = ({
       <View style={styles.backdrop}>
         <View style={[styles.modal, { backgroundColor: bgColor }]}>
           <TouchableOpacity onPress={onClose} style={styles.closeIconContainer}>
-            <AntDesign name="close" size={20} color={isDark ? "#9B9B9B" : "#80D1FF"} />
+            <AntDesign
+              name="close"
+              size={20}
+              color={isDark ? "#9B9B9B" : "#80D1FF"}
+            />
           </TouchableOpacity>
+
           <ThemedText style={styles.title}>
             How do you want to receive OTP
           </ThemedText>
 
-          {methods.map((method) => (
+          {effectiveMethods.map((method) => (
             <TouchableOpacity
-              key={method}
+              key={method as string}
               onPress={() => handleSelect(method)}
               style={[
                 styles.option,
@@ -65,7 +99,7 @@ const OtpMediumModal = ({
                 darkColor="#F5F5F5"
                 style={styles.optionText}
               >
-                {method.toUpperCase()}
+                {(method as string).toUpperCase()}
               </ThemedText>
             </TouchableOpacity>
           ))}
@@ -75,7 +109,7 @@ const OtpMediumModal = ({
       </View>
     </Modal>
   );
-};
+}
 
 export default OtpMediumModal;
 
@@ -103,7 +137,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     textAlign: "center",
     fontFamily: "Inter-Bold",
-    fontWeight: 700,
+    fontWeight: "700",
     fontSize: 18,
     lineHeight: 25,
     letterSpacing: 0

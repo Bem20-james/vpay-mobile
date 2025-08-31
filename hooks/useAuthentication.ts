@@ -20,7 +20,7 @@ interface RegisterData {
   password: string;
   country_id?: string;
   phone?: string;
-  referral?: string;
+  referrer?: string;
 }
 
 interface LoginData {
@@ -86,8 +86,10 @@ const useVerifyEmail = () => {
 
       if (response.status === 200) {
         Toast.show({ type: "success", text1: message || "Email verified successfully!" });
-        await storeData("hasOnboarded", true);
-        router.push("/(auth)/login");
+        router.push({
+          pathname: "/(auth)/transaction-pin",
+          params: { email },
+        });
       }
     } catch (err: any) {
       const errMsg = err.response?.data?.message || err.message || "Network or server error";
@@ -171,6 +173,42 @@ const useResendLoginOTP = () => {
 }
 
 function useLogin() {
+  return async (data: LoginData): Promise<boolean> => {
+    try {
+      const response = await axios.post<AuthResponse>(
+        `${SERVER_BASE_URL}/auth/user/login`,
+        data
+      );
+
+      const result = response?.data;
+      console.log("Login Response:", result);
+
+      if (result.code) {
+        Toast.show({ type: "error", text1: result.message });
+        return false;
+      }
+
+      if (result.success) {
+        Toast.show({ type: "success", text1: result.message });
+        return true;
+      }
+
+      Toast.show({ type: "error", text1: "Something went wrong!" });
+      return false;
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      const errorMessage =
+        axiosError.response?.data?.message || "Login failed, try again.";
+
+      console.error("Catch err:", error);
+      Toast.show({ type: "error", text1: errorMessage });
+
+      return false;
+    }
+  };
+};
+
+function useLoginWithBiometrics() {
   return async (data: LoginData): Promise<boolean> => {
     try {
       const response = await axios.post<AuthResponse>(
@@ -564,6 +602,59 @@ const useChangePwd = () => {
   return { changePwd, loading, error };
 };
 
+const useSetTransactionPin = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter()
+
+  const setTransactionPin = async ({
+    transaction_pin,
+    email
+  }: {
+    transaction_pin: string;
+    email: string;
+  }): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await axios.post(
+        `${SERVER_BASE_URL}/user/transaction-pin/create`,{transaction_pin, email}
+      );
+
+      const result = response.data;
+      console.log("Server Response:", result);
+
+      if (result.code === 0) {
+        await storeData("hasOnboarded", true);
+        Toast.show({ type: "success", text1: result.message });
+        router.push("/(auth)/login");
+      }
+
+      return false;
+    } catch (error: any) {
+      const errMsg =
+        error?.response?.data?.message ||
+        error?.message ||
+        "An unexpected error occurred.";
+      setError(errMsg);
+
+      Toast.show({
+        type: "error",
+        text1: errMsg,
+        text2: "Failed to set Transaction Pin",
+      });
+
+      console.error("Set Transaction Pin Error:", errMsg);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { setTransactionPin, loading, error };
+};
+
 export  {
   useRegister, 
   useVerifyEmail, 
@@ -571,11 +662,13 @@ export  {
   useResendEmailOTP, 
   useResendLoginOTP, 
   useLogin, 
+  useLoginWithBiometrics,
   useForgotPwd, 
   useResendPwdResetOTP, 
   useResetPwd, 
   useVerifyForgotPwd,
   useSendResetPwdOTP,
   useLogout,
-  useChangePwd
+  useChangePwd,
+  useSetTransactionPin
 };
