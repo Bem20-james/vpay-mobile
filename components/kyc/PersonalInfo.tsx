@@ -16,15 +16,12 @@ import IdentityVerification from "./Steps/IdentityVerification";
 import ReviewInformation from "./Steps/ReviewInformation";
 
 export interface FormData {
-  // Basic Information
   firstname: string;
   lastname: string;
   email: string;
   phone: string;
   gender: string;
   dob: string;
-
-  // Personal Details
   marital_status: string;
   occupation: string;
   country: string;
@@ -32,8 +29,6 @@ export interface FormData {
   city: string;
   postal_code: string;
   address: string;
-
-  // Identity
   selfie_image: string;
 }
 
@@ -120,7 +115,7 @@ const PersonalInfo = ({ onBack }: PersonalInfoProps) => {
       const errors: FormErrors = {};
 
       switch (step) {
-        case 1: // Basic Information
+        case 1:
           if (!data.firstname.trim())
             errors.firstname = "First name is required";
           if (!data.lastname.trim()) errors.lastname = "Last name is required";
@@ -138,7 +133,7 @@ const PersonalInfo = ({ onBack }: PersonalInfoProps) => {
           if (!data.dob) errors.dob = "Date of birth is required";
           break;
 
-        case 2: // Personal Details
+        case 2: 
           if (!data.marital_status)
             errors.marital_status = "Marital status is required";
           if (!data.occupation.trim())
@@ -151,7 +146,7 @@ const PersonalInfo = ({ onBack }: PersonalInfoProps) => {
           if (!data.address.trim()) errors.address = "Address is required";
           break;
 
-        case 3: // Identity Verification
+        case 3:
           if (!data.selfie_image)
             errors.selfie_image = "Selfie is required for verification";
           break;
@@ -218,12 +213,11 @@ const PersonalInfo = ({ onBack }: PersonalInfoProps) => {
     }
   }, [currentStep, onBack]);
 
-  // Final submission
   const handleFinalSubmit = useCallback(async () => {
     setSubmission({ isLoading: true, error: null, hasAttempted: true });
 
     try {
-      await verifyUserInfo({
+      const res = await verifyUserInfo({
         firstname: formData.firstname,
         lastname: formData.lastname,
         email: formData.email,
@@ -245,12 +239,13 @@ const PersonalInfo = ({ onBack }: PersonalInfoProps) => {
       if (autoSaveTimeoutRef.current) {
         clearTimeout(autoSaveTimeoutRef.current);
       }
-
-      Alert.alert(
-        "Verification Submitted",
-        "Your information has been submitted for verification. You'll be notified once it's complete.",
-        [{ text: "OK", onPress: () => router.push("/(tabs)/home") }]
-      );
+      if (res) {
+        Alert.alert(
+          "Verification Submitted",
+          "Your information has been submitted for verification. You'll be notified once it's complete.",
+          [{ text: "OK", onPress: () => router.push("/(tabs)/home") }]
+        );
+      }
     } catch (error: any) {
       console.error("Verification error:", error);
       setSubmission({
@@ -283,7 +278,6 @@ const PersonalInfo = ({ onBack }: PersonalInfoProps) => {
     }
   };
 
-  // Render current step
   const renderCurrentStep = () => {
     const stepProps = {
       formData,

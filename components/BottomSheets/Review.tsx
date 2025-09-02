@@ -40,12 +40,13 @@ const ReviewBottomSheet = ({
   accountNumber,
   name,
   selectedAsset,
-  snapPoints = ["60", "75%"],
+  snapPoints = ["60", "70%"],
   title = "Review Details"
 }: Props) => {
   const sheetRef = useRef<BottomSheet>(null);
   const colorScheme = useColorScheme();
   const border = colorScheme === "dark" ? "#414141" : "#d7d7d7";
+  const isDark = colorScheme === "dark";
 
   useEffect(() => {
     if (isVisible) {
@@ -126,10 +127,19 @@ const ReviewBottomSheet = ({
             <View
               style={[
                 btmSheetStyles.paymentMethod,
-                { backgroundColor: Colors.light.primaryDark3 }
+                {
+                  backgroundColor: isDark
+                    ? Colors.light.primaryDark3
+                    : Colors.light.primary
+                }
               ]}
             >
-              <ThemedText style={btmSheetStyles.paymentText}>
+              <ThemedText
+                style={[
+                  btmSheetStyles.paymentText,
+                  { color: isDark ? "#000000" : "#FFFFFF" }
+                ]}
+              >
                 payment Method
               </ThemedText>
               <TouchableOpacity
@@ -145,13 +155,24 @@ const ReviewBottomSheet = ({
                 </View>
 
                 <View style={btmSheetStyles.labelWrapper}>
-                  <ThemedText style={btmSheetStyles.label}>
+                  <ThemedText
+                    style={[
+                      btmSheetStyles.label,
+                      ,
+                      { color: isDark ? "#000000" : "#FFFFFF" }
+                    ]}
+                  >
                     {selectedAsset.name} ({selectedAsset.code})
                   </ThemedText>
                 </View>
 
                 <View style={btmSheetStyles.amountWrapper}>
-                  <ThemedText style={btmSheetStyles.amount}>
+                  <ThemedText
+                    style={[
+                      btmSheetStyles.amount,
+                      { color: isDark ? "#000000" : "#FFFFFF" }
+                    ]}
+                  >
                     {getSymbolFromCurrency(selectedAsset.code) || "₦"}
                     {selectedAsset.balance.toFixed(2)}
                   </ThemedText>
@@ -163,7 +184,7 @@ const ReviewBottomSheet = ({
               <View
                 style={{
                   position: "absolute",
-                  bottom: -120,
+                  bottom: -100,
                   left: 1,
                   right: 1
                 }}

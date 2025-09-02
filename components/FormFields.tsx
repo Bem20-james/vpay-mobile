@@ -147,7 +147,8 @@ const FormField = ({
           autoCapitalize={autoCapitalize}
           secureTextEntry={
             (placeholder === "Password" ||
-              placeholder === "Confirm Password" ||
+              placeholder === "Current Password" ||
+              placeholder === "Confirm New Password" ||
               placeholder === "New Password") &&
             !showPassword
           }
@@ -166,6 +167,8 @@ const FormField = ({
 
         {(placeholder === "Password" ||
           placeholder === "Confirm Password" ||
+          placeholder === "Current Password" ||
+          placeholder === "Confirm New Password" ||
           placeholder === "New Password") && (
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             {!showPassword ? (

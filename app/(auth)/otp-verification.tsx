@@ -20,7 +20,9 @@ import {
   useResendEmailOTP,
   useResendPwdResetOTP,
   useVerifyForgotPwd,
-  useResetPwd
+  useResetPwd,
+  useEnable2FA,
+  useChangePwd
 } from "@/hooks/useAuthentication";
 import Toast from "react-native-toast-message";
 import { Colors } from "@/constants/Colors";
@@ -28,9 +30,16 @@ import { Colors } from "@/constants/Colors";
 interface OtpVerificationProps {
   email?: string;
   onBack?: () => void;
-  mode?: "verify-email" | "forgot-password" | "reset-password" | "login" | "change-password";
+  mode?:
+    | "verify-email"
+    | "forgot-password"
+    | "reset-password"
+    | "login"
+    | "change-password"
+    | "setup-2fa";
   otp_medium?: string;
   password?: string;
+  secret?: string;
 }
 
 const OtpVerification: React.FC<OtpVerificationProps> = ({
@@ -38,7 +47,8 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
   email,
   onBack,
   otp_medium,
-  password
+  password,
+  secret
 }) => {
   const colorScheme = useColorScheme();
   const router = useRouter();
@@ -55,6 +65,8 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
   const { resendPwdResetOTP } = useResendPwdResetOTP();
   const { verifyForgotPwd, loading: verifyingForgotPwd } = useVerifyForgotPwd();
   const { resetPwd, loading: verifyingResetPwd } = useResetPwd();
+  const { enable2FA } = useEnable2FA();
+  const { changePwd, loading: verifyingOTP } = useChangePwd();
 
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | undefined;
@@ -96,6 +108,31 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
         if (success) {
           router.push({
             pathname: "/(auth)/login",
+            params: { otp, email }
+          });
+        }
+      } else if (mode === "setup-2fa") {
+        const success = await enable2FA({
+          otp,
+          secret: secret ?? "",
+          otp_medium: otp_medium ?? "",
+          email: email ?? ""
+        });
+        if (success) {
+          router.push({
+            pathname: "/(tabs)/settings",
+            params: { otp, email }
+          });
+        }
+      } else if (mode === "change-password") {
+        const success = await changePwd({
+          otp,
+          otp_medium: otp_medium ?? "",
+          email: email ?? ""
+        });
+        if (success) {
+          router.push({
+            pathname: "/(tabs)/settings",
             params: { otp, email }
           });
         }
@@ -146,7 +183,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
   };
 
   const isLoading =
-    verifyingEmail || verifyingLogin || verifyingForgotPwd || verifyingResetPwd;
+    verifyingEmail || verifyingLogin || verifyingForgotPwd || verifyingResetPwd || verifyingOTP;
 
   return (
     <SafeAreaView style={{ backgroundColor: bgColor, height: "100%" }}>

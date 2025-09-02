@@ -168,8 +168,6 @@ const Login = () => {
 
           <Pressable
             onPress={() => router.push("/(auth)/forgot-password")}
-            //onPress={() => router.push("/(tabs)/home")}
-
             style={({ pressed }) => [
               styles.forgotPwd,
               { opacity: pressed ? 0.7 : 1 }

@@ -2,7 +2,7 @@ import { useColorScheme } from "@/hooks/useColorScheme.web";
 import Navigator from "@/components/Navigator";
 import { ThemedText } from "@/components/ThemedText";
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, ScrollView, Alert } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SettingItem } from "@/components/SettingItem";
 import { useRouter } from "expo-router";
@@ -11,13 +11,14 @@ import { useUser } from "@/contexts/UserContexts";
 import { getData, storeData, removeData } from "@/utils/store";
 import * as LocalAuthentication from "expo-local-authentication";
 import { Colors } from "@/constants/Colors";
+import Toast from "react-native-toast-message";
+import Setup2FAScreen from "@/components/2FASetup";
 
 const SettingsScreen: React.FC = () => {
-  const [hideBalance, setHideBalance] = useState(false);
   const [securityLock, setSecurityLock] = useState(false);
-  const [fingerprint, setFingerprint] = useState(false);
+  const [make2FAVisible, setMake2FAVisible] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
-
+  const [hideBalance, setHideBalance] = useState(false);
   const colorScheme = useColorScheme();
   const boxBackgroundColor =
     colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
@@ -25,11 +26,16 @@ const SettingsScreen: React.FC = () => {
   const logout = useLogout();
   const { clearUser } = useUser();
 
+  console.log("hide Balance:", hideBalance)
 
   useEffect(() => {
     (async () => {
-      const enabled = await getData("useBiometrics");
-      setIsEnabled(Boolean(enabled));
+      const res = await getData<boolean>("useBiometrics");
+      if (res.success && res.data !== null) {
+        setIsEnabled(res.data);
+      } else {
+        setIsEnabled(false);
+      }
     })();
   }, []);
 
@@ -38,10 +44,11 @@ const SettingsScreen: React.FC = () => {
     const isEnrolled = await LocalAuthentication.isEnrolledAsync();
 
     if (!hasHardware || !isEnrolled) {
-      Alert.alert(
-        "Biometric not supported",
-        "Your device does not support biometrics."
-      );
+      Toast.show({
+        type: "error",
+        text1: "Biometric not supported",
+        text2: "Your device does not support biometrics."
+      });
       return;
     }
 
@@ -50,25 +57,21 @@ const SettingsScreen: React.FC = () => {
         ? "Confirm to disable biometric login"
         : "Authenticate to enable biometric login",
       cancelLabel: "Cancel",
-      fallbackLabel: "Use PIN"
+      disableDeviceFallback: true
     });
 
     if (result.success) {
       const newValue = !isEnabled;
       setIsEnabled(newValue);
 
-      if (newValue) {
-        await storeData("useBiometrics", true);
-        Alert.alert("Enabled", "Biometric login is now enabled.");
-      } else {
-        await removeData("useBiometrics");
-        Alert.alert("Disabled", "Biometric login is now disabled.");
-      }
+      await storeData("useBiometrics", newValue);
+
+      Toast.show({
+        type: "info",
+        text1: `Biometric login is now ${newValue ? "enabled" : "disabled"}.`
+      });
     } else {
-      Alert.alert(
-        "Authentication failed",
-        "Unable to change biometric settings."
-      );
+      Toast.show({ type: "error", text1: "Biometric Authentication failed" });
     }
   };
 
@@ -79,6 +82,29 @@ const SettingsScreen: React.FC = () => {
       router.push("/(auth)/login-index");
     }
   };
+
+  useEffect(() => {
+    (async () => {
+      const res = await getData<boolean>("hideBalance");
+      if (res.success && res.data !== null) {
+        setHideBalance(res.data);
+      }
+    })();
+  }, []);
+
+  const toggleHideBalance = async (value: boolean) => {
+    setHideBalance(value);
+    await storeData("hideBalance", value);
+  };
+
+  if (make2FAVisible) {
+    return (
+      <Setup2FAScreen
+        showBack={() => setMake2FAVisible(false)}
+        title="Enable Two-factor"
+      />
+    );
+  }
 
   return (
     <SafeAreaView
@@ -124,7 +150,7 @@ const SettingsScreen: React.FC = () => {
                 label="Hide your balance on the app"
                 hasSwitch
                 switchValue={hideBalance}
-                onSwitchChange={setHideBalance}
+                onSwitchChange={toggleHideBalance}
               />
 
               <SettingItem
@@ -143,22 +169,22 @@ const SettingsScreen: React.FC = () => {
               />
 
               <SettingItem
-                title="Enable 2FA"
-                hasSwitch
-                switchValue={fingerprint}
-                onSwitchChange={setFingerprint}
+                title="Setup 2FA"
+                label="Setup two-factor authentication"
+                hasChevron
+                onPress={() => setMake2FAVisible(true)}
               />
 
               <SettingItem
                 title="Change PIN"
                 hasChevron
-                onPress={() => router.push("/(auth)/change-pin")}
+                onPress={() => router.push("/(user)/change-transaction-pin")}
               />
 
               <SettingItem
                 title="Change Password"
                 hasChevron
-                onPress={() => router.push("/(auth)/change-password")}
+                onPress={() => router.push("/(user)/change-password")}
               />
 
               <SettingItem

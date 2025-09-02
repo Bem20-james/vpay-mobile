@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback } from "react";
 import { StyleSheet, View, Image, TouchableOpacity } from "react-native";
+import * as FileSystem from "expo-file-system";
 import { MaterialIcons } from "@expo/vector-icons";
 import { ThemedText } from "../ThemedText";
 import CustomButton from "../CustomButton";
@@ -7,14 +8,15 @@ import { KycStyles as styles } from "@/styles/kyc";
 import { CameraView, useCameraPermissions } from "expo-camera";
 
 interface SelfieUploadProps {
-  onNext: () => void;
+  onBack: () => void;
   onSubmit: (selfieUri: string) => void;
   isLoading?: boolean;
   isvalid?: boolean;
 }
 
 const SelfieUpload: React.FC<SelfieUploadProps> = ({
-  onNext,
+  onBack,
+  onSubmit,
   isLoading = false,
   isvalid
 }) => {
@@ -41,16 +43,30 @@ const SelfieUpload: React.FC<SelfieUploadProps> = ({
       if (photoData?.uri) {
         setPhoto(photoData.uri);
         setCameraActive(false);
+
+        // Converting file URI to base64
+        try {
+          const base64 = await FileSystem.readAsStringAsync(photoData.uri, {
+            encoding: FileSystem.EncodingType.Base64
+          });
+
+          const dataUri = `data:image/jpeg;base64,${base64}`;
+
+          onSubmit(dataUri);
+        } catch (base64Error) {
+          console.error("Failed to convert image to base64:", base64Error);
+        }
       }
     } catch (error) {
       console.error("Failed to take picture:", error);
     }
-  }, []);
+  }, [onSubmit]);
 
   const retakeSelfie = useCallback(() => {
     setPhoto(null);
     setCameraActive(true);
-  }, []);
+    onSubmit("");
+  }, [onSubmit]);
 
   const renderCameraContent = () => {
     if (photo) {

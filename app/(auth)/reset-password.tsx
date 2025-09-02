@@ -14,8 +14,6 @@ import Toast from "react-native-toast-message";
 import OtpVerification from "./otp-verification";
 import { Colors } from "@/constants/Colors";
 import toastConfig from "@/config/toastConfig";
-
-import type { OtpMethod } from "@/components/OtpMediumModal";
 import OtpMediumModal, { OTP_METHODS } from "@/components/OtpMediumModal";
 
 const ResetPassword = () => {
@@ -24,7 +22,6 @@ const ResetPassword = () => {
     colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
   const { sendResetOTP } = useSendResetPwdOTP();
   const { otp, email: rawEmail } = useLocalSearchParams();
-
   const email = Array.isArray(rawEmail) ? rawEmail[0] : rawEmail;
 
   const [form, setForm] = useState({
@@ -33,7 +30,6 @@ const ResetPassword = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  type OtpMethod = "sms" | "authenticator" | "email";
 
   const [showOtpScreen, setShowOtpScreen] = useState(false);
   const allowedMethods = ["sms", "authenticator"] as const;
@@ -182,8 +178,7 @@ const ResetPassword = () => {
           onClose={() => setShowModal(false)}
           isLoading={isSubmitting}
           onSubmit={submitForm}
-          methods={allowedMethods} // ✅ narrowed, readonly
-          // autoSubmitIfSingle={true}    // optional (default true)
+          methods={allowedMethods}
         />
       </ScrollView>
       <Toast

@@ -10,12 +10,11 @@ import CustomButton from "@/components/CustomButton";
 import { styles } from "@/styles/auth";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
-import OtpMediumModal from "@/components/OtpMediumModal";
 import { getData } from "@/utils/store";
 import { Colors } from "@/constants/Colors";
 import * as LocalAuthentication from "expo-local-authentication";
-import { Alert } from "react-native";
 import { useLoginWithBiometrics } from "@/hooks/useAuthentication";
+import { useLoader } from "@/contexts/LoaderContext";
 
 const IndexLogin = () => {
   const colorScheme = useColorScheme();
@@ -25,41 +24,41 @@ const IndexLogin = () => {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ identifier: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
   const [showBiometricIcon, setShowBiometricIcon] = useState(false);
   const screenHeight = Dimensions.get("window").height;
 
   const [username, setUsername] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const loginWithBiometrics = useLoginWithBiometrics();
+  const { showLoader, hideLoader } = useLoader();
+
+  console.log("last logged user:", username);
 
   useEffect(() => {
     const loadLastUser = async () => {
-      const result = await getData<{ username: string; email: string }>(
-        "lastUser"
-      );
-
-      if (result.success && result.data) {
-        const { username, email } = result.data;
-        setUsername(username);
-        setEmail(email);
-      } else {
-        console.warn("No last user data found or failed to load.");
+      const result = await getData("lastUser");
+      if (result && result.success && result.data) {
+        setUsername(result.data.username);
+        setEmail(result.data.email);
       }
     };
-
     loadLastUser();
   }, []);
 
   useEffect(() => {
     (async () => {
-      const enabled = await getData("useBiometrics");
-      setShowBiometricIcon(Boolean(enabled));
+      const res = await getData<boolean>("useBiometrics");
+      if (res.success && typeof res.data === "boolean") {
+        setShowBiometricIcon(res.data);
+      } else {
+        setShowBiometricIcon(false);
+      }
     })();
   }, []);
 
   const handleSubmit = async () => {
     setIsLoading(true);
+    showLoader();
 
     try {
       const payload = {
@@ -71,6 +70,8 @@ const IndexLogin = () => {
       const success = await loginWithBiometrics(payload);
       if (success) {
         setIsLoading(false);
+        hideLoader();
+        router.push("/(tabs)/home");
       }
     } catch (error) {
       Toast.show({
@@ -88,19 +89,19 @@ const IndexLogin = () => {
     const enrolled = await LocalAuthentication.isEnrolledAsync();
 
     if (!compatible || !enrolled) {
-      Toast.show({ type: "error", text1: "Biometrics not available"});
+      Toast.show({ type: "error", text1: "Biometrics not available" });
       return;
     }
 
     const result = await LocalAuthentication.authenticateAsync({
-      promptMessage: "Login with Biometrics",
-      fallbackLabel: "Enter password"
+      promptMessage: "Login with biometrics",
+      disableDeviceFallback: true
     });
 
     if (result.success) {
-      // Retrieve user credentials (if stored securely)
       const storedCredentials = await getData("biometricCredentials");
-      console.log("bio payload:", "got here now");
+      console.log("bio payload:", storedCredentials);
+      showLoader();
 
       if (
         storedCredentials?.success &&
@@ -111,17 +112,19 @@ const IndexLogin = () => {
 
         const payload = {
           email: storedCredentials.data.identifier,
-          password: storedCredentials.data.password,
-          otp_medium: "email"
+          password: storedCredentials.data.password
         };
         console.log("bio payload:", payload);
-        // Auto-login using stored credentials
-        await loginWithBiometrics(payload);
+        const res = await loginWithBiometrics(payload);
+        if (res) {
+          hideLoader();
+          router.push("/(tabs)/home");
+        }
       } else {
-        Alert.alert("No stored credentials found");
+        Toast.show({ type: "error", text1: "No stored credentials found" });
       }
     } else {
-      Alert.alert("Authentication failed", result.error ?? "Please try again");
+      Toast.show({ type: "error", text1: "Biometrics operation cancelled" });
     }
   };
 
@@ -223,8 +226,7 @@ const IndexLogin = () => {
           >
             <CustomButton
               title="Login"
-              //handlePress={() => router.push("/(tabs)/home")}
-              handlePress={() => setShowModal(true)}
+              handlePress={handleSubmit}
               btnStyles={{ width: "100%" }}
               isLoading={isLoading}
               disabled={!password}
@@ -265,12 +267,7 @@ const IndexLogin = () => {
             </View>
           </View>
         </View>
-        <OtpMediumModal
-          visible={showModal}
-          onClose={() => setShowModal(false)}
-          isLoading={isLoading}
-          onSubmit={handleSubmit}
-        />
+
       </ScrollView>
     </SafeAreaView>
   );

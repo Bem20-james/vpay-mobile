@@ -20,6 +20,9 @@ const ActionsLayout = () => {
         <Stack.Screen name="accounts" options={{ headerShown: false }} />
         <Stack.Screen name="devices" options={{ headerShown: false }} />
         <Stack.Screen name="personal" options={{ headerShown: false }} />
+
+        <Stack.Screen name="change-password" options={{ headerShown: false }} />
+        <Stack.Screen name="change-transaction-pin" options={{ headerShown: false }} />
       </Stack>
 
       <Toast

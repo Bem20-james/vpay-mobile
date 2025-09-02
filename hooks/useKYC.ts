@@ -37,11 +37,13 @@ interface RegisterData {
 }
 
 function usePersonalVerification() {
+  const { config } = useUser()
   return async (data: RegisterData): Promise<boolean> => {
     try {
       const response = await axios.post<Response>(
         `${SERVER_BASE_URL}/user/kyc/personal`,
-        data
+        data,
+        config
       );
 
       const result = response?.data;

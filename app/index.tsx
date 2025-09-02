@@ -11,8 +11,6 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    AsyncStorage.clear();
-
     const redirect = async () => {
       const hasOnboarded = await getData("hasOnboarded");
 

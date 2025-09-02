@@ -13,6 +13,7 @@ import { KycStyles as styles } from "@/styles/kyc";
 import images from "@/constants/Images";
 import AddressVerification from "@/components/kyc/AddressVerification";
 import { Colors } from "@/constants/Colors";
+import { useUser } from "@/contexts/UserContexts";
 
 const Verification = () => {
   const colorScheme = useColorScheme();
@@ -27,6 +28,7 @@ const Verification = () => {
   const [showPersonalInfo, setShowPersonalInfo] = useState(false);
   const [showIdVerification, setShowIdVerification] = useState(false);
   const [showAddressInfo, setShowAddressInfo] = useState(false);
+  const {user} = useUser()
 
   if (showPersonalInfo) {
     return <PersonalInfo onBack={() => setShowPersonalInfo(false)} />;
@@ -64,6 +66,7 @@ const Verification = () => {
               backgroundColor={bgColor}
               image={images.tier1}
             />
+            
             <Option
               label="Identity Verification"
               title="Tier 2"

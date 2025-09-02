@@ -140,7 +140,7 @@ const ForgotPassword = () => {
             handlePress={handleSubmit}
             isLoading={isSubmitting}
             disabled={!email.trim() || isSubmitting}
-            btnStyles={{ width: "100%", marginTop: 100 }}
+            btnStyles={{ width: "100%", marginTop: 20 }}
           />
         </View>
       </ScrollView>

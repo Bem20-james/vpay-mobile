@@ -35,7 +35,6 @@ const PersonalInformation: React.FC<PersonalInfoProps> = ({
     return touchedFields.has(fieldName) ? formErrors[fieldName] : undefined;
   };
 
-  // Check if step is valid
   const stepFields = [
     "marital_status",
     "occupation",
@@ -62,9 +61,7 @@ const PersonalInformation: React.FC<PersonalInfoProps> = ({
       </ThemedText>
 
       <View style={{ gap: 1 }}>
-        {/* Personal Status Row */}
         <View style={{ flexDirection: "row", gap: 8 }}>
-          {/* Marital Status */}
           <View style={{ flex: 1 }}>
             <TouchableOpacity onPress={() => setShowMaritalSheet(true)}>
               <FormField
@@ -79,7 +76,6 @@ const PersonalInformation: React.FC<PersonalInfoProps> = ({
             </TouchableOpacity>
           </View>
 
-          {/* Occupation */}
           <View style={{ flex: 1 }}>
             <FormField
               placeholder="Occupation"
@@ -93,7 +89,6 @@ const PersonalInformation: React.FC<PersonalInfoProps> = ({
           </View>
         </View>
 
-        {/* Address Section Header */}
         <View style={{ marginTop: 5, marginBottom: 3 }}>
           <ThemedText style={{ fontSize: 16, fontFamily: "Inter-SemiBold" }}>
             Address Information
@@ -110,7 +105,6 @@ const PersonalInformation: React.FC<PersonalInfoProps> = ({
           </ThemedText>
         </View>
 
-        {/* Country Field */}
         <FormField
           placeholder="Country"
           value={formData.country}
@@ -120,7 +114,6 @@ const PersonalInformation: React.FC<PersonalInfoProps> = ({
           autoCapitalize="words"
         />
 
-        {/* State and City Row */}
         <View style={{ flexDirection: "row", gap: 8 }}>
           <View style={{ flex: 1 }}>
             <FormField
@@ -142,12 +135,10 @@ const PersonalInformation: React.FC<PersonalInfoProps> = ({
           </View>
         </View>
 
-        {/* Postal Code */}
         <FormField
           placeholder="Postal/ZIP Code"
           value={formData.postal_code}
           handleChangeText={(value) => {
-            // Allow only alphanumeric characters for postal codes
             const cleaned = value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
             updateFormData({ postal_code: cleaned });
           }}
@@ -157,7 +148,6 @@ const PersonalInformation: React.FC<PersonalInfoProps> = ({
           maxLength={10}
         />
 
-        {/* Full Address */}
         <FormField
           placeholder="Street Address"
           value={formData.address}
@@ -167,7 +157,6 @@ const PersonalInformation: React.FC<PersonalInfoProps> = ({
           helpText="Include street number, street name, and any apartment/unit details"
         />
 
-        {/* Progress Indicator */}
         <View
           style={{
             backgroundColor: "rgba(34, 197, 94, 0.1)",
@@ -183,7 +172,6 @@ const PersonalInformation: React.FC<PersonalInfoProps> = ({
         </View>
       </View>
 
-      {/* Navigation Buttons */}
       <View style={{ flexDirection: "row", marginTop: 32, gap: 5 }}>
         <CustomButton
           title="Back"
@@ -218,7 +206,6 @@ const PersonalInformation: React.FC<PersonalInfoProps> = ({
         </ThemedText>
       )}
 
-      {/* Marital Status Selection Sheet */}
       <CustomSheet
         isVisible={showMaritalSheet}
         onClose={() => setShowMaritalSheet(false)}

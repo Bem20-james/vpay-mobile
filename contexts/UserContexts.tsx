@@ -29,6 +29,7 @@ export interface User {
   kyc?: {
     address: number;
     identity: number;
+    personal: number;
   };
   [key: string]: any;
 }
@@ -76,16 +77,6 @@ export default function UserContextProvider({ children }: PropsWithChildren) {
       setIsUserLoaded(true);
     }
   }, []);
-
-  // const updateUser = useCallback(async (data: User) => {
-  //   try {
-  //     await storeData("auth", data);
-  //     setUser(data);
-  //   } catch (error) {
-  //     console.error("Failed to update user data:", error);
-  //     throw error;
-  //   }
-  // }, []);
 
   const updateUser = useCallback(async (data: User) => {
     try {

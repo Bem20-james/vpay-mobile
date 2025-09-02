@@ -8,6 +8,8 @@ import { Colors } from "@/constants/Colors";
 import CustomButton from "../CustomButton";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import QRCode from "react-native-qrcode-svg";
+import Toast from "react-native-toast-message";
+import * as Clipboard from "expo-clipboard";
 
 interface FiatItem {
   bank: string;
@@ -56,6 +58,13 @@ const AccountsBottomSheet: React.FC<Props> = ({
 
   if (!isVisible) return null;
 
+  const handleCopy = async () => {
+    if (selectedItem && "account_number" in selectedItem) {
+      await Clipboard.setStringAsync(selectedItem.account_number);
+      Toast.show({ type: "success", text1: "Copied to clipboard" });
+    }
+  };
+
   return (
     <Portal>
       <BottomSheet
@@ -87,19 +96,24 @@ const AccountsBottomSheet: React.FC<Props> = ({
                 <ThemedText style={styles.option}>Account Number</ThemedText>
                 <View style={styles.icon}>
                   <ThemedText style={styles.value}>
-                    {selectedItem?.account_number}
+                    {"account_number" in (selectedItem ?? {})
+                      ? (selectedItem as FiatItem).account_number
+                      : ""}
                   </ThemedText>
                   <MaterialIcons
                     name="content-copy"
                     size={20}
                     color={"#208BC9"}
+                    onPress={handleCopy}
                   />
                 </View>
 
                 <ThemedText style={styles.option}>Bank</ThemedText>
                 <View style={styles.icon}>
                   <ThemedText style={styles.value}>
-                    {selectedItem?.bank}
+                    {"bank" in (selectedItem ?? {})
+                      ? (selectedItem as FiatItem).bank
+                      : ""}
                   </ThemedText>
                   <MaterialIcons
                     name="content-copy"
@@ -110,13 +124,15 @@ const AccountsBottomSheet: React.FC<Props> = ({
 
                 <ThemedText style={styles.option}>Account Name</ThemedText>
                 <ThemedText style={styles.value}>
-                  {selectedItem?.account_name}
+                  {"account_name" in (selectedItem ?? {})
+                    ? (selectedItem as FiatItem).account_name
+                    : ""}
                 </ThemedText>
               </View>
             ) : (
               <View style={styles.qrContainer}>
                 <QRCode
-                  value={selectedItem?.address}
+                  value={"656577hfhfkdjdh738383849"}
                   size={200}
                   color="#000000"
                   backgroundColor="#ffffff"

@@ -17,7 +17,7 @@ interface FiatAccount {
   name: string;
   account_balance: string;
   account_name: string;
-  bank_name: string;
+  bank: string;
   account_number: string;
   currency_code: string;
   country_code: string;
@@ -95,7 +95,7 @@ const Accounts: React.FC = () => {
                   type="fiat"
                   account_balance={item.account_balance}
                   account_name={item.account_name}
-                  bank_name={item.bank_name}
+                  bank_name={item.bank}
                   account_number={item.account_number}
                   handlePress={() => openSheet("fiat", item)}
                 />
@@ -133,20 +133,24 @@ const Accounts: React.FC = () => {
           label={
             selectedType === "fiat" ? (
               <>
-                Add cash to your{" "} 
+                Add cash to your{" "}
                 <ThemedText style={styles.selectedText}>
-                  {selectedItem?.currency_code}
-                </ThemedText>
-                {" "}
+                  {selectedType === "fiat" &&
+                  selectedItem &&
+                  "currency_code" in selectedItem
+                    ? selectedItem.currency_code
+                    : ""}
+                </ThemedText>{" "}
                 wallet using the account details below
               </>
             ) : (
               <>
                 Fund your{" "}
                 <ThemedText style={styles.selectedText}>
-                  {selectedItem?.token_name}
-                </ThemedText>
-                {" "}
+                  {selectedItem && "token_name" in selectedItem
+                    ? selectedItem.token_name
+                    : ""}
+                </ThemedText>{" "}
                 wallet with the address below
               </>
             )

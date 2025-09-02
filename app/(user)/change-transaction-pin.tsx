@@ -9,27 +9,22 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Navigator from "./Navigator";
+import Navigator from "@/components/Navigator";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { Colors } from "@/constants/Colors";
 import images from "@/constants/Images";
-import { ThemedText } from "./ThemedText";
+import { ThemedText } from "@/components/ThemedText";
 import { useSetTransactionPin } from "@/hooks/useAuthentication";
 import Toast from "react-native-toast-message";
 import { useLoader } from "@/contexts/LoaderContext";
 import { useLocalSearchParams } from "expo-router";
 
-interface TransactionPinProps {
-  showBack?: boolean;
-}
 interface NumberButtonProps {
   number: string;
   onPress: (number: string) => void;
 }
 
-const TransactionPinScreen: React.FC<TransactionPinProps> = ({
-  showBack = true
-}) => {
+const TransactionPinScreen: React.FC = () => {
   const colorScheme = useColorScheme();
   const bgColor =
     colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
@@ -120,10 +115,10 @@ const TransactionPinScreen: React.FC<TransactionPinProps> = ({
   return (
     <SafeAreaView style={{ backgroundColor: bgColor, height: "100%" }}>
       <ScrollView
-        style={{ paddingHorizontal: 7, marginTop: showBack === true ? 0 : 50 }}
+        style={{ paddingHorizontal: 7, marginTop: 50 }}
         showsVerticalScrollIndicator={false}
       >
-        {showBack && <Navigator />}
+         <Navigator title="Change Pin" />
         <View style={styles.container}>
           {colorScheme === "dark" ? (
             <Image source={images.logolight} style={styles.logo} />

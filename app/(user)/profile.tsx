@@ -12,7 +12,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Navigator from "@/components/Navigator";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useRouter } from "expo-router";
-import { useUser } from "@/contexts/UserContexts";
 import images from "@/constants/Images";
 import { styles } from "@/styles/users";
 import { useFetchAuthUser } from "@/hooks/useUser";
@@ -104,12 +103,8 @@ const Profile = () => {
   const backgroundColor = colorScheme === "dark" ? "#000000" : "#EEF3FB";
   const boxBg = colorScheme === "dark" ? "#161622" : "#FFFFFF";
   const router = useRouter();
-  const { clearUser, user } = useUser();
-  const [securityLock, setSecurityLock] = useState(false);
-  const [transactionPin, setTransactionPin] = useState(false);
   const { userData } = useFetchAuthUser();
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
-  console.log("user:", userData)
 
   return (
     <SafeAreaView

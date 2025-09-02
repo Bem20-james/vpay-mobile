@@ -28,11 +28,32 @@ interface LoginData {
   password?: string;
 }
 
+type UserData = {
+  token: string;
+  user: {
+    username: string;
+    email: string;
+    [key: string]: any;
+  };
+  country?: any;
+  kyc?: any;
+  [key: string]: any;
+};
+
 interface AuthResponse {
   code: boolean | number;
   message: string;
   success: string;
+  result?: UserData
 }
+
+interface payload {
+  email: string;
+  secret?: string;
+  otp?: string;
+  otp_medium?: string;
+}
+
 
 function useRegister() {
   return async (data: RegisterData): Promise<boolean> => {
@@ -209,10 +230,12 @@ function useLogin() {
 };
 
 function useLoginWithBiometrics() {
+  const { updateUser } = useUser();
+
   return async (data: LoginData): Promise<boolean> => {
     try {
       const response = await axios.post<AuthResponse>(
-        `${SERVER_BASE_URL}/auth/user/login`,
+        `${SERVER_BASE_URL}/auth/user/resume`,
         data
       );
 
@@ -225,8 +248,27 @@ function useLoginWithBiometrics() {
       }
 
       if (result.success) {
-        Toast.show({ type: "success", text1: result.message });
-        return true;
+        if (result.result) {
+          const { token, user, country, kyc } = result.result;
+          const tokenPayload: JwtPayload = jwtDecode(token);
+          const expiresAt = tokenPayload.exp * 1000;
+
+          const userData = {
+            ...user,
+            country,
+            kyc,
+            accessToken: token,
+            refreshToken: null,
+            expiresAt,
+          };
+          await updateUser(userData);
+          await storeData("lastUser", {
+            username: user.username,
+            email: user.email,
+          });
+          Toast.show({ type: "success", text1: result.message });
+          return true;
+        }
       }
 
       Toast.show({ type: "error", text1: "Something went wrong!" });
@@ -472,7 +514,6 @@ const useVerifyLogin = () => {
           refreshToken: null,
           expiresAt,
         };
-        console.log("logged userdata:", userData)
         await updateUser(userData);
         await storeData("lastUser", {
           username: user.username,
@@ -539,23 +580,16 @@ function useLogout() {
     try {
       const response = await axios.post<AuthResponse>(
         `${SERVER_BASE_URL}/auth/user/logout`,
-        {config}
+        {},
+        config
       );
   
       const result = response?.data;
       console.log("Logout Response:", result);
 
-      if (result.code !== 0) {
-        Toast.show({ type: "error", text1: result.message });
-        return false;
-      }
-
-      if (result.success) {
-        Toast.show({ type: "success", text1: result.message });
+      if (result.code === 0) {
         return true;
       }
-
-      Toast.show({ type: "error", text1: "Logout failed unexpectedly." });
       return false;
     } catch (error: unknown) {
       const axiosError = error as AxiosError<{ message?: string }>;
@@ -582,7 +616,7 @@ const useChangePwd = () => {
       const response = await axios.post(`${SERVER_BASE_URL}/auth/user/forgot/password/mobile`,email );
 
       const result = response?.data;
-
+      console.log("change pwd res:", result)
       if (result.success) {
         Toast.show({ type: "success", text1: result.message || "OTP sent successfully!" });
         return true; 
@@ -655,6 +689,96 @@ const useSetTransactionPin = () => {
   return { setTransactionPin, loading, error };
 };
 
+const useSetup2FA = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { config } = useUser();
+
+  const setup2FA = async (data: payload): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+    const payload = {
+      email: data.email,
+    };
+    try {
+      const response = await axios.post(
+        `${SERVER_BASE_URL}/auth/create/authenticator-2fa`, payload, config
+      );
+
+      const result = response.data;
+      console.log("Server Response:", result);
+
+      if (result?.code === 0) {
+        return true
+      }
+
+      return false;
+    } catch (error: any) {
+      const errMsg =
+        error?.response?.data?.message ||
+        error?.message ||
+        "An unexpected error occurred.";
+      setError(errMsg);
+
+      Toast.show({type:"error", text1: errMsg});
+
+      console.error("setup error:", errMsg);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { setup2FA, loading, error };
+};
+
+const useEnable2FA = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { config } = useUser();
+
+  const enable2FA = async (data: payload): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+
+    const payload = {
+      email: data.email,
+      secret: data.secret,
+      
+    }
+
+    try {
+      const response = await axios.post(
+        `${SERVER_BASE_URL}/auth/create/authenticator-2fa`, payload, config
+      );
+
+      const result = response.data;
+      console.log("Server Response:", result);
+
+      if (result.code === 0) {
+        Toast.show({ type: "success", text1:result.message });
+      }
+
+      return false;
+    } catch (error: any) {
+      const errMsg =
+        error?.response?.data?.message ||
+        error?.message ||
+        "An unexpected error occurred.";
+      setError(errMsg);
+
+      Toast.show({type:"error", text1: errMsg});
+
+      console.error("Set Transaction Pin Error:", errMsg);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { enable2FA, loading, error };
+};
+
 export  {
   useRegister, 
   useVerifyEmail, 
@@ -670,5 +794,7 @@ export  {
   useSendResetPwdOTP,
   useLogout,
   useChangePwd,
-  useSetTransactionPin
+  useSetTransactionPin,
+  useSetup2FA,
+  useEnable2FA
 };

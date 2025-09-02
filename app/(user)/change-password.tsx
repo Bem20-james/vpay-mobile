@@ -6,12 +6,13 @@ import { ThemedText } from "@/components/ThemedText";
 import FormField from "@/components/FormFields";
 import CustomButton from "@/components/CustomButton";
 import { styles } from "@/styles/auth";
-import OtpVerification from "./otp-verification";
 import Toast from "react-native-toast-message";
 import OtpMediumModal from "@/components/OtpMediumModal";
 import { Colors } from "@/constants/Colors";
 import { useChangePwd } from "@/hooks/useAuthentication";
 import Navigator from "@/components/Navigator";
+import OtpVerification from "../(auth)/otp-verification";
+import { useUser } from "@/contexts/UserContexts";
 
 const ChangePassword = () => {
   const colorScheme = useColorScheme();
@@ -31,6 +32,8 @@ const ChangePassword = () => {
   );
   const { changePwd } = useChangePwd();
   const screenHeight = Dimensions.get("window").height;
+  const { user } = useUser()
+  const userEmail = user?.email
 
   const validate = () => {
     let valid = true;
@@ -42,16 +45,22 @@ const ChangePassword = () => {
     }
 
     if (!form.newPwd) {
-      newErrors.newPwd = "Enter a new password.";
+      newErrors.newPwd = "New password is required.";
       valid = false;
-    }
-    if (!form.newPwd) {
-      newErrors.newPwd = "Enter a new password.";
+    } else if (form.newPwd.length < 8) {
+      newErrors.newPwd = "Password must be at least 8 characters.";
+      valid = false;
+    } else if (!/[A-Z]/.test(form.newPwd) || !/[0-9]/.test(form.newPwd)) {
+      newErrors.newPwd =
+        "Password must contain at least one uppercase letter and one number.";
       valid = false;
     }
 
     if (!form.confirmNewPwd) {
-      newErrors.newPwd = "Enter a new password.";
+      newErrors.confirmNewPwd = "Please confirm your new password.";
+      valid = false;
+    } else if (form.newPwd !== form.confirmNewPwd) {
+      newErrors.confirmNewPwd = "Passwords do not match.";
       valid = false;
     }
 
@@ -73,7 +82,8 @@ const ChangePassword = () => {
     try {
       const payload = {
         password: form.pwd,
-        new_password: form.newPwd
+        new_password: form.newPwd,
+        email: userEmail
       };
 
       const success = await changePwd(payload);
@@ -85,7 +95,7 @@ const ChangePassword = () => {
     } catch (error) {
       Toast.show({
         type: "error",
-        text1: "ChangePassword failed",
+        text1: "Change password failed",
         text2: "Please check your credentials"
       });
     } finally {
@@ -97,10 +107,9 @@ const ChangePassword = () => {
     return (
       <OtpVerification
         mode="change-password"
-        email={form.pwd}
+        email={userEmail}
         onBack={() => setShowOtpScreen(false)}
         otp_medium={otpMedium}
-        password={form.pwd}
       />
     );
   }
@@ -118,8 +127,8 @@ const ChangePassword = () => {
             paddingHorizontal: 15
           }}
         >
-          <Navigator />
-          <View style={{ marginTop: 10 }}>
+          <Navigator title="Change Password" />
+          <View style={{ marginTop: 20 }}>
             <ThemedText
               darkColor="#FFFFFF"
               lightColor="#000000"
@@ -132,26 +141,25 @@ const ChangePassword = () => {
               lightColor="#9B9B9B"
               style={styles.subtitle}
             >
-              Welcome back, pick up exactly where you left off champ
+              Please enter your current and new password below
             </ThemedText>
           </View>
 
           <FormField
             placeholder={"Current Password"}
             handleChangeText={(value) =>
-              setForm((prev) => ({ ...prev, identifier: value }))
+              setForm((prev) => ({ ...prev, pwd: value }))
             }
             value={form.pwd}
             error={errors.pwd}
             otherStyles={{ marginTop: 10 }}
-            keyboardType="email-address"
             isIcon
-            iconName="person"
+            iconName="shield"
           />
           <FormField
             placeholder={"New Password"}
             handleChangeText={(value) =>
-              setForm((prev) => ({ ...prev, password: value }))
+              setForm((prev) => ({ ...prev, newPwd: value }))
             }
             value={form.newPwd}
             error={errors.newPwd}
@@ -162,7 +170,7 @@ const ChangePassword = () => {
           <FormField
             placeholder={"Confirm New Password"}
             handleChangeText={(value) =>
-              setForm((prev) => ({ ...prev, password: value }))
+              setForm((prev) => ({ ...prev, confirmNewPwd: value }))
             }
             value={form.confirmNewPwd}
             error={errors.confirmNewPwd}
