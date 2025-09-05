@@ -26,7 +26,6 @@ const IndexLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showBiometricIcon, setShowBiometricIcon] = useState(false);
   const screenHeight = Dimensions.get("window").height;
-
   const [username, setUsername] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const loginWithBiometrics = useLoginWithBiometrics();
@@ -81,6 +80,7 @@ const IndexLogin = () => {
       });
     } finally {
       setIsLoading(false);
+      hideLoader();
     }
   };
 
@@ -101,30 +101,43 @@ const IndexLogin = () => {
     if (result.success) {
       const storedCredentials = await getData("biometricCredentials");
       console.log("bio payload:", storedCredentials);
-      showLoader();
+      try {
+        showLoader();
 
-      if (
-        storedCredentials?.success &&
-        storedCredentials?.data?.identifier &&
-        storedCredentials?.data?.password
-      ) {
-        console.log("bio payload:", storedCredentials);
+        if (
+          storedCredentials?.success &&
+          storedCredentials?.data?.identifier &&
+          storedCredentials?.data?.password
+        ) {
+          console.log("bio payload:", storedCredentials);
 
-        const payload = {
-          email: storedCredentials.data.identifier,
-          password: storedCredentials.data.password
-        };
-        console.log("bio payload:", payload);
-        const res = await loginWithBiometrics(payload);
-        if (res) {
-          hideLoader();
-          router.push("/(tabs)/home");
+          const payload = {
+            email: storedCredentials.data.identifier,
+            password: storedCredentials.data.password
+          };
+
+          console.log("bio payload:", payload);
+
+          const res = await loginWithBiometrics(payload);
+
+          if (res) {
+            router.push("/(tabs)/home");
+          } else {
+            Toast.show({ type: "error", text1: "Biometric login failed" });
+          }
+        } else {
+          Toast.show({ type: "error", text1: "No stored credentials found" });
         }
-      } else {
-        Toast.show({ type: "error", text1: "No stored credentials found" });
+      } catch (err) {
+        console.error("Biometric login error:", err);
+        Toast.show({
+          type: "error",
+          text1: "An error occurred",
+          text2: err instanceof Error ? err.message : String(err)
+        });
+      } finally {
+        hideLoader();
       }
-    } else {
-      Toast.show({ type: "error", text1: "Biometrics operation cancelled" });
     }
   };
 
@@ -267,7 +280,6 @@ const IndexLogin = () => {
             </View>
           </View>
         </View>
-
       </ScrollView>
     </SafeAreaView>
   );

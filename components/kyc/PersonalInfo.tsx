@@ -235,7 +235,6 @@ const PersonalInfo = ({ onBack }: PersonalInfoProps) => {
 
       setSubmission({ isLoading: false, error: null, hasAttempted: true });
 
-      // Clear auto-save data
       if (autoSaveTimeoutRef.current) {
         clearTimeout(autoSaveTimeoutRef.current);
       }

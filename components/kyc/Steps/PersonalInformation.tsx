@@ -104,6 +104,17 @@ const PersonalInformation: React.FC<PersonalInfoProps> = ({
             Your current residential address
           </ThemedText>
         </View>
+        {!isStepValid && touchedFields.size > 0 && (
+          <ThemedText
+            style={{
+              textAlign: "center",
+              color: "#EF4444",
+              fontSize: 13
+            }}
+          >
+            Please complete all address fields
+          </ThemedText>
+        )}
 
         <FormField
           placeholder="Country"
@@ -172,7 +183,7 @@ const PersonalInformation: React.FC<PersonalInfoProps> = ({
         </View>
       </View>
 
-      <View style={{ flexDirection: "row", marginTop: 32, gap: 5 }}>
+      <View style={{ flexDirection: "row", marginTop: 20, gap: 5 }}>
         <CustomButton
           title="Back"
           handlePress={onPrevious}
@@ -194,17 +205,6 @@ const PersonalInformation: React.FC<PersonalInfoProps> = ({
           }}
         />
       </View>
-      {!isStepValid && touchedFields.size > 0 && (
-        <ThemedText
-          style={{
-            textAlign: "center",
-            color: "#EF4444",
-            fontSize: 13
-          }}
-        >
-          Please complete all address fields
-        </ThemedText>
-      )}
 
       <CustomSheet
         isVisible={showMaritalSheet}

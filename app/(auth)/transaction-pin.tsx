@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Navigator from "@/components/Navigator";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { Colors } from "@/constants/Colors";
 import images from "@/constants/Images";
@@ -18,7 +17,6 @@ import { useSetTransactionPin } from "@/hooks/useAuthentication";
 import Toast from "react-native-toast-message";
 import { useLoader } from "@/contexts/LoaderContext";
 import { useLocalSearchParams } from "expo-router";
-
 
 interface NumberButtonProps {
   number: string;
@@ -91,7 +89,7 @@ const TransactionPinScreen: React.FC = () => {
     </TouchableOpacity>
   );
 
-  console.log("Current PIN:", pin, "email:", email); // Debugging line
+  console.log("Current PIN:", pin, "email:", email);
 
   const handleSetTransactionPin = async (finalPin: string) => {
     showLoader();
@@ -116,7 +114,7 @@ const TransactionPinScreen: React.FC = () => {
   return (
     <SafeAreaView style={{ backgroundColor: bgColor, height: "100%" }}>
       <ScrollView
-        style={{ paddingHorizontal: 7 }}
+        style={{ paddingHorizontal: 7, marginTop: 60 }}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.container}>

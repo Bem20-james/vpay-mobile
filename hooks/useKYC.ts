@@ -1,6 +1,5 @@
 import axios, { AxiosError } from "axios";
 import { useState } from "react";
-import { useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 import { SERVER_BASE_URL } from "../constants/Paths";
 import { useUser } from "@/contexts/UserContexts";
@@ -11,11 +10,9 @@ interface Response {
   success: string;
 }
 
-interface KYCFormData {
-  doc_country: string;
-  id_type: string;
-  id_number?: string;
-  document_number?: string;
+interface VerifyIdData {
+  id_type: string | undefined;
+  id_number?: string | number | null;
   selfie_image: string;
 }
 
@@ -34,6 +31,16 @@ interface RegisterData {
   dob?: string;
   address?: string;
   selfie_image?: string;
+}
+
+interface AddressData {
+  document?: string;
+  postal_code?: string;
+  state?: string;
+  city?: string;
+  street_address_one?: string;
+  country?: string;
+  document_type?: string;
 }
 
 function usePersonalVerification() {
@@ -76,7 +83,7 @@ const useIdVerification = () => {
   const [error, setError] = useState<string | null>(null);
   const {config} = useUser()
 
-  const verifyId = async (data: KYCFormData): Promise<void> => {
+  const verifyId = async (data: VerifyIdData): Promise<void> => {
     setLoading(true);
     setError(null);
 
@@ -88,6 +95,7 @@ const useIdVerification = () => {
       );
 
       const result = response.data;
+      console.log("Id res:", result)
 
       if (response.status === 200) {
         Toast.show({
@@ -102,7 +110,6 @@ const useIdVerification = () => {
         type: "error",
         text1: errMsg,
       });
-      console.error("Error Response:", err.response?.data);
     } finally {
       setLoading(false);
     }
@@ -111,7 +118,48 @@ const useIdVerification = () => {
   return { verifyId, loading, error };
 };
 
+const useAddressVerification = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const {config} = useUser()
+
+  const verifyAddress = async (data: AddressData): Promise<void> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await axios.post(
+        `${SERVER_BASE_URL}/user/kyc/address`,
+        data,
+        config
+      );
+
+      const result = response.data;
+      console.log("Id res:", result)
+
+      if (response.status === 200) {
+        Toast.show({
+          type: "success",
+          text1: result.message || "Verification Submitted Successfully!",
+        });
+      }
+    } catch (err: any) {
+      const errMsg = err.response?.data?.message || err.message || "Network or server error";
+      setError(errMsg);
+      Toast.show({
+        type: "error",
+        text1: errMsg,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { verifyAddress, loading, error };
+};
+
 export  {
   useIdVerification,
-  usePersonalVerification
+  usePersonalVerification,
+  useAddressVerification
 };

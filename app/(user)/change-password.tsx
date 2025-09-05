@@ -81,9 +81,9 @@ const ChangePassword = () => {
 
     try {
       const payload = {
-        password: form.pwd,
-        new_password: form.newPwd,
-        email: userEmail
+        currentPassword: form.pwd,
+        newPassword: form.newPwd,
+        otp_medium: otpMedium
       };
 
       const success = await changePwd(payload);
@@ -110,6 +110,8 @@ const ChangePassword = () => {
         email={userEmail}
         onBack={() => setShowOtpScreen(false)}
         otp_medium={otpMedium}
+        password={form.pwd}
+        newPassword={form.newPwd}
       />
     );
   }

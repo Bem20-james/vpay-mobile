@@ -5,6 +5,7 @@ import CustomButton from "../../CustomButton";
 import SelfieUpload from "../SelfieUpload";
 import { KycStyles as styles } from "@/styles/kyc";
 import { FormData, FormErrors } from "../PersonalInfo";
+import { useUser } from "@/contexts/UserContexts";
 
 interface IdentityVerificationProps {
   formData: FormData;
@@ -33,6 +34,11 @@ const IdentityVerification: React.FC<IdentityVerificationProps> = ({
 
   const hasValidSelfie =
     formData.selfie_image && formData.selfie_image.trim() !== "";
+
+  const { user} = useUser()
+  const doc_country = user?.firstname
+
+  console.log("country code doc:", doc_country)
 
   return (
     <View>

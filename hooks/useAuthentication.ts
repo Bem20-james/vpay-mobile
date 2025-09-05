@@ -5,55 +5,16 @@ import Toast from "react-native-toast-message";
 import { SERVER_BASE_URL } from "../constants/Paths";
 import { useUser } from "@/contexts/UserContexts";
 import { storeData } from "@/utils/store";
-import {jwtDecode} from "jwt-decode";
-
-interface JwtPayload {
-  exp: number;
-  [key: string]: any;
-}
-
-interface RegisterData {
-  firstname?: string;
-  lastname?: string;
-  username?: string;
-  email: string;
-  password: string;
-  country_id?: string;
-  phone?: string;
-  referrer?: string;
-}
-
-interface LoginData {
-  email?: string;
-  password?: string;
-}
-
-type UserData = {
-  token: string;
-  user: {
-    username: string;
-    email: string;
-    [key: string]: any;
-  };
-  country?: any;
-  kyc?: any;
-  [key: string]: any;
-};
-
-interface AuthResponse {
-  code: boolean | number;
-  message: string;
-  success: string;
-  result?: UserData
-}
-
-interface payload {
-  email: string;
-  secret?: string;
-  otp?: string;
-  otp_medium?: string;
-}
-
+import { jwtDecode } from "jwt-decode";
+import {
+  LoginData,
+  payload,
+  AuthResponse,
+  RegisterData,
+  JwtPayload,
+  ChangePwdTypes
+} from "../types/auth"
+import { useLoader } from "@/contexts/LoaderContext";
 
 function useRegister() {
   return async (data: RegisterData): Promise<boolean> => {
@@ -79,7 +40,7 @@ function useRegister() {
       const axiosError = error as AxiosError<{ message?: any }>;
       const errorMessage =
         axiosError.response?.data?.message || "An error occurred while registering.";
-        
+
       console.error("Error:", errorMessage);
       Toast.show({ type: "error", text1: errorMessage.message });
 
@@ -92,7 +53,7 @@ const useVerifyEmail = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter()
-  
+
   const verifyEmail = async (token: string, email: string): Promise<void> => {
     setLoading(true);
     setError(null);
@@ -128,7 +89,7 @@ const useVerifyEmail = () => {
 const useResendEmailOTP = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const resendEmailOTP = async (otp_type: string, email: string): Promise<void> => {
     setLoading(true);
     setError(null);
@@ -140,12 +101,12 @@ const useResendEmailOTP = () => {
       });
 
       const result = response.data;
-      console.log("data:",result)
+      console.log("data:", result)
 
       if (response.status === 200) {
         Toast.show({ type: "success", text1: result.message || "OTP resent successfully!" });
       }
-      
+
     } catch (err: any) {
       const errMsg = err.response?.data?.message || err.message || "Network or server error";
       setError(errMsg);
@@ -162,7 +123,7 @@ const useResendEmailOTP = () => {
 const useResendLoginOTP = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const resendLoginOTP = async (otp_medium: string, email: string): Promise<void> => {
     setLoading(true);
     setError(null);
@@ -174,12 +135,12 @@ const useResendLoginOTP = () => {
       });
 
       const result = response.data;
-      console.log("data:",result)
+      console.log("data:", result)
 
       if (response.status === 200) {
         Toast.show({ type: "success", text1: result.message || "OTP resent successfully!" });
       }
-      
+
     } catch (err: any) {
       const errMsg = err.response?.data?.message || err.message || "Network or server error";
       setError(errMsg);
@@ -231,6 +192,7 @@ function useLogin() {
 
 function useLoginWithBiometrics() {
   const { updateUser } = useUser();
+  const {hideLoader} = useLoader()
 
   return async (data: LoginData): Promise<boolean> => {
     try {
@@ -277,31 +239,32 @@ function useLoginWithBiometrics() {
       const axiosError = error as AxiosError<{ message?: string }>;
       const errorMessage =
         axiosError.response?.data?.message || "Login failed, try again.";
-
       console.error("Catch err:", error);
       Toast.show({ type: "error", text1: errorMessage });
 
       return false;
+    }finally {
+      hideLoader();
     }
   };
 };
 
-const useForgotPwd = () => { 
+const useForgotPwd = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-    
+
   const forgotPwd = async (email: any): Promise<boolean> => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await axios.post(`${SERVER_BASE_URL}/auth/user/forgot/password/mobile`,email );
+      const response = await axios.post(`${SERVER_BASE_URL}/auth/user/forgot/password/mobile`, email);
 
       const result = response?.data;
 
       if (result.success) {
         Toast.show({ type: "success", text1: result.message || "OTP sent successfully!" });
-        return true; 
+        return true;
       }
     } catch (err: any) {
       const errMsg = err.response?.data?.message || err.message || "Network or server error";
@@ -311,17 +274,17 @@ const useForgotPwd = () => {
     } finally {
       setLoading(false);
     }
-    
+
     return false;
   };
-  
+
   return { forgotPwd, loading, error };
 };
 
 const useResendPwdResetOTP = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const resendPwdResetOTP = async (otp_medium: string, email: string): Promise<void> => {
     setLoading(true);
     setError(null);
@@ -333,12 +296,12 @@ const useResendPwdResetOTP = () => {
       });
 
       const result = response.data;
-      console.log("data:",result)
+      console.log("data:", result)
 
       if (response.status === 200) {
         Toast.show({ type: "success", text1: result.message || "OTP resent successfully!" });
       }
-      
+
     } catch (err: any) {
       const errMsg = err.response?.data?.message || err.message || "Network or server error";
       setError(errMsg);
@@ -356,11 +319,11 @@ const useResetPwd = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const resetPwd = async ({ otp, otp_medium, email, password }: { 
-    otp: string; 
-    email: string; 
-    password: string, 
-    otp_medium: string 
+  const resetPwd = async ({ otp, otp_medium, email, password }: {
+    otp: string;
+    email: string;
+    password: string,
+    otp_medium: string
   }): Promise<boolean> => {
     setLoading(true);
     setError(null);
@@ -539,25 +502,25 @@ const useVerifyLogin = () => {
 const useVerifyForgotPwd = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-    
+
   const verifyForgotPwd = async (otp: string, email: string): Promise<boolean> => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      const response = await axios.post(`${SERVER_BASE_URL}/auth/user/forgot/password/mobile`,{ otp, email});
+      const response = await axios.post(`${SERVER_BASE_URL}/auth/user/forgot/password/mobile`, { otp, email });
       const result = response.data;
-  
+
       if (!result || result.error) {
         Toast.show({ type: "error", text1: result?.message || "Invalid response from server." });
         return false;
       }
-        
+
       if (result.success) {
         Toast.show({ type: "success", text1: result.message });
         return true;
       }
-      
+
       return false;
     } catch (err: any) {
       const errMsg = err.response?.data?.message || err.message || "Network or server error";
@@ -569,7 +532,7 @@ const useVerifyForgotPwd = () => {
       setLoading(false);
     }
   };
-  
+
   return { verifyForgotPwd, loading, error };
 };
 
@@ -583,7 +546,7 @@ function useLogout() {
         {},
         config
       );
-  
+
       const result = response?.data;
       console.log("Logout Response:", result);
 
@@ -604,22 +567,27 @@ function useLogout() {
   };
 }
 
-const useChangePwd = () => { 
+const useChangePwd = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-    
-  const changePwd = async (email: any): Promise<boolean> => {
+  const { config } = useUser()
+
+  const changePwd = async (data: ChangePwdTypes): Promise<boolean> => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await axios.post(`${SERVER_BASE_URL}/auth/user/forgot/password/mobile`,email );
+      const response = await axios.post(`${SERVER_BASE_URL}/auth/user/change/password`,
+        data, 
+        config
+      );
 
       const result = response?.data;
       console.log("change pwd res:", result)
-      if (result.success) {
-        Toast.show({ type: "success", text1: result.message || "OTP sent successfully!" });
-        return true; 
+
+      if (result.success === "true") {
+        Toast.show({ type: "success", text1: result.message || "Password changed successfully!" });
+        return true;
       }
     } catch (err: any) {
       const errMsg = err.response?.data?.message || err.message || "Network or server error";
@@ -629,12 +597,50 @@ const useChangePwd = () => {
     } finally {
       setLoading(false);
     }
-    
+
     return false;
   };
-  
+
   return { changePwd, loading, error };
 };
+
+const useResendChangePwdOTP = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { config } = useUser()
+
+  const resendChangePwdOTP = async (otp_medium: string, email: string): Promise<void> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await axios.post(`${SERVER_BASE_URL}/auth/user/change/password/otp`, 
+        {
+          otp_medium,
+          email
+        },
+        config
+      );
+
+      const result = response.data;
+      console.log("data:", result)
+
+      if (response.status === 200) {
+        Toast.show({ type: "success", text1: result.message || "OTP resent successfully!" });
+      }
+
+    } catch (err: any) {
+      const errMsg = err.response?.data?.message || err.message || "Network or server error";
+      setError(errMsg);
+      Toast.show({ type: "error", text1: errMsg });
+      console.error("Error Response:", err.response?.data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { resendChangePwdOTP, loading, error };
+}
 
 const useSetTransactionPin = () => {
   const [loading, setLoading] = useState(false);
@@ -653,7 +659,7 @@ const useSetTransactionPin = () => {
 
     try {
       const response = await axios.post(
-        `${SERVER_BASE_URL}/user/transaction-pin/create`,{transaction_pin, email}
+        `${SERVER_BASE_URL}/user/transaction-pin/create`, { transaction_pin, email }
       );
 
       const result = response.data;
@@ -720,7 +726,7 @@ const useSetup2FA = () => {
         "An unexpected error occurred.";
       setError(errMsg);
 
-      Toast.show({type:"error", text1: errMsg});
+      Toast.show({ type: "error", text1: errMsg });
 
       console.error("setup error:", errMsg);
       return false;
@@ -744,7 +750,7 @@ const useEnable2FA = () => {
     const payload = {
       email: data.email,
       secret: data.secret,
-      
+
     }
 
     try {
@@ -756,7 +762,7 @@ const useEnable2FA = () => {
       console.log("Server Response:", result);
 
       if (result.code === 0) {
-        Toast.show({ type: "success", text1:result.message });
+        Toast.show({ type: "success", text1: result.message });
       }
 
       return false;
@@ -767,7 +773,7 @@ const useEnable2FA = () => {
         "An unexpected error occurred.";
       setError(errMsg);
 
-      Toast.show({type:"error", text1: errMsg});
+      Toast.show({ type: "error", text1: errMsg });
 
       console.error("Set Transaction Pin Error:", errMsg);
       return false;
@@ -779,21 +785,22 @@ const useEnable2FA = () => {
   return { enable2FA, loading, error };
 };
 
-export  {
-  useRegister, 
-  useVerifyEmail, 
-  useVerifyLogin, 
-  useResendEmailOTP, 
-  useResendLoginOTP, 
-  useLogin, 
+export {
+  useRegister,
+  useVerifyEmail,
+  useVerifyLogin,
+  useResendEmailOTP,
+  useResendLoginOTP,
+  useLogin,
   useLoginWithBiometrics,
-  useForgotPwd, 
-  useResendPwdResetOTP, 
-  useResetPwd, 
+  useForgotPwd,
+  useResendPwdResetOTP,
+  useResetPwd,
   useVerifyForgotPwd,
   useSendResetPwdOTP,
   useLogout,
   useChangePwd,
+  useResendChangePwdOTP,
   useSetTransactionPin,
   useSetup2FA,
   useEnable2FA

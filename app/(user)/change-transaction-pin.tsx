@@ -115,7 +115,7 @@ const TransactionPinScreen: React.FC = () => {
   return (
     <SafeAreaView style={{ backgroundColor: bgColor, height: "100%" }}>
       <ScrollView
-        style={{ paddingHorizontal: 7, marginTop: 50 }}
+        style={{ paddingHorizontal: 7 }}
         showsVerticalScrollIndicator={false}
       >
          <Navigator title="Change Pin" />
