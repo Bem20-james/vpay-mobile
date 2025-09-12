@@ -10,8 +10,8 @@ export const TransferStyles = StyleSheet.create({
   },
   searchContainer: {
     flexDirection: "row",
-    backgroundColor: "#ffffff",
-    borderWidth: 1,
+    backgroundColor: "#E9F7FF",
+    borderWidth: 0.5,
     borderColor: "#c9c8c8",
     borderRadius: 6,
     alignItems: "center",
@@ -166,7 +166,7 @@ export const TransferStyles = StyleSheet.create({
     fontFamily: "Inter-Regular",
     marginTop: 4
   },
-    itemContainer: {
+  itemContainer: {
     marginTop: 5,
     padding: 10
   },
@@ -194,5 +194,10 @@ export const TransferStyles = StyleSheet.create({
   primaryText: {
     fontFamily: "Inter-Regular",
     fontSize: 16
+  },
+  lastUsed: {
+    fontSize: 10,
+    marginTop: 2,
+    fontStyle: "italic"
   }
 });

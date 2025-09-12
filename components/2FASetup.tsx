@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   ScrollView,
-  TextInput,
   Image,
   StatusBar,
-  StyleSheet
+  StyleSheet,
+  TouchableOpacity
 } from "react-native";
 import { useSetup2FA, useEnable2FA } from "@/hooks/useAuthentication";
 import Toast from "react-native-toast-message";
@@ -26,12 +26,11 @@ interface Props {
 }
 
 const Setup2FAScreen: React.FC<Props> = ({ showBack, title }) => {
-  const { setup2FA } = useSetup2FA();
+  const { setup2FA, data2FA } = useSetup2FA();
   const { enable2FA } = useEnable2FA();
   const { user } = useUser();
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [secret, setSecret] = useState<string | null>(null);
-  const [code, setCode] = useState("");
   const email = user?.email;
   const [showOtpScreen, setShowOtpScreen] = useState(false);
 
@@ -44,11 +43,10 @@ const Setup2FAScreen: React.FC<Props> = ({ showBack, title }) => {
       try {
         if (!email) throw new Error("User email not found");
 
-        const response = await setup2FA({ email });
-        console.log("2fa res:", response)
-        if (response) {
-          setQrCode(response?.qrCodeUrl);
-          setSecret(response?.secret);
+        await setup2FA({ email });
+        if (data2FA) {
+          setQrCode(data2FA?.qrCodeUrl);
+          setSecret(data2FA?.secret);
         }
       } catch (err: any) {
         Toast.show({ type: "error", text1: err.message || "Setup failed" });
@@ -57,7 +55,7 @@ const Setup2FAScreen: React.FC<Props> = ({ showBack, title }) => {
   }, []);
 
   const handleEnable = async () => {
-    const payload = { secret: token, email: email };
+    const payload = { secret: data2FA.secret, email: email };
     try {
       await enable2FA(payload);
       Toast.show({ type: "success", text1: "2FA Enabled Successfully!" });
@@ -103,14 +101,17 @@ const Setup2FAScreen: React.FC<Props> = ({ showBack, title }) => {
           <ThemedText style={{ fontFamily: "Questrial", fontSize: 12 }}>
             Or enter this secret manually:
           </ThemedText>
-          <View style={styles.icon}>
-            <ThemedText>{secret}</ThemedText>
-            <MaterialIcons
-              name="content-copy"
-              size={20}
-              color={"#208BC9"}
-              onPress={handleCopy}
-            />
+          <View style={styles.bgBx}>
+            <View style={styles.icon}>
+              <ThemedText>{secret}</ThemedText>
+              <TouchableOpacity onPress={handleCopy}>
+                <MaterialIcons
+                  name="content-copy"
+                  size={25}
+                  color={"#208BC9"}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
 
           <CustomButton
@@ -130,7 +131,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     justifyContent: "center",
-    paddingHorizontal: 20
+    paddingHorizontal: 10
   },
   icon: {
     flexDirection: "row",
@@ -141,6 +142,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: "Inter-Bold",
     marginBottom: 5
+  },
+  bgBx: {
+    backgroundColor: Colors.dark.primaryDark2,
+    paddingHorizontal: 10,
+    paddingVertical: 15,
+    borderRadius: 6
   }
 });
 

@@ -15,7 +15,6 @@ import OtpVerification from "./otp-verification";
 import Toast from "react-native-toast-message";
 import OtpMediumModal from "@/components/OtpMediumModal";
 import { Colors } from "@/constants/Colors";
-import { storeData } from "@/utils/store";
 
 const isValidEmail = (value: string): boolean =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -85,11 +84,6 @@ const Login = () => {
 
       const success = await login(payload);
 
-      await storeData("biometricCredentials", {
-        identifier: form.identifier,
-        password: form.password
-      });
-
       if (success) {
         setIsLoading(false);
         setShowOtpScreen(true);
@@ -118,7 +112,9 @@ const Login = () => {
   }
 
   return (
-    <SafeAreaView style={{ backgroundColor: bgColor, height: "100%", position: "relative" }}>
+    <SafeAreaView
+      style={{ backgroundColor: bgColor, height: "100%", position: "relative" }}
+    >
       <ScrollView>
         <View style={styles.container}>
           {colorScheme === "dark" ? (

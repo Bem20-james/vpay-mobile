@@ -22,7 +22,7 @@ type userInfoProps = {
 
 const PersonalInfo: React.FC = () => {
   const colorScheme = useColorScheme();
-  const boxBackgroundColor = colorScheme === "dark" ? "#000000" : "#EEF3FB";
+  const boxBackgroundColor = colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
 
   const UserInfoItem = ({ label, name }: userInfoProps) => {
     return (
@@ -60,7 +60,7 @@ const PersonalInfo: React.FC = () => {
             <TouchableOpacity
               style={styles.avatarWrapper}
               activeOpacity={0.7}
-              onPress={() => {}}
+              onPress={() => { }}
             >
               <Image
                 source={images.avatar}

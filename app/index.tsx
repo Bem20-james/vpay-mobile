@@ -12,7 +12,7 @@ export default function Index() {
       const hasOnboarded = await getData("hasOnboarded");
 
       if (hasOnboarded) {
-        router.replace("/onboarding");
+        router.replace("/(auth)/login-index");
       } else {
         router.replace("/onboarding");
       }

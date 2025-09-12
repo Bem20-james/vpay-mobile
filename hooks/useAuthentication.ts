@@ -12,7 +12,8 @@ import {
   AuthResponse,
   RegisterData,
   JwtPayload,
-  ChangePwdTypes
+  ChangePwdTypes,
+  data2FA
 } from "../types/auth"
 import { useLoader } from "@/contexts/LoaderContext";
 
@@ -699,7 +700,8 @@ const useSetup2FA = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { config } = useUser();
-
+  const [data2FA, setData2FA] = useState<data2FA[]>([]);
+  
   const setup2FA = async (data: payload): Promise<boolean> => {
     setLoading(true);
     setError(null);
@@ -715,7 +717,7 @@ const useSetup2FA = () => {
       console.log("Server Response:", result);
 
       if (result?.code === 0) {
-        return true
+        setData2FA(result.data)
       }
 
       return false;
@@ -735,7 +737,7 @@ const useSetup2FA = () => {
     }
   };
 
-  return { setup2FA, loading, error };
+  return { setup2FA, data2FA, loading, error };
 };
 
 const useEnable2FA = () => {

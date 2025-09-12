@@ -51,3 +51,8 @@ export interface ChangePwdTypes {
   otp_medium: string;
   otp?: string;
 }
+
+export interface data2FA{
+  qrCodeUrl: string;
+  secret: string;
+}

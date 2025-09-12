@@ -2,7 +2,7 @@ import axios, { AxiosError } from "axios";
 import { SERVER_BASE_URL } from "../constants/Paths";
 import { useEffect, useState } from "react";
 
-interface Country {
+interface Provider {
   id: number;
   country_name: string;
   country_code: string;
@@ -18,14 +18,14 @@ interface ProviderRes<T> {
 }
 
 function useGetAirtimeProviders() {
-  const [providers, setProviders] = useState<Country[]>([]);
+  const [providers, setProviders] = useState<Provider[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   const fetchData = async () => {
     setLoading(true);
 
     try {
-      const response = await axios.get<ProviderRes<Country[]>>(
+      const response = await axios.get<ProviderRes<Provider[]>>(
         `${SERVER_BASE_URL}/user/airtime/provider`,
       );
 

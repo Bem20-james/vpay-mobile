@@ -25,11 +25,16 @@
         "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
         "recordAudioAndroid": true
       }
-    ]
+    ],
+    "expo-secure-store"
   ],
   "description": null,
   "sdkVersion": "52.0.0",
-  "platforms": ["ios", "android", "web"],
+  "platforms": [
+    "ios",
+    "android",
+    "web"
+  ],
   "ios": {
     "supportsTablet": true,
     "bundleIdentifier": "com.jimie.verseepay",
