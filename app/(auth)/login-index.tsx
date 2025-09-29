@@ -13,8 +13,11 @@ import Toast from "react-native-toast-message";
 import { getData } from "@/utils/store";
 import { Colors } from "@/constants/Colors";
 import * as LocalAuthentication from "expo-local-authentication";
-import { useLoginWithBiometrics } from "@/hooks/useAuthentication";
+import { useLogin } from "@/hooks/useAuthentication";
 import { useLoader } from "@/contexts/LoaderContext";
+import OtpMediumModal from "@/components/OtpMediumModal";
+import OtpVerification from "./otp-verification";
+import { useUser } from "@/contexts/UserContexts";
 
 const IndexLogin = () => {
   const colorScheme = useColorScheme();
@@ -22,16 +25,20 @@ const IndexLogin = () => {
   const bgColor =
     colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({ identifier: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [showBiometricIcon, setShowBiometricIcon] = useState(false);
   const screenHeight = Dimensions.get("window").height;
   const [username, setUsername] = useState<string | null>(null);
   const [email, setEmail] = useState("");
-  const loginWithBiometrics = useLoginWithBiometrics();
+  const login = useLogin();
   const { showLoader, hideLoader } = useLoader();
 
-  console.log("last logged user:", username);
+  const [showOtpScreen, setShowOtpScreen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [otpMedium, setOtpMedium] = useState<"email" | "sms" | "authenticator">(
+    "email"
+  );
+  const { user, refreshUserToken, isTokenExpired } = useUser();
 
   useEffect(() => {
     const loadLastUser = async () => {
@@ -55,22 +62,29 @@ const IndexLogin = () => {
     })();
   }, []);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (method: "email" | "sms" | "authenticator") => {
+    setOtpMedium(method);
     setIsLoading(true);
     showLoader();
+
+    if (method === "authenticator") {
+      hideLoader();
+      setShowOtpScreen(true);
+      return;
+    }
 
     try {
       const payload = {
         email: email,
-        password: password
+        password: password,
+        otp_medium: method
       };
       console.log("payload", payload);
 
-      const success = await loginWithBiometrics(payload);
+      const success = await login(payload);
       if (success) {
         setIsLoading(false);
-        hideLoader();
-        router.push("/(tabs)/home");
+        setShowOtpScreen(true);
       }
     } catch (error) {
       Toast.show({
@@ -98,58 +112,67 @@ const IndexLogin = () => {
       disableDeviceFallback: true
     });
 
-    if (result.success) {
-      const storedCredentials = await getData("biometricCredentials");
-      console.log("bio payload:", storedCredentials);
-      try {
-        showLoader();
+    if (!result.success) return;
 
-        if (
-          storedCredentials?.success &&
-          storedCredentials?.data?.identifier &&
-          storedCredentials?.data?.password
-        ) {
-          console.log("bio payload:", storedCredentials);
+    try {
+      showLoader();
 
-          const payload = {
-            email: storedCredentials.data.identifier,
-            password: storedCredentials.data.password
-          };
-
-          console.log("bio payload:", payload);
-
-          const res = await loginWithBiometrics(payload);
-
-          if (res) {
-            router.push("/(tabs)/home");
-          } else {
-            Toast.show({ type: "error", text1: "Biometric login failed" });
-          }
-        } else {
-          Toast.show({ type: "error", text1: "No stored credentials found" });
-        }
-      } catch (err) {
-        console.error("Biometric login error:", err);
+      if (!user) {
         Toast.show({
           type: "error",
-          text1: "An error occurred",
-          text2: err instanceof Error ? err.message : String(err)
+          text1: "No active session, please sign in"
         });
-      } finally {
-        hideLoader();
+        router.push("/(auth)/login");
+        return;
       }
+
+      // ✅ If we have a user saved
+      if (isTokenExpired()) {
+        const refreshed = await refreshUserToken();
+        console.log("refresh user:", refreshed)
+        if (!refreshed) {
+          Toast.show({
+            type: "error",
+            text1: "Session expired. Please log in again."
+          });
+          router.push("/(auth)/login");
+          return;
+        }
+      }
+
+      // At this point user has a valid session
+      Toast.show({ type: "success", text1: "Welcome back!" });
+      router.push("/(tabs)/home"); // or your main app screen
+    } catch (err) {
+      console.error("Biometric login error:", err);
+      Toast.show({
+        type: "error",
+        text1: err instanceof Error ? err.message : "Biometric login failed"
+      });
+    } finally {
+      hideLoader();
     }
   };
+
+  if (showOtpScreen) {
+    return (
+      <OtpVerification
+        mode="login"
+        email={email}
+        onBack={() => setShowOtpScreen(false)}
+        otp_medium={otpMedium}
+        password={password}
+      />
+    );
+  }
 
   return (
     <SafeAreaView style={{ backgroundColor: bgColor, height: "100%" }}>
       <ScrollView>
         <View style={styles.container}>
-          {colorScheme === "dark" ? (
-            <Image source={images.logolight} style={styles.logo} />
-          ) : (
-            <Image source={images.logodark} style={styles.logo} />
-          )}
+          {colorScheme === "dark"
+            ? <Image source={images.logolight} style={styles.logo} />
+            : <Image source={images.logodark} style={styles.logo} />}
           <View style={styles.userField}>
             <View style={styles.avatarBg}>
               <Image source={images.avatar} style={styles.avatar} />
@@ -161,7 +184,7 @@ const IndexLogin = () => {
                 darkColor="#ffffff"
                 style={styles.heading}
               >
-                Hello {username || "Jimie"}
+                Hello, {username || "Welcome back"}
               </ThemedText>
               <ThemedText
                 lightColor="#9B9B9B"
@@ -175,9 +198,8 @@ const IndexLogin = () => {
 
           <FormField
             placeholder={"Password"}
-            handleChangeText={(value) => setPassword(value)}
+            handleChangeText={value => setPassword(value)}
             value={password}
-            error={errors.password}
             isIcon
             iconName="shield"
             otherStyles={{ marginTop: 20 }}
@@ -210,7 +232,7 @@ const IndexLogin = () => {
             </ThemedText>
           </Pressable>
 
-          {showBiometricIcon && (
+          {showBiometricIcon &&
             <View style={styles.fingerprint}>
               <Pressable
                 onPress={handleBiometricLogin}
@@ -224,8 +246,7 @@ const IndexLogin = () => {
               <ThemedText lightColor="#9B9B9B" style={{ fontSize: 14 }}>
                 use fingerprint
               </ThemedText>
-            </View>
-          )}
+            </View>}
 
           <View
             style={{
@@ -239,7 +260,7 @@ const IndexLogin = () => {
           >
             <CustomButton
               title="Login"
-              handlePress={handleSubmit}
+              handlePress={() => setShowModal(true)}
               btnStyles={{ width: "100%" }}
               isLoading={isLoading}
               disabled={!password}
@@ -280,6 +301,13 @@ const IndexLogin = () => {
             </View>
           </View>
         </View>
+
+        <OtpMediumModal
+          visible={showModal}
+          onClose={() => setShowModal(false)}
+          isLoading={isLoading}
+          onSubmit={handleSubmit}
+        />
       </ScrollView>
     </SafeAreaView>
   );

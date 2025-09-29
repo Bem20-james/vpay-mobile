@@ -38,7 +38,7 @@ const International = () => {
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
       {!screenVisible ? (
         <ScrollView showsVerticalScrollIndicator={false}>
-          <Navigator title="International" />
+          <Navigator title="Send International" />
           <View style={styles.container}>
             <View style={TransferStyles.searchContainer}>
               <Feather

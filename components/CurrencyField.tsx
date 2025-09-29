@@ -6,12 +6,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { TransferStyles as styles } from "@/styles/transfers";
 import { Colors } from "@/constants/Colors";
 import AssetsBottomSheet from "./BottomSheets/Assets";
+import { useFetchUserAssets } from "@/hooks/useUser";
 
 const currencies = [
   {
     code: "NGN",
     name: "Nigerian Naira",
-    flag: "🇳🇬",
+    flag: "🇳🇬",     
     balance: 1500.25
   },
   {
@@ -43,6 +44,9 @@ const CurrencyField = ({
   const [amount, setAmount] = useState("");
   const [selectedCurrency, setSelectedCurrency] = useState(currencies[0]);
   const [showCurrencySheet, setShowCurrencySheet] = useState(false);
+
+    const { assets, loading } = useFetchUserAssets();
+    console.log("User Assets:", assets);
 
   return (
     <View>

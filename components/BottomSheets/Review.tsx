@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { Portal } from "@gorhom/portal";
 import { ThemedText } from "../ThemedText";
@@ -40,7 +40,7 @@ const ReviewBottomSheet = ({
   accountNumber,
   name,
   selectedAsset,
-  snapPoints = ["60", "70%"],
+  snapPoints = ["50", "60%"],
   title = "Review Details"
 }: Props) => {
   const sheetRef = useRef<BottomSheet>(null);
@@ -56,6 +56,11 @@ const ReviewBottomSheet = ({
 
   if (!isVisible) return null;
 
+  const handleConfirm = () => {
+    onClose();
+    onPay();
+  }
+
   return (
     <Portal>
       <BottomSheet
@@ -63,6 +68,7 @@ const ReviewBottomSheet = ({
         index={0}
         snapPoints={snapPoints}
         enablePanDownToClose
+        handleIndicatorStyle={btmSheetStyles.indicatorHandle}
         onClose={onClose}
         backgroundStyle={{
           backgroundColor:
@@ -79,10 +85,6 @@ const ReviewBottomSheet = ({
           >
             {title}
           </ThemedText>
-          <View style={btmSheetStyles.amountContainer}>
-            <ThemedText style={btmSheetStyles.amountText}>send</ThemedText>
-            <ThemedText style={btmSheetStyles.amount}>{amount}</ThemedText>
-          </View>
           <View style={btmSheetStyles.container}>
             {[
               { label: "Bank", value: bank },
@@ -137,7 +139,7 @@ const ReviewBottomSheet = ({
               <ThemedText
                 style={[
                   btmSheetStyles.paymentText,
-                  { color: isDark ? "#000000" : "#FFFFFF" }
+                  { color: isDark ? "#F5F5F5" : "#FFFFFF" }
                 ]}
               >
                 payment Method
@@ -159,7 +161,7 @@ const ReviewBottomSheet = ({
                     style={[
                       btmSheetStyles.label,
                       ,
-                      { color: isDark ? "#000000" : "#FFFFFF" }
+                      { color: isDark ? "#F5F5F5" : "#FFFFFF" }
                     ]}
                   >
                     {selectedAsset.name} ({selectedAsset.code})
@@ -170,7 +172,7 @@ const ReviewBottomSheet = ({
                   <ThemedText
                     style={[
                       btmSheetStyles.amount,
-                      { color: isDark ? "#000000" : "#FFFFFF" }
+                      { color: isDark ? "#F5F5F5" : "#FFFFFF" }
                     ]}
                   >
                     {getSymbolFromCurrency(selectedAsset.code) || "₦"}
@@ -184,14 +186,14 @@ const ReviewBottomSheet = ({
               <View
                 style={{
                   position: "absolute",
-                  bottom: -100,
+                  bottom: -80,
                   left: 1,
                   right: 1
                 }}
               >
                 <CustomButton
                   title="Confirm"
-                  handlePress={() => {}}
+                  handlePress={handleConfirm }
                   btnStyles={{ width: "100%" }}
                 />
               </View>

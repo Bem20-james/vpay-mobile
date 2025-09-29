@@ -1,12 +1,12 @@
 import React, { useRef, useEffect } from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { Portal } from "@gorhom/portal";
 import { ThemedText } from "../ThemedText";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import CustomButton from "../CustomButton";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import QRCode from "react-native-qrcode-svg";
 import Toast from "react-native-toast-message";
 import * as Clipboard from "expo-clipboard";
@@ -21,7 +21,7 @@ interface FiatItem {
 interface CryptoItem {
   token_name: string;
   token_symbol: string;
-  address: string;
+  wallet_address: string;
   balance: string;
 }
 
@@ -48,8 +48,6 @@ const AccountsBottomSheet: React.FC<Props> = ({
 }) => {
   const colorScheme = useColorScheme();
   const sheetRef = useRef<BottomSheet>(null);
-  const isDark = colorScheme === "dark";
-
   useEffect(() => {
     if (isVisible) {
       sheetRef.current?.expand();
@@ -72,6 +70,7 @@ const AccountsBottomSheet: React.FC<Props> = ({
         index={0}
         snapPoints={snapPoints}
         enablePanDownToClose
+        handleIndicatorStyle={styles.handleIndicator}
         onClose={onClose}
         backgroundStyle={{
           backgroundColor:
@@ -80,15 +79,14 @@ const AccountsBottomSheet: React.FC<Props> = ({
               : Colors.light.accentBg
         }}
       >
-        <BottomSheetView style={{ marginHorizontal: 10 }}>
+        <BottomSheetView style={{ marginHorizontal: 15 }}>
           <View style={styles.header}>
             <ThemedText style={styles.title}>{title}</ThemedText>
             <ThemedText style={styles.label}>{label}</ThemedText>
           </View>
           <View
             style={[
-              styles.customContent,
-              { backgroundColor: isDark ? "#0A2D4A" : "#F5F5F5" }
+              styles.customContent
             ]}
           >
             {selectedType === "fiat" ? (
@@ -130,30 +128,41 @@ const AccountsBottomSheet: React.FC<Props> = ({
                 </ThemedText>
               </View>
             ) : (
-              <View style={styles.qrContainer}>
-                <QRCode
-                  value={"656577hfhfkdjdh738383849"}
-                  size={200}
-                  color="#000000"
-                  backgroundColor="#ffffff"
-                />
-              </View>
+              <>
+                <View style={styles.qrContainer}>
+                  <QRCode
+                    value={(selectedItem as CryptoItem)?.wallet_address}
+                    size={200}
+                    color="#000000"
+                    backgroundColor="#ffffff"
+                  />
+                </View>
+                <ThemedText style={styles.noticeText}>
+                  Your {selectedItem && "token_name" in selectedItem
+                    ? selectedItem.token_name
+                    : ""} wallet address
+                </ThemedText>
+              </>
             )}
           </View>
-          <View style={styles.noticeBox}>
-            <Ionicons name="warning-outline" size={20} color={"#D22C1F"} />
-            <ThemedText style={styles.noticeText}>
-              All existing account type are current. Swipe to see alternative
-              bank accounts.
-            </ThemedText>
-          </View>
 
+          <View style={styles.icon}>
+            <ThemedText style={styles.value}>
+              {(selectedItem as CryptoItem)?.wallet_address}
+            </ThemedText>
+            <MaterialIcons
+              name="content-copy"
+              size={20}
+              color={"#208BC9"}
+              onPress={handleCopy}
+            />
+          </View>
           <CustomButton
             title="Got it"
-            handlePress={() => {}}
+            handlePress={() => { }}
             btnStyles={{
               width: "100%",
-              marginTop: 20
+              marginVertical: 20
             }}
           />
         </BottomSheetView>
@@ -185,21 +194,21 @@ const styles = StyleSheet.create({
   icon: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center"
+    alignItems: "baseline",
+    gap: 5
   },
   value: {
-    fontSize: 15,
+    fontSize: 13,
     fontFamily: "Inter-Bold",
     marginBottom: 5
   },
   customContent: {
-    padding: 20,
-    gap: 7,
-    marginHorizontal: 7,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
     borderRadius: 6
   },
   noticeBox: {
-    backgroundColor: "#FFFABE99",
+    backgroundColor: Colors.dark.primaryDark3,
     paddingHorizontal: 15,
     paddingVertical: 15,
     borderRadius: 6,
@@ -209,20 +218,24 @@ const styles = StyleSheet.create({
     gap: 5
   },
   noticeText: {
-    color: "#423D00CC",
+    color: "#FFFABE99",
     fontSize: 13,
     fontFamily: "Questrial",
     lineHeight: 15
   },
   qrContainer: {
-    marginTop: 20,
-    padding: 10,
-    backgroundColor: "#ffffff",
+    padding: 30,
+    margin: 20,
+    backgroundColor: "#f5f5f5",
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#E8E8E8",
+    borderColor: "#208BC9",
     alignItems: "center"
+  },
+  handleIndicator: {
+    backgroundColor: "#208BC9"
   }
+
 });
 
 export default AccountsBottomSheet;

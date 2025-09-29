@@ -5,7 +5,7 @@ import { Portal } from "@gorhom/portal";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import CountryFlag from "react-native-country-flag";
 import { ThemedText } from "../ThemedText";
-import { styles } from "../../styles/formfield";
+import { btmSheetStyles as styles } from "../../styles/bottomsheets";
 import { Colors } from "@/constants/Colors";
 
 export type CountryItem = {
@@ -46,6 +46,7 @@ const CountryBottomSheet = ({
         index={0}
         snapPoints={snapPoints}
         enablePanDownToClose
+        handleIndicatorStyle={styles.indicatorHandle}
         onClose={onClose}
         backgroundStyle={{
           backgroundColor:
@@ -54,7 +55,7 @@ const CountryBottomSheet = ({
               : Colors.light.accentBg
         }}
       >
-        <ThemedText style={styles.bottomSheetTitle}>{title}</ThemedText>
+        <ThemedText style={styles.title}>{title}</ThemedText>
         <BottomSheetFlatList
           data={data}
           keyExtractor={(item, index) =>
@@ -62,7 +63,7 @@ const CountryBottomSheet = ({
           }
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={styles.bottomSheetItem}
+              style={styles.item}
               onPress={() => {
                 onSelect(item);
                 bottomSheetRef.current?.close();
@@ -71,13 +72,13 @@ const CountryBottomSheet = ({
               {isLoading ? (
                 <ActivityIndicator size={20} />
               ) : (
-                <View style={styles.bottomSheetItemCon}>
+                <View style={styles.sheetCon}>
                   <CountryFlag
                     isoCode={item.country_code}
                     size={15}
                     style={{ borderRadius: 2, marginRight: 5 }}
                   />
-                  <ThemedText style={styles.bottomSheetItemText}>
+                  <ThemedText style={styles.sheetLabel}>
                     {item.country_name}
                   </ThemedText>
                 </View>

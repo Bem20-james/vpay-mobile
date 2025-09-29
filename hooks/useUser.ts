@@ -1,6 +1,5 @@
 import axios, { AxiosError } from "axios";
 import { useState, useEffect } from "react";
-import { useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 import { SERVER_BASE_URL } from "../constants/Paths";
 import { useUser } from "@/contexts/UserContexts";

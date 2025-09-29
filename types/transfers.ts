@@ -14,7 +14,11 @@ export interface ResolveRes {
   result: ResolveTag[];
 }
 
-export interface LookUpData {
+export interface LookUpDataRes {
+  name: string;
+}
+
+export interface LookUpParams {
   account_number: string;
   bank_code: string;
 }
@@ -23,5 +27,5 @@ export interface LookUpResponse {
   error: number;
   message: string;
   success: boolean;
-  result: LookUpData[];
+  result: LookUpDataRes[];
 }

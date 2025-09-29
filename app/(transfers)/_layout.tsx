@@ -21,6 +21,10 @@ const ActionsLayout = () => {
         <Stack.Screen name="mobile-money" options={{ headerShown: false }} />
         <Stack.Screen name="international" options={{ headerShown: false }} />
         <Stack.Screen name="crypto" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="authorization-pin"
+          options={{ headerShown: false }}
+        />
       </Stack>
 
       <Toast

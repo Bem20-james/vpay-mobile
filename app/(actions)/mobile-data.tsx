@@ -9,16 +9,9 @@ import Navigator from "@/components/Navigator";
 import FormField from "@/components/FormFields";
 import CustomButton from "@/components/CustomButton";
 import CustomChip from "@/components/CustomChips";
-import images from "@/constants/Images";
 import { Colors } from "@/constants/Colors";
-import CurrencyField from "@/components/CurrencyField";
-
-const methods = [
-  { id: "mtn", text: "MTN", image: images.mtn },
-  { id: "ninemobile", text: "9Mobile", image: images.ninemobile },
-  { id: "glo", text: "Glo", image: images.glo },
-  { id: "airtel", text: "Airtel", image: images.airtel }
-];
+import AmountInputField from "@/components/AmountInputField";
+import { useFetchAirtimeProviders } from "@/hooks/useAirtimePurchase";
 
 const DataScreen = () => {
   const colorScheme = useColorScheme();
@@ -30,6 +23,8 @@ const DataScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState<
     number | string | null
   >(null);
+
+  const { providers, loading } = useFetchAirtimeProviders()
 
   return (
     <SafeAreaView
@@ -47,10 +42,12 @@ const DataScreen = () => {
           </ThemedText>
 
           <CustomChip
-            items={methods}
+            items={providers}
             selectedItem={selectedCategory}
             onSelect={(id) => setSelectedCategory(id)}
             containerStyle={{ marginVertical: 20 }}
+                        isLoading={loading}
+
           />
 
           <View>
@@ -68,13 +65,13 @@ const DataScreen = () => {
               iconName="person"
             />
 
-            <CurrencyField />
+            <AmountInputField />
           </View>
 
           <CustomButton
             title={"Continue"}
             handlePress={() => router.push("/(tabs)/home")}
-            btnStyles={{ marginTop: 20 }}
+            btnStyles={{ marginTop: 10 }}
             variant="primary"
             size="medium"
           />

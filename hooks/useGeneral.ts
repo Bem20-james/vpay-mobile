@@ -24,11 +24,10 @@ interface Banks {
   code: string;
 }
 interface BanksRes {
-  error: number;
+  error: number;             
   message: string;
   success: boolean;
-  result: string
-  data: Banks[];
+  result: any[];
 }
 
 function useFetchCountries() {
@@ -70,7 +69,7 @@ function useFetchCountries() {
 }
 
 function useFetchNgnBanks() {
-  const [banks, setBanks] = useState<Banks[]>([]);
+  const [banks, setBanks] = useState<Banks[]>([]); 
   const [loading, setLoading] = useState<boolean>(true);
   const { config } = useUser();
 
@@ -79,15 +78,15 @@ function useFetchNgnBanks() {
 
     try {
       const response = await axios.get<BanksRes>(
-        `${SERVER_BASE_URL}/ngn-banks`,
+        `${SERVER_BASE_URL}/app/banks/ng`,
         config
       );
 
       const result = response.data
-      console.log("banks res:", result)
+      console.log("banks response:", result)
 
       if (result.success) {
-        setBanks(result.data);
+        setBanks(result.result);
       } else {
         if (response.data.error) {
 

@@ -27,7 +27,7 @@ interface CryptoAccount {
   token_name: string;
   token_symbol: string;
   balance: string;
-  address: string;
+  wallet_address: string;
   price?: string;
   token_image?: string;
 }
@@ -118,7 +118,7 @@ const Accounts: React.FC = () => {
                   balance={item.balance}
                   price={item.price}
                   type="crypto"
-                  address={item.address}
+                  address={item.wallet_address}
                   handlePress={() => openSheet("crypto", item)}
                 />
               ))}

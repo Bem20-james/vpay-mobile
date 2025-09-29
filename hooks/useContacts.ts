@@ -3,6 +3,8 @@ import { useState, useEffect, useCallback } from 'react';
 import EncryptedContactStorage, { StoredContact } from '@/utils/encryptedStore';
 import * as Contacts from 'expo-contacts';
 import { useUser } from '@/contexts/UserContexts';
+import axios, {AxiosError} from 'axios';
+import { SERVER_BASE_URL } from '../constants/Paths';
 
 export const useContacts = () => {
   const [recentContacts, setRecentContacts] = useState<StoredContact[]>([]);
@@ -62,51 +64,67 @@ export const useContacts = () => {
   };
 };
 
-// ================================================================
-
 // hooks/useVpayContacts.ts
+
+
+
+type BackendContact = {
+  displayName?: string;
+  name?: string;
+  vpayTag?: string;
+  username?: string;
+  country?: string;
+  profileImage?: string;
+};
+
 export const useVpayContacts = () => {
   const [vpayContacts, setVpayContacts] = useState<StoredContact[]>([]);
   const [loading, setLoading] = useState(false);
-  const { config} = useUser()
+  const { config } = useUser(); // auth token
 
-  const matchContactsWithVpay = async (phoneNumbers: Array<{name: string, phoneNumber: string}>): Promise<StoredContact[]> => {
+  /**
+   * Matches given phone numbers against backend vPay users
+   */
+  const matchContactsWithVpay = async (
+    phoneNumbers: Array<{ name: string; phoneNumber: string }>
+  ): Promise<StoredContact[]> => {
     try {
-      // Replace with your actual API endpoint
-      const response = await fetch('/api/contacts/match', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${config}`, // Add your auth token
-        },
-        body: JSON.stringify({ phoneNumbers }),
-      });
+      const response = await axios.post<BackendContact[]>(
+        `${SERVER_BASE_URL}/user/contact-users/resolve`,
+        { phoneNumbers },
+        config
 
-      if (!response.ok) throw new Error('Failed to match contacts');
+      );
 
-      const matchedData = await response.json();
-      
-      return matchedData.map((contact: any) => ({
-        name: contact.displayName || contact.name,
-        handle: contact.vpayTag || `@${contact.username}`,
-        flag: contact.country || 'NG',
+      return response.data.map((contact) => ({
+        name: contact.displayName || contact.name || "Unknown",
+        handle: contact.vpayTag || `@${contact.username ?? "unknown"}`,
+        flag: contact.country || "NG",
         image: contact.profileImage,
         frequency: 0,
       }));
-      
-    } catch (error) {
-      console.error('Error matching contacts with backend:', error);
+    } catch (err) {
+      const error = err as AxiosError;
+      console.error("Error matching contacts with backend:", {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
       return [];
     }
   };
 
+  /**
+   * Loads local contacts from device, filters them,
+   * and attempts to resolve against backend
+   */
   const loadVpayContacts = async () => {
     try {
       setLoading(true);
-      
+
       const { status } = await Contacts.requestPermissionsAsync();
-      if (status !== 'granted') {
-        console.log('Contacts permission denied');
+      if (status !== "granted") {
+        console.warn("Contacts permission denied");
         return;
       }
 
@@ -115,30 +133,41 @@ export const useVpayContacts = () => {
       });
 
       const phoneNumbers = phoneContacts
-        .filter(contact => contact.phoneNumbers && contact.phoneNumbers.length > 0)
-        .map(contact => ({
-          name: contact.name || 'Unknown',
-          phoneNumber: contact.phoneNumbers?.[0]?.number?.replace(/\D/g, '') || '',
+        .filter(
+          (c) => c.phoneNumbers && c.phoneNumbers.length > 0
+        )
+        .map((c) => ({
+          name: c.name || "Unknown",
+          phoneNumber:
+            c.phoneNumbers?.[0]?.number?.replace(/\D/g, "") || "",
         }))
-        .filter(contact => contact.phoneNumber.length >= 10);
+        .filter((c) => c.phoneNumber.length >= 10);
+
+      if (!phoneNumbers.length) {
+        console.log("No valid phone numbers found in contacts");
+        return;
+      }
 
       const matchedContacts = await matchContactsWithVpay(phoneNumbers);
       setVpayContacts(matchedContacts);
-      
     } catch (error) {
-      console.error('Error loading Vpay contacts:', error);
+      console.error("❌ Error loading Vpay contacts:", error);
     } finally {
       setLoading(false);
     }
   };
 
+  /**
+   * Local search for contacts
+   */
   const searchVpayContacts = (query: string): StoredContact[] => {
     if (!query.trim()) return vpayContacts;
-    
+
     const searchTerm = query.toLowerCase();
-    return vpayContacts.filter(contact => 
-      contact.name.toLowerCase().includes(searchTerm) ||
-      contact.handle.toLowerCase().includes(searchTerm)
+    return vpayContacts.filter(
+      (c) =>
+        c.name.toLowerCase().includes(searchTerm) ||
+        c.handle.toLowerCase().includes(searchTerm)
     );
   };
 
@@ -146,6 +175,6 @@ export const useVpayContacts = () => {
     vpayContacts,
     loading,
     loadVpayContacts,
-    searchVpayContacts
+    searchVpayContacts,
   };
 };

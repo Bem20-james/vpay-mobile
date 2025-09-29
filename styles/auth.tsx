@@ -60,7 +60,6 @@ export const styles = StyleSheet.create({
     justifyContent: "flex-end",
     alignItems: "center",
     paddingHorizontal: 4,
-    marginVertical: 7,
     gap: 2
   },
   forgotPwdTxt: {

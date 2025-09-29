@@ -224,6 +224,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
                 {mode === "forgot-password"
                   ? "Enter the OTP sent to reset your password."
                   : "We have sent a code to your email."}
+                  {mode === "setup-2fa" && "enter the code from your at"}
               </ThemedText>
               <ThemedText
                 style={{

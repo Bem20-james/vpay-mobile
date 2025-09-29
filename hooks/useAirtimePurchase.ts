@@ -1,10 +1,9 @@
 import axios, { AxiosError } from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 import { SERVER_BASE_URL } from "../constants/Paths";
 import { useUser } from "@/contexts/UserContexts";
-
 
 interface AirtimeData {
   type: string;
@@ -18,6 +17,39 @@ interface AirtimeData {
 interface AirtimeRes {
   success: boolean;
   message?: string;
+}
+
+
+function useFetchAirtimeProviders() {
+  const [providers, setProviders] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const { config } = useUser();
+
+  const fetchProviders = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${SERVER_BASE_URL}/user/airtime/providers`, config);
+      const result = response.data;
+      console.log("results:", result)
+
+      if (result.success && result.code === 0) {
+        setProviders(result.result);
+      } else {
+        Toast.show({ type: "error", text1: result.message || "Failed to fetch providers." });
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || "An error occurred while fetching providers.";
+      Toast.show({ type: "error", text1: errorMessage });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProviders();
+  }, [config]);
+
+  return { providers, loading, refetch: fetchProviders };
 }
 
 const usePurchaseAirtime = () => {
@@ -72,4 +104,7 @@ const usePurchaseAirtime = () => {
   return { purchaseAirtime, isLoading, error };
 };
 
-export {usePurchaseAirtime};
+export {
+  usePurchaseAirtime,
+  useFetchAirtimeProviders
+};

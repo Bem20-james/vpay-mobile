@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   secondaryText: {
-    color: "#000000",
+    color: "#D92D20",
     fontSize: 12,
     marginLeft: 8,
   },

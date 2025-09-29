@@ -2,10 +2,9 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   ScrollView,
-  Image,
   StatusBar,
   StyleSheet,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
 import { useSetup2FA, useEnable2FA } from "@/hooks/useAuthentication";
 import Toast from "react-native-toast-message";
@@ -19,6 +18,7 @@ import CustomButton from "./CustomButton";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import OtpVerification from "@/app/(auth)/otp-verification";
+import QRCode from "react-native-qrcode-svg";
 
 interface Props {
   showBack?: () => void;
@@ -29,33 +29,30 @@ const Setup2FAScreen: React.FC<Props> = ({ showBack, title }) => {
   const { setup2FA, data2FA } = useSetup2FA();
   const { enable2FA } = useEnable2FA();
   const { user } = useUser();
-  const [qrCode, setQrCode] = useState<string | null>(null);
-  const [secret, setSecret] = useState<string | null>(null);
   const email = user?.email;
   const [showOtpScreen, setShowOtpScreen] = useState(false);
 
   const colorScheme = useColorScheme();
   const bgColor =
     colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+  const isDark = colorScheme === "dark";
 
+  // Fetch setup data on mount
   useEffect(() => {
-    (async () => {
-      try {
-        if (!email) throw new Error("User email not found");
-
-        await setup2FA({ email });
-        if (data2FA) {
-          setQrCode(data2FA?.qrCodeUrl);
-          setSecret(data2FA?.secret);
-        }
-      } catch (err: any) {
-        Toast.show({ type: "error", text1: err.message || "Setup failed" });
-      }
-    })();
-  }, []);
+    if (!email) {
+      Toast.show({ type: "error", text1: "User email not found" });
+      return;
+    }
+    setup2FA({ email });
+  }, [email]);
 
   const handleEnable = async () => {
-    const payload = { secret: data2FA.secret, email: email };
+    if (!data2FA?.secret) {
+      Toast.show({ type: "error", text1: "Secret is missing" });
+      return;
+    }
+
+    const payload = { secret: data2FA.secret, email };
     try {
       await enable2FA(payload);
       Toast.show({ type: "success", text1: "2FA Enabled Successfully!" });
@@ -65,59 +62,68 @@ const Setup2FAScreen: React.FC<Props> = ({ showBack, title }) => {
   };
 
   const handleCopy = async () => {
-    await Clipboard.setStringAsync(secret ?? "");
-    Toast.show({ type: "success", text1: "Copied to clipboard" });
+    if (data2FA?.secret) {
+      console.log(data2FA?.secret)
+      await Clipboard.setStringAsync(data2FA.secret);
+      Toast.show({ type: "success", text1: "Copied to clipboard" });
+    }
   };
 
-  if (showOtpScreen) {
+  if (showOtpScreen && data2FA?.secret) {
     return (
       <OtpVerification
-        mode="login"
+        mode="setup-2fa"
         email={email}
         onBack={() => setShowOtpScreen(false)}
-        otp_medium={"authenticator"}
-        secret={secret ?? ""}
+        otp_medium="authenticator"
+        secret={data2FA.secret}
       />
     );
   }
 
   return (
     <SafeAreaView style={{ backgroundColor: bgColor, height: "100%" }}>
-      <ScrollView
-        style={{ paddingHorizontal: 7 }}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={{ paddingHorizontal: 7 }} showsVerticalScrollIndicator={false}>
         <Navigator onBack={showBack} title={title} />
         <View style={styles.container}>
-          <ThemedText style={{ fontFamily: "Inter-Bold", fontSize: 15 }}>
+          <ThemedText style={{ fontFamily: "Inter-Bold", fontSize: 15, paddingVertical: 5 }}>
             Scan this QR with your Authenticator App
           </ThemedText>
-          {qrCode && (
-            <Image
-              source={{ uri: qrCode }}
-              style={{ width: 200, height: 200 }}
-            />
+
+          {data2FA?.qrCodeUrl && (
+            <View
+              style={[
+                styles.customContent,
+              ]}
+            >
+              <View style={styles.qrContainer}>
+                <QRCode
+                  value={data2FA.qrCodeUrl}
+                  size={200}
+                  color="#000000"
+                  backgroundColor="#ffffff"
+                />
+              </View>
+            </View>
           )}
-          <ThemedText style={{ fontFamily: "Questrial", fontSize: 12 }}>
+
+          <ThemedText style={{ fontFamily: "Questrial", fontSize: 12, marginTop: 5 }}>
             Or enter this secret manually:
           </ThemedText>
+
           <View style={styles.bgBx}>
             <View style={styles.icon}>
-              <ThemedText>{secret}</ThemedText>
+              <ThemedText>{data2FA?.secret ?? "Loading..."}</ThemedText>
               <TouchableOpacity onPress={handleCopy}>
-                <MaterialIcons
-                  name="content-copy"
-                  size={25}
-                  color={"#208BC9"}
-                />
+                <MaterialIcons name="content-copy" size={25} color={"#208BC9"} />
               </TouchableOpacity>
             </View>
           </View>
 
           <CustomButton
             title="Enable 2FA"
-            handlePress={handleEnable}
-            btnStyles={{ width: "100%", marginTop: 10 }}
+            handlePress={() => setShowOtpScreen(true)}
+            btnStyles={{ width: "100%", marginTop: 20 }}
           />
         </View>
         <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
@@ -128,27 +134,34 @@ const Setup2FAScreen: React.FC<Props> = ({ showBack, title }) => {
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%",
-    height: "100%",
     justifyContent: "center",
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
   },
   icon: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center"
-  },
-  value: {
-    fontSize: 15,
-    fontFamily: "Inter-Bold",
-    marginBottom: 5
+    alignItems: "center",
   },
   bgBx: {
     backgroundColor: Colors.dark.primaryDark2,
     paddingHorizontal: 10,
     paddingVertical: 15,
-    borderRadius: 6
-  }
+    borderRadius: 6,
+  },
+  customContent: {
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderRadius: 6,
+  },
+  qrContainer: {
+    padding: 30,
+    margin: 20,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#208BC9",
+    alignItems: "center",
+  },
 });
 
 export default Setup2FAScreen;

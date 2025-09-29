@@ -44,6 +44,8 @@ export default function HomeScreen() {
   const headerTranslateY = useRef(new Animated.Value(-50)).current;
   const { user} = useUser()
 
+  console.log("user:", user)
+
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
     {

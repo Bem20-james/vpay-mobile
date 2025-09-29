@@ -37,36 +37,6 @@ export const styles = StyleSheet.create({
   countryCode: {
     fontSize: 14
   },
-  bottomSheetHeader: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E7E7E7"
-  },
-  bottomSheetTitle: {
-    textAlign: "center",
-    fontFamily: "Inter-Bold",
-    fontSize: 16,
-    borderBottomWidth: 0.7,
-    borderBottomColor: "#9B9B9B",
-    paddingBottom: 5
-  },
-  bottomSheetContent: {
-    paddingBottom: 24
-  },
-  bottomSheetItem: {
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderBottomWidth: 0.5,
-    borderBottomColor: "#E7E7E7"
-  },
-  bottomSheetItemCon: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5
-  },
-  bottomSheetItemText: {
-    fontSize: 16
-  },
   errorText: {
     marginTop: 0,
     fontFamily: "Questrial",

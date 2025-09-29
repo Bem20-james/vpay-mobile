@@ -9,6 +9,12 @@ import React, {
   PropsWithChildren
 } from "react";
 import { getData, removeData, storeData } from "@/utils/store";
+import { jwtDecode } from "jwt-decode";
+import { getToken, deleteToken } from "@/utils/secureStore";
+import { JwtPayload } from "@/types/auth";
+import { Router, useRouter } from "expo-router";
+import Toast from "react-native-toast-message";
+
 
 export interface User {
   id?: number;
@@ -52,6 +58,7 @@ export default function UserContextProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<User | null>(null);
   const [isUserLoaded, setIsUserLoaded] = useState<boolean>(false);
   const isRefreshingRef = useRef(false);
+  const router = useRouter()
 
   const isTokenExpired = useCallback((): boolean => {
     if (!user?.accessToken || !user?.expiresAt) return true;
@@ -104,17 +111,20 @@ export default function UserContextProvider({ children }: PropsWithChildren) {
     isRefreshingRef.current = true;
 
     try {
-      if (!user?.refreshToken) {
+                  const token = await getToken("accessToken");
+
+      if (!user?.accessToken) {
         await clearUser();
         return false;
       }
+
 
       const response = await fetch("auth/refresh/token", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ refreshToken: user.refreshToken })
+        body: JSON.stringify({ refreshToken: user.accessToken })
       });
 
       if (!response.ok) {
@@ -182,6 +192,29 @@ export default function UserContextProvider({ children }: PropsWithChildren) {
     refreshUserToken,
     clearUser
   ]);
+
+  useEffect(() => {
+    const checkStoredToken = async () => {
+      const token = await getToken("accessToken");
+      if (token) {
+        // validate expiry
+        const payload: JwtPayload = jwtDecode(token);
+        const expiresAt = payload.exp * 1000;
+
+        if (Date.now() < expiresAt) {
+          // token still valid → go straight to home
+          router.replace("/(tabs)/home");
+        } else {
+          // expired → clear and stay on login
+          await deleteToken("accessToken");
+          Toast.show({ type: "error", text1: "Session expired" });
+        }
+      }
+    };
+
+    checkStoredToken();
+  }, []);
+
 
   const contextValue = useMemo(
     (): UserContextType => ({

@@ -4,18 +4,20 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  Dimensions
+  Dimensions,
+  View
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { ThemedText } from "./ThemedText";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
+import { MotiView } from "moti";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 interface Item {
   id: string | number;
-  text: string;
+  provider_name: string;
   icon?: keyof typeof MaterialIcons.glyphMap;
   image?: any;
 }
@@ -26,6 +28,7 @@ interface CustomChipProps {
   onSelect: (id: string | number) => void;
   containerStyle?: object;
   itemStyle?: object;
+  isLoading?: boolean;
 }
 
 const CustomChip: React.FC<CustomChipProps> = ({
@@ -33,7 +36,8 @@ const CustomChip: React.FC<CustomChipProps> = ({
   selectedItem,
   onSelect,
   containerStyle,
-  itemStyle
+  itemStyle,
+  isLoading = false
 }) => {
   const colorScheme = useColorScheme();
   const BgColor =
@@ -71,20 +75,43 @@ const CustomChip: React.FC<CustomChipProps> = ({
           darkColor="#F8F8F8"
           style={styles.text}
         >
-          {item.text}
+          {item.provider_name}
         </ThemedText>
-
-        {isSelected && (
-          <MaterialIcons
-            name="check"
-            size={25}
-            color="#FFFFFF"
-            style={styles.checkIcon}
-          />
-        )}
       </TouchableOpacity>
     );
   };
+
+  // Skeleton loader using MotiView
+  // if (isLoading) {
+  //   const placeholders = Array.from({ length: 4 }).map((_, i) => ({ id: i })); // 6 fake items
+  //   return (
+  //     <FlatList
+  //       data={placeholders}
+  //       keyExtractor={(item) => `skeleton-${item.id}`}
+  //       numColumns={2}
+  //       key={"grid"}
+  //       style={[styles.list, containerStyle]}
+  //       contentContainerStyle={styles.gridContent}
+  //       renderItem={() => (
+  //         <MotiView
+  //           from={{ opacity: 0.3 }}
+  //           animate={{ opacity: 1 }}
+  //           transition={{
+  //             type: "timing",
+  //             duration: 800,
+  //             loop: true,
+  //           }}
+  //           style={[
+  //             styles.itemContainer,
+  //             {
+  //               backgroundColor: colorScheme === "dark" ? "#333" : "#E0E0E0",
+  //             },
+  //           ]}
+  //         />
+  //       )}
+  //     />
+  //   );
+  // }
 
   return (
     <FlatList
@@ -137,11 +164,8 @@ const styles = StyleSheet.create({
   },
   text: {
     flex: 1,
-    fontSize: 16,
-    fontFamily: "Inter-Medium",
-    fontWeight: 500
-  },
-  checkIcon: {
-    marginLeft: 10
+    fontSize: 13,
+    fontFamily: "Inter-SemiBold",
+    fontWeight: "500"
   }
 });

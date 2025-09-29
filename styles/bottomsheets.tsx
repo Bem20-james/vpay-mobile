@@ -9,18 +9,6 @@ export const btmSheetStyles = StyleSheet.create({
   container: {
     padding: 15
   },
-  amountContainer: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 7,
-    paddingVertical: 10
-  },
-  amountText: {
-    fontSize: 20,
-    fontFamily: "Inter-Bold",
-    textTransform: "capitalize"
-  },
   amount: {
     fontSize: 20,
     fontFamily: "Inter-Bold"
@@ -50,7 +38,8 @@ export const btmSheetStyles = StyleSheet.create({
     textTransform: "capitalize"
   },
   item: {
-    paddingVertical: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center"
@@ -78,15 +67,16 @@ export const btmSheetStyles = StyleSheet.create({
   title: {
     textAlign: "center",
     fontFamily: "Inter-SemiBold",
-    fontSize: 15,
+    fontSize: 16,
     borderBottomWidth: 0.7,
     borderBottomColor: "#9B9B9B",
-    paddingBottom: 5
+    paddingBottom: 5,
   },
   sheetItem: {
     paddingVertical: 14,
     paddingHorizontal: 16,
-    borderBottomWidth: 1
+    borderBottomWidth: 1,
+    borderBottomColor: "#E7E7E7"
   },
   sheetCon: {
     flexDirection: "row",
@@ -98,10 +88,82 @@ export const btmSheetStyles = StyleSheet.create({
     padding: 10
   },
   sheetLabel: {
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: "Inter-SemiBold"
   },
   bottomSheetContent: {
     paddingBottom: 24
-  }
+  },
+  indicatorHandle: {
+    backgroundColor: "#208BC9",
+    width: 40,
+  },
+  searchContainer: {
+    position: 'relative',
+    flexDirection: "row",
+    backgroundColor: "#E9F7FF",
+    borderWidth: 0.5,
+    borderColor: "#c9c8c8",
+    borderRadius: 6,
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+    marginVertical: 10,
+    marginHorizontal: 7,
+  },
+  searchIcon: {
+    marginRight: 8
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    width: "100%",
+    color: "#000"
+  },
+
+
+
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 50,
+    paddingHorizontal: 20,
+  },
+  loadingText: {
+    fontSize: 16,
+    opacity: 0.7,
+    textAlign: 'center',
+  },
+  noResultsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 50,
+    paddingHorizontal: 20,
+  },
+  noResultsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  noResultsText: {
+    fontSize: 14,
+    opacity: 0.7,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  sheetCode: {
+    fontSize: 12,
+    opacity: 0.6,
+    marginTop: 2,
+    fontStyle: 'italic',
+  },
+  clearButton: {
+    padding: 8,
+    marginLeft: 8,
+    borderRadius: 12,
+    backgroundColor: 'rgba(0,0,0,0.05)',
+  },
 });

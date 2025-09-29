@@ -26,7 +26,7 @@ const SendMobileMoney = ({ onBack }: SendScreenProps) => {
   const screenHeight = Dimensions.get("window").height;
 
   return (
-    <>
+    <React.Fragment>
       {!showSendScreen ? (
         <ScrollView showsVerticalScrollIndicator={false}>
           <Navigator title="Mobile Money" onBack={onBack} />
@@ -87,10 +87,17 @@ const SendMobileMoney = ({ onBack }: SendScreenProps) => {
           </View>
         </ScrollView>
       ) : (
-        <SendScreen title="Send to mobile money" onBack={() => setShowSendScreen(false)} />
+        <SendScreen title="Send to mobile money"           
+          accountDetails={{
+            accountNumber: phone,
+            bank: selectedBank?.name ?? "",
+            name: accountName,
+          }} 
+          onBack={() => setShowSendScreen(false)} 
+        />
       )}
-    </>
-  );
+    </React.Fragment>
+  );  
 };
 
 const styles = StyleSheet.create({

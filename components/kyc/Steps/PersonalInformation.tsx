@@ -3,7 +3,7 @@ import { View, TouchableOpacity } from "react-native";
 import { ThemedText } from "../../ThemedText";
 import FormField from "../../FormFields";
 import CustomButton from "../../CustomButton";
-import CustomSheet from "../../BottomSheets/CustomSheet";
+import CustomSheet from "../../BottomSheets/Banks";
 import { KycStyles as styles } from "@/styles/kyc";
 import { FormData, FormErrors } from "../PersonalInfo";
 

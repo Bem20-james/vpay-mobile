@@ -3,20 +3,32 @@ import { useState } from "react";
 import Toast from "react-native-toast-message";
 import { SERVER_BASE_URL } from "../constants/Paths";
 import { useUser } from "@/contexts/UserContexts";
-import { LookUpResponse, LookUpData, ResolveTag, ResolveRes } from "@/types/transfers";
+import {  LookUpParams, ResolveTag, ResolveRes } from "@/types/transfers";
 
 interface SendFiatData {
-  type: string;
-  amount: string;
-  recipient: string;
-  bank_code: string;
-  description: string;
+  account_number: string;
   currency: string;
+  amount: string;
+  description?: string;
+  account_password: string;
 }
 
 interface FiatResponse {
   success: boolean;
   message?: string;
+}
+
+interface LookUpResult {
+  account_name: string;
+  account_number: string;
+  bank_id: number;
+}
+
+interface LookUpResponse {
+  success: boolean;
+  code: number;
+  message?: string;
+  result: LookUpResult;
 }
 
 function useResolveVpayTag() {
@@ -37,7 +49,7 @@ function useResolveVpayTag() {
       console.log(result)
 
       if (result.success && result.error === 0) {
-        setAcctInfo(result);
+        setAcctInfo(result.result);
         return true;
       } else {
         Toast.show({
@@ -64,22 +76,28 @@ function useResolveVpayTag() {
 }
 
 function useLookUpUser() {
-  const [acctInfo, setAcctInfo] = useState<LookUpData[]>([]);
+  const [acctInfo, setAcctInfo] = useState<LookUpResult | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const { config } = useUser();
 
-  const fetchData = async (data: LookUpData): Promise<boolean> => {
+  const fetchData = async (data: { account_number: string; bank_code: string }): Promise<boolean> => {
     setLoading(true);
-    const { account_number, bank_code } = data;
-    const url = `${SERVER_BASE_URL}/lookup/recipient/${encodeURIComponent(bank_code)}/${encodeURIComponent(account_number)}`;
 
     try {
-      const response = await axios.get<LookUpResponse>(url, config);
+      const response = await axios.post<LookUpResponse>(
+        `${SERVER_BASE_URL}/user/fiat/recipient/verify`,
+        {
+          account_number: data.account_number,
+          bank: "001", // hardcoded to access bank for now
+        },
+        config
+      );
+      const result = response.data;
+      console.log("lookup response:", result)
+      console.log("acctInfo:", acctInfo)
 
-      console.log(response.data.result)
-
-      if (response.data.success && response.data.error === 0) {
-        setAcctInfo(response.data.result);
+      if (result.success && result.code === 0) {
+        setAcctInfo(result.result);
         return true;
       } else {
         Toast.show({
@@ -105,18 +123,19 @@ function useLookUpUser() {
   return { acctInfo, loading, lookup: fetchData };
 }
 
-const useSendFiat = () => {
+
+const useSendLocal = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { config } = useUser();
 
-  const sendFiat = async (data: SendFiatData): Promise<FiatResponse> => {
+  const sendFunds = async (data: SendFiatData): Promise<FiatResponse> => {
     setIsLoading(true);
     setError(null);
 
     try {
       const response = await axios.post<FiatResponse>(
-        `${SERVER_BASE_URL}/user/fiat/send`,
+        `${SERVER_BASE_URL}/user/fiat/send/local`,
         data,
         config
       );
@@ -154,12 +173,12 @@ const useSendFiat = () => {
     }
   };
 
-  return { sendFiat, isLoading, error };
+  return { sendFunds, isLoading, error };
 };
 
 
 export {
-  useSendFiat,
+  useSendLocal,
   useLookUpUser,
   useResolveVpayTag
 };

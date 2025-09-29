@@ -11,7 +11,8 @@ import FormField from "@/components/FormFields";
 import CustomButton from "@/components/CustomButton";
 import CustomChip from "@/components/CustomChips";
 import { Colors } from "@/constants/Colors";
-import CurrencyField from "@/components/CurrencyField";
+import AmountInputField from "@/components/AmountInputField";
+import { useFetchAirtimeProviders } from "@/hooks/useAirtimePurchase";
 
 const methods = [
   { id: "mtn", text: "MTN", image: images.mtn },
@@ -31,6 +32,9 @@ const AirtimeScreen = () => {
     number | string | null
   >(null);
 
+  const { providers, loading} = useFetchAirtimeProviders()
+  console.log("res providers:", providers)
+
   return (
     <SafeAreaView
       style={[styles.safeArea, { backgroundColor: boxBackgroundColor }]}
@@ -47,10 +51,11 @@ const AirtimeScreen = () => {
           </ThemedText>
 
           <CustomChip
-            items={methods}
+            items={providers}
             selectedItem={selectedCategory}
             onSelect={(id) => setSelectedCategory(id)}
             containerStyle={{ marginVertical: 20 }}
+            isLoading={loading}
           />
 
           <View>
@@ -61,13 +66,13 @@ const AirtimeScreen = () => {
               isLeftIcon
               iconName="person"
             />
-            <CurrencyField />
+            <AmountInputField />
           </View>
 
           <CustomButton
             title={"Continue"}
             handlePress={() => router.push("/(tabs)/home")}
-            btnStyles={{ marginTop: 20 }}
+            btnStyles={{ marginTop: 10 }}
             variant="primary"
             size="medium"
           />

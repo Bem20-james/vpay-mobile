@@ -124,7 +124,7 @@ export const TransferStyles = StyleSheet.create({
   },
   label: {
     color: "#9B9B9B",
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: "Questrial",
     marginBottom: 8
   },

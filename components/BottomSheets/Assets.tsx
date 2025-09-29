@@ -23,6 +23,7 @@ interface Props {
   snapPoints?: string[];
   selectedCurrency: Currency;
   title?: string;
+  isLoading?: boolean;
 }
 
 const AssetsBottomSheet = ({
@@ -32,7 +33,8 @@ const AssetsBottomSheet = ({
   onSelectCurrency,
   selectedCurrency,
   snapPoints = ["35%"],
-  title = "Select Currency"
+  title = "Select Currency",
+  isLoading = false
 }: Props) => {
   const colorScheme = useColorScheme();
   const sheetRef = useRef<BottomSheet>(null);

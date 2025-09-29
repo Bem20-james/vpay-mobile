@@ -8,6 +8,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import CountryFlag from "react-native-country-flag";
 import { styles } from "../styles/formfield";
 import { Colors } from "@/constants/Colors";
+import { btmSheetStyles } from "@/styles/bottomsheets";
 
 export type CountryItem = {
   id?: number;
@@ -108,7 +109,7 @@ const FormField = ({
       >
         {isPhoneInput && selectedCountry && (
           <View style={styles.countryContainer}>
-            <View style={styles.bottomSheetItemCon}>
+            <View style={btmSheetStyles.sheetCon}>
               <CountryFlag
                 isoCode={selectedCountry.country_code}
                 size={12}

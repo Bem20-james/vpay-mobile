@@ -9,37 +9,26 @@ import { TransferStyles as styles } from "@/styles/transfers";
 import AssetsBottomSheet from "../BottomSheets/Assets";
 import ReviewBottomSheet from "../BottomSheets/Review";
 import { Colors } from "@/constants/Colors";
+import { router } from "expo-router";
+import { useFetchUserAssets } from "@/hooks/useUser";
 
-const currencies = [
-  {
-    code: "NGN",
-    name: "Nigerian Naira",
-    flag: "🇳🇬",
-    balance: 1500.25
-  },
-  {
-    code: "GHS",
-    name: "Ghana Cedi",
-    flag: "🇬🇭",
-    balance: 2000.12
-  },
-  { code: "USD", name: "US Dollar", flag: "🇺🇸", balance: 123.45 }
-];
-
-const paymentData = {
-  amount: "504.40",
-  bank: "Opay Bank",
-  accountNumber: "1236547892",
-  name: "ADVANTEK TECHNOLOGIES",
-  rate: "5"
+type AccountDetails = {
+  bank: string;
+  accountNumber: string;
+  name: string;
 };
 
 type SendScreenProps = {
   onBack: () => void;
   title?: string;
+  accountDetails: AccountDetails;
 };
 
-const SendScreen = ({ onBack, title = "Send to local" }: SendScreenProps) => {
+const SendScreen = ({
+  onBack,
+  title = "Send to local",
+  accountDetails
+}: SendScreenProps) => {
   const colorScheme = useColorScheme();
   const bgColor =
     colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
@@ -47,21 +36,25 @@ const SendScreen = ({ onBack, title = "Send to local" }: SendScreenProps) => {
     colorScheme === "dark" ? Colors.light.accentBg : Colors.dark.background;
   const inputBgColor =
     colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const { assets, loading } = useFetchUserAssets();
+  console.log("Fetched Assets:", assets);
 
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
-  const [selectedCurrency, setSelectedCurrency] = useState(currencies[0]);
+  const [selectedCurrency, setSelectedCurrency] = useState(assets[0]);
   const [showCurrencySheet, setShowCurrencySheet] = useState(false);
   const [showDetailsSheet, setDetailsShowSheet] = useState(false);
 
   const handlePay = () => {
-    console.log("Payment initiated");
     setDetailsShowSheet(false);
+    router.push("/(transfers)/authorization-pin");
   };
 
   return (
     <ScrollView>
       <Navigator title={title} onBack={onBack} />
+
+      {/* Recipient Section */}
       <View style={styles.container}>
         <View style={[styles.recipientContainer, { backgroundColor: bgColor }]}>
           <Image
@@ -70,14 +63,15 @@ const SendScreen = ({ onBack, title = "Send to local" }: SendScreenProps) => {
           />
           <View>
             <ThemedText style={styles.recipientName}>
-              ELISHA SONTER ADUE
+              {accountDetails.name}
             </ThemedText>
             <ThemedText style={styles.recipientDetails}>
-              7015566456 OPay
+              {accountDetails.accountNumber} {accountDetails.bank}
             </ThemedText>
           </View>
         </View>
 
+        {/* Amount Section */}
         <View style={[styles.inputBox, { backgroundColor: bgColor }]}>
           <ThemedText style={styles.label}>Amount</ThemedText>
           <View style={[styles.splitInput, { backgroundColor: inputBgColor }]}>
@@ -109,6 +103,7 @@ const SendScreen = ({ onBack, title = "Send to local" }: SendScreenProps) => {
           </ThemedText>
         </View>
 
+        {/* Note Section */}
         <View style={[styles.inputBox, { backgroundColor: bgColor }]}>
           <ThemedText style={styles.label}>Description</ThemedText>
           <TextInput
@@ -121,29 +116,33 @@ const SendScreen = ({ onBack, title = "Send to local" }: SendScreenProps) => {
         </View>
       </View>
 
+      {/* Currency Selection */}
       <AssetsBottomSheet
         isVisible={showCurrencySheet}
         onClose={() => setShowCurrencySheet(false)}
-        currencies={currencies}
-        onSelectCurrency={(currency) => {
+        currencies={assets}
+        onSelectCurrency={currency => {
           setSelectedCurrency(currency);
           setShowCurrencySheet(false);
         }}
         selectedCurrency={selectedCurrency}
+        isLoading={loading}
       />
 
+      {/* Review Sheet */}
       <ReviewBottomSheet
         isVisible={showDetailsSheet}
         onClose={() => setDetailsShowSheet(false)}
         onPay={handlePay}
-        amount={paymentData.amount}
-        bank={paymentData.bank}
-        accountNumber={paymentData.accountNumber}
-        name={paymentData.name}
-        rate={paymentData.rate}
+        amount={amount}
+        bank={accountDetails.bank}
+        accountNumber={accountDetails.accountNumber}
+        name={accountDetails.name}
+        rate="5"
         selectedAsset={selectedCurrency}
       />
 
+      {/* Continue Button */}
       <View style={{ position: "relative" }}>
         <View
           style={{ position: "absolute", bottom: -300, left: 10, right: 10 }}
@@ -152,6 +151,7 @@ const SendScreen = ({ onBack, title = "Send to local" }: SendScreenProps) => {
             title="Continue"
             handlePress={() => setDetailsShowSheet(true)}
             btnStyles={{ width: "100%" }}
+            disabled={!amount}
           />
         </View>
       </View>

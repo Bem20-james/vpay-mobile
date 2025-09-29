@@ -16,6 +16,7 @@ import {
   data2FA
 } from "../types/auth"
 import { useLoader } from "@/contexts/LoaderContext";
+import { saveToken } from "@/utils/secureStore";
 
 function useRegister() {
   return async (data: RegisterData): Promise<boolean> => {
@@ -43,7 +44,7 @@ function useRegister() {
         axiosError.response?.data?.message || "An error occurred while registering.";
 
       console.error("Error:", errorMessage);
-      Toast.show({ type: "error", text1: errorMessage.message });
+      Toast.show({ type: "error", text1: errorMessage });
 
       return false;
     }
@@ -191,64 +192,61 @@ function useLogin() {
   };
 };
 
-function useLoginWithBiometrics() {
-  const { updateUser } = useUser();
-  const {hideLoader} = useLoader()
+function useRefreshToken() {
+  const { updateUser, clearUser } = useUser();
+  const { hideLoader } = useLoader();
+  const {config} = useUser()
 
-  return async (data: LoginData): Promise<boolean> => {
+  return async (): Promise<boolean> => {
     try {
       const response = await axios.post<AuthResponse>(
-        `${SERVER_BASE_URL}/auth/user/resume`,
-        data
+        `${SERVER_BASE_URL}/auth/refresh/token`, config
       );
 
       const result = response?.data;
-      console.log("Login Response:", result);
+      console.log("Refresh Response:", result);
 
       if (result.code) {
         Toast.show({ type: "error", text1: result.message });
+        await clearUser();
         return false;
       }
 
-      if (result.success) {
-        if (result.result) {
-          const { token, user, country, kyc } = result.result;
-          const tokenPayload: JwtPayload = jwtDecode(token);
-          const expiresAt = tokenPayload.exp * 1000;
+      if (result.success && result.result) {
+        const { token, refreshToken, user, country, kyc } = result.result;
+        const tokenPayload: JwtPayload = jwtDecode(token);
+        const expire_at = tokenPayload.exp * 1000;
 
-          const userData = {
-            ...user,
-            country,
-            kyc,
-            accessToken: token,
-            refreshToken: null,
-            expiresAt,
-          };
-          await updateUser(userData);
-          await storeData("lastUser", {
-            username: user.username,
-            email: user.email,
-          });
-          Toast.show({ type: "success", text1: result.message });
-          return true;
-        }
+        const userData = {
+          ...user,
+          country,
+          kyc,
+          accessToken: token,
+          refreshToken,
+          expire_at,
+        };
+
+        await updateUser(userData);
+        return true; 
       }
-
-      Toast.show({ type: "error", text1: "Something went wrong!" });
+      Toast.show({ type: "error", text1: "Session expired. Please log in again." });
+      await clearUser();
       return false;
     } catch (error: unknown) {
       const axiosError = error as AxiosError<{ message?: string }>;
       const errorMessage =
-        axiosError.response?.data?.message || "Login failed, try again.";
-      console.error("Catch err:", error);
+        axiosError.response?.data?.message || "Session expired. Please log in again.";
+
+      console.error("Refresh token error:", error);
       Toast.show({ type: "error", text1: errorMessage });
 
+      await clearUser();
       return false;
-    }finally {
+    } finally {
       hideLoader();
     }
   };
-};
+}
 
 const useForgotPwd = () => {
   const [loading, setLoading] = useState(false);
@@ -468,7 +466,7 @@ const useVerifyLogin = () => {
 
         const { token, user, country, kyc } = result.result;
         const tokenPayload: JwtPayload = jwtDecode(token);
-        const expiresAt = tokenPayload.exp * 1000;
+        const expire_at = tokenPayload.exp * 1000;
 
         const userData = {
           ...user,
@@ -476,9 +474,10 @@ const useVerifyLogin = () => {
           kyc,
           accessToken: token,
           refreshToken: null,
-          expiresAt,
+          expire_at,
         };
         await updateUser(userData);
+        await saveToken("accessToken", token); 
         await storeData("lastUser", {
           username: user.username,
           email: user.email,
@@ -700,7 +699,7 @@ const useSetup2FA = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { config } = useUser();
-  const [data2FA, setData2FA] = useState<data2FA[]>([]);
+  const [data2FA, setData2FA] = useState<data2FA | null>(null);
   
   const setup2FA = async (data: payload): Promise<boolean> => {
     setLoading(true);
@@ -738,7 +737,7 @@ const useSetup2FA = () => {
   };
 
   return { setup2FA, data2FA, loading, error };
-};
+}; 
 
 const useEnable2FA = () => {
   const [loading, setLoading] = useState(false);
@@ -752,7 +751,6 @@ const useEnable2FA = () => {
     const payload = {
       email: data.email,
       secret: data.secret,
-
     }
 
     try {
@@ -794,7 +792,7 @@ export {
   useResendEmailOTP,
   useResendLoginOTP,
   useLogin,
-  useLoginWithBiometrics,
+  useRefreshToken,
   useForgotPwd,
   useResendPwdResetOTP,
   useResetPwd,
