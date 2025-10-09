@@ -40,6 +40,7 @@ interface FormFieldProps {
   isPhoneInput?: boolean;
   defaultCountry?: CountryItem;
   helpText?: string;
+  onIconPress?: () => void;
 }
 
 const FormField = ({
@@ -71,6 +72,7 @@ const FormField = ({
     country_dial_code: "+234"
   },
   helpText,
+  onIconPress,
   ...props
 }: FormFieldProps) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -128,7 +130,7 @@ const FormField = ({
 
         {isIcon && iconName && (
           <View style={{ paddingRight: 5 }}>
-            <MaterialIcons name={iconName} size={20} color="#208BC9" />
+            <MaterialIcons name={iconName} size={25} color="#208BC9" />
           </View>
         )}
 
@@ -162,7 +164,7 @@ const FormField = ({
 
         {isLeftIcon && iconName && (
           <View>
-            <MaterialIcons name={iconName} size={20} color="#208BC9" />
+            <MaterialIcons name={iconName} size={25} color="#208BC9" onPress={onIconPress} />
           </View>
         )}
 

@@ -1,3 +1,4 @@
+import { Colors } from "@/constants/Colors";
 import { StyleSheet } from "react-native";
 export const TransferStyles = StyleSheet.create({
   safeArea: {
@@ -10,7 +11,7 @@ export const TransferStyles = StyleSheet.create({
   },
   searchContainer: {
     flexDirection: "row",
-    backgroundColor: "#E9F7FF",
+    backgroundColor: "#fbffffff",
     borderWidth: 0.5,
     borderColor: "#c9c8c8",
     borderRadius: 6,
@@ -63,8 +64,8 @@ export const TransferStyles = StyleSheet.create({
     fontFamily: "Questrial"
   },
   flagWrapper: {
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     borderRadius: 20,
     backgroundColor: "#f1f1f1",
     justifyContent: "center",
@@ -90,7 +91,6 @@ export const TransferStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center"
   },
-
   recipientContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -119,14 +119,36 @@ export const TransferStyles = StyleSheet.create({
   inputBox: {
     paddingVertical: 13,
     paddingHorizontal: 15,
-    borderRadius: 10,
-    marginBottom: 20
+    borderRadius: 10
   },
   label: {
     color: "#9B9B9B",
     fontSize: 12,
     fontFamily: "Questrial",
     marginBottom: 8
+  },
+  amountArea: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderBottomColor: Colors.light.primaryDark2,
+    borderBottomWidth: 0.7,
+    marginTop: 10
+  },
+  payMethod: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10
+  },
+  balanceSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10
   },
   splitInput: {
     flexDirection: "row",
@@ -146,7 +168,7 @@ export const TransferStyles = StyleSheet.create({
   },
   currencyCode: {
     color: "#fff",
-    fontFamily: "Inter-SemiBold",
+    fontFamily: "Inter-Bold",
     marginLeft: 6,
     marginRight: 4
   },
@@ -155,9 +177,14 @@ export const TransferStyles = StyleSheet.create({
     fontSize: 20,
     fontFamily: "Inter-Bold"
   },
+  mainBal: {
+    marginTop: 5,
+    fontSize: 20,
+    fontFamily: "Inter-Bold"
+  },
   balances: {
     marginTop: 10,
-    color: "#9B9B9B",
+    color: "#2c404aff",
     fontSize: 12,
     fontFamily: "Questrial"
   },
@@ -199,5 +226,11 @@ export const TransferStyles = StyleSheet.create({
     fontSize: 10,
     marginTop: 2,
     fontStyle: "italic"
+  },
+  flag: {
+    width: 20,
+    height: 20,
+    resizeMode: "contain",
+    borderRadius: 20
   }
 });

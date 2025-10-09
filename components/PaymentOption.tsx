@@ -3,19 +3,16 @@ import {
   View,
   TouchableOpacity,
   Image,
-  ImageSourcePropType,
   StyleSheet
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useRouter, Router } from "expo-router";
 import CountryFlag from "react-native-country-flag";
-import { SERVER_BASE_URL } from "@/constants/Paths";
 
 interface PaymentOptionProps {
   name: string;
   label: string;
-  image?: ImageSourcePropType;
+  image?: any;
   balance: string;
   price?: string;
   type: "fiat" | "crypto";
@@ -45,7 +42,6 @@ export const PaymentOption: React.FC<PaymentOptionProps> = ({
   bgColor,
   handlePress
 }) => {
-  const router: Router = useRouter();
 
   return (
     <TouchableOpacity
@@ -55,7 +51,7 @@ export const PaymentOption: React.FC<PaymentOptionProps> = ({
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         {type === "crypto" && (
           <Image
-            source={{ uri: `${SERVER_BASE_URL}/${image}` }}
+            source={image}
             style={styles.icon}
           />
         )}
@@ -90,7 +86,7 @@ export const PaymentOption: React.FC<PaymentOptionProps> = ({
 
       <View style={{ flexDirection: "row", gap: 10 }}>
         <ThemedText>
-          {type === "fiat" ? Number(balance).toFixed(2) : balance}
+          { Number(balance).toFixed(2)}
         </ThemedText>
         <ThemedText style={styles.arrow}>
           <MaterialIcons name="chevron-right" size={30} color="#218DC9" />
@@ -115,15 +111,12 @@ const styles = StyleSheet.create({
     elevation: 3
   },
   icon: {
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     marginRight: 15,
     resizeMode: "contain",
-    borderRadius: 20
   },
   flagicon: {
-    width: 40,
-    height: 40,
     marginRight: 10,
     resizeMode: "contain",
     borderRadius: 5

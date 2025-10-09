@@ -27,6 +27,7 @@ import {
 } from "@/hooks/useAuthentication";
 import Toast from "react-native-toast-message";
 import { Colors } from "@/constants/Colors";
+import { useLoader } from "@/contexts/LoaderContext"; 
 
 interface OtpVerificationProps {
   email?: string;
@@ -71,6 +72,8 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
   const { enable2FA } = useEnable2FA();
   const { changePwd, loading: verifyingOTP } = useChangePwd();
   const { resendChangePwdOTP } = useResendChangePwdOTP();
+    const { showLoader, hideLoader } = useLoader();
+
 
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | undefined;
@@ -83,6 +86,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
   }, [countdown]);
 
   const handleOTPSubmit = async () => {
+    showLoader();
     if (otp.length !== 6) {
       return Toast.show({
         type: "error",
@@ -95,6 +99,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
       } else if (mode === "forgot-password") {
         const success = await verifyForgotPwd(otp, email ?? "");
         if (success) {
+          hideLoader();
           router.push({
             pathname: "/(auth)/reset-password",
             params: { otp, email }
@@ -110,6 +115,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
           password: password ?? ""
         });
         if (success) {
+          hideLoader();
           router.push({
             pathname: "/(auth)/login",
             params: { otp, email }
@@ -123,6 +129,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
           email: email ?? ""
         });
         if (success) {
+          hideLoader();
           router.push({
             pathname: "/(tabs)/settings"
           });
@@ -135,6 +142,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
           newPassword: newPassword ?? ""
         });
         if (success) {
+          hideLoader();
           Toast.show({ type: "success", text1: "Password change successful!" });
           router.push({
             pathname: "/(tabs)/settings"
@@ -149,6 +157,8 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
             ? (error as { message: string }).message
             : "OTP Verification Failed"
       });
+    }finally{
+      hideLoader();
     }
   };
 
@@ -156,6 +166,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
     if (countdown > 0) return;
 
     setOtp("");
+    showLoader();
     setIsResending(true);
     try {
       if (mode === "verify-email") {
@@ -180,6 +191,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
             : "OTP Resend Failed"
       });
     }
+    hideLoader();
     setIsResending(false);
   };
 
@@ -254,6 +266,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
               opacity: isLoading ? 0.7 : 1
             }}
             isLoading={isLoading}
+            disabled={isLoading || otp.length !== 6}
           />
 
           <View style={styles.resendCon}>

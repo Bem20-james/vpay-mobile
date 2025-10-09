@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import { View, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity, Image } from "react-native";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { Portal } from "@gorhom/portal";
 import { ThemedText } from "../ThemedText";
@@ -8,26 +8,40 @@ import CustomButton from "../CustomButton";
 import { Colors } from "@/constants/Colors";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { btmSheetStyles } from "@/styles/bottomsheets";
+import { SERVER_IMAGE_URL } from "@/constants/Paths";
+import CountryFlag from "react-native-country-flag";
+import { TransferStyles as styles } from "@/styles/transfers";
+import images from "@/constants/Images";
 
 interface Currency {
-  code: string;
+  country_code: string;
+  currency_code: string;
+  image?: string;
   name: string;
-  flag: string;
+  type: string;
   balance: number;
 }
-
 interface Props {
   isVisible: boolean;
   onClose: () => void;
   onPay: () => void;
   amount: string;
-  bank: string;
-  accountNumber: string;
-  name: string;
   rate: string;
+  selectedAsset: Currency;
   snapPoints?: string[];
   title?: string;
-  selectedAsset: Currency;
+
+  // Transfer-specific
+  bank?: string;
+  accountNumber?: string;
+  name?: string;
+
+  // Airtime-specific
+  phoneNumber?: string;
+  provider?: string;
+
+  // Mode
+  type: "transfer" | "airtime" | "data";
 }
 
 const ReviewBottomSheet = ({
@@ -40,18 +54,21 @@ const ReviewBottomSheet = ({
   accountNumber,
   name,
   selectedAsset,
+  phoneNumber,
+  provider,
   snapPoints = ["50", "60%"],
-  title = "Review Details"
+  title = "Review Details",
+  type
 }: Props) => {
   const sheetRef = useRef<BottomSheet>(null);
   const colorScheme = useColorScheme();
-  const border = colorScheme === "dark" ? "#414141" : "#d7d7d7";
   const isDark = colorScheme === "dark";
+  const border = isDark ? "#414141" : "#d7d7d7";
+
+  console.log("💰 Selected Asset in ReviewBottomSheet:", selectedAsset);
 
   useEffect(() => {
-    if (isVisible) {
-      sheetRef.current?.expand();
-    }
+    if (isVisible) sheetRef.current?.expand();
   }, [isVisible]);
 
   if (!isVisible) return null;
@@ -59,7 +76,36 @@ const ReviewBottomSheet = ({
   const handleConfirm = () => {
     onClose();
     onPay();
-  }
+  };
+
+  // Dynamically build the list
+  const details =
+    type === "transfer"
+      ? [
+          { label: "Bank", value: bank },
+          { label: "Account Number", value: accountNumber },
+          { label: "Name", value: name, transform: "uppercase" },
+          {
+            label: "Amount",
+            value: getSymbolFromCurrency(selectedAsset.currency_code) + amount
+          },
+          {
+            label: "Transaction fee",
+            value: getSymbolFromCurrency(selectedAsset.currency_code) + rate
+          }
+        ]
+      : [
+          { label: "Phone Number", value: phoneNumber },
+          { label: "Provider", value: provider },
+          {
+            label: "Amount",
+            value: getSymbolFromCurrency(selectedAsset.currency_code) + amount
+          },
+          {
+            label: "Transaction fee",
+            value: getSymbolFromCurrency(selectedAsset.currency_code) + rate
+          }
+        ];
 
   return (
     <Portal>
@@ -71,10 +117,9 @@ const ReviewBottomSheet = ({
         handleIndicatorStyle={btmSheetStyles.indicatorHandle}
         onClose={onClose}
         backgroundStyle={{
-          backgroundColor:
-            colorScheme === "dark"
-              ? Colors.dark.primaryBgDark
-              : Colors.light.accentBg
+          backgroundColor: isDark
+            ? Colors.dark.primaryBgDark
+            : Colors.light.accentBg
         }}
       >
         <BottomSheetView>
@@ -85,24 +130,9 @@ const ReviewBottomSheet = ({
           >
             {title}
           </ThemedText>
+
           <View style={btmSheetStyles.container}>
-            {[
-              { label: "Bank", value: bank },
-              { label: "Account Number", value: accountNumber },
-              {
-                label: "Name",
-                value: name,
-                transform: "uppercase"
-              },
-              {
-                label: "Amount",
-                value: getSymbolFromCurrency(selectedAsset.code) + amount
-              },
-              {
-                label: "Transaction fee",
-                value: getSymbolFromCurrency(selectedAsset.code) + rate
-              }
-            ].map((item, index) => (
+            {details.map((item, index) => (
               <View
                 style={[
                   btmSheetStyles.detailRow,
@@ -142,29 +172,39 @@ const ReviewBottomSheet = ({
                   { color: isDark ? "#F5F5F5" : "#FFFFFF" }
                 ]}
               >
-                payment Method
+                Payment Method
               </ThemedText>
               <TouchableOpacity
                 style={btmSheetStyles.item}
-                onPress={() => {
-                  sheetRef.current?.close();
-                }}
+                onPress={() => sheetRef.current?.close()}
               >
-                <View style={btmSheetStyles.flagWrapper}>
-                  <ThemedText style={btmSheetStyles.flag}>
-                    {selectedAsset.flag}
-                  </ThemedText>
+                <View style={styles.flagWrapper}>
+                  {selectedAsset.image ? (
+                    <Image
+                      source={{
+                        uri: `${SERVER_IMAGE_URL}/${selectedAsset.image}`
+                      }}
+                      style={styles.flag}
+                    />
+                  ) : selectedAsset.country_code ? (
+                    <CountryFlag
+                      isoCode={selectedAsset.country_code}
+                      size={20}
+                      style={styles.flag}
+                    />
+                  ) : (
+                    <Image source={images.logodark} style={styles.logo} />
+                  )}
                 </View>
 
                 <View style={btmSheetStyles.labelWrapper}>
                   <ThemedText
                     style={[
                       btmSheetStyles.label,
-                      ,
                       { color: isDark ? "#F5F5F5" : "#FFFFFF" }
                     ]}
                   >
-                    {selectedAsset.name} ({selectedAsset.code})
+                    {selectedAsset.name} ({selectedAsset.currency_code})
                   </ThemedText>
                 </View>
 
@@ -175,7 +215,7 @@ const ReviewBottomSheet = ({
                       { color: isDark ? "#F5F5F5" : "#FFFFFF" }
                     ]}
                   >
-                    {getSymbolFromCurrency(selectedAsset.code) || "₦"}
+                    {getSymbolFromCurrency(selectedAsset.country_code) || "₦"}
                     {selectedAsset.balance.toFixed(2)}
                   </ThemedText>
                 </View>
@@ -186,14 +226,14 @@ const ReviewBottomSheet = ({
               <View
                 style={{
                   position: "absolute",
-                  bottom: -80,
+                  bottom: -90,
                   left: 1,
                   right: 1
                 }}
               >
                 <CustomButton
                   title="Confirm"
-                  handlePress={handleConfirm }
+                  handlePress={handleConfirm}
                   btnStyles={{ width: "100%" }}
                 />
               </View>
@@ -204,5 +244,4 @@ const ReviewBottomSheet = ({
     </Portal>
   );
 };
-
 export default ReviewBottomSheet;

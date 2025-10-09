@@ -79,7 +79,7 @@ const QuickActionsSection: React.FC<Props> = ({ title = "", actions }) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: 7
+    marginHorizontal: 10
   },
   title: {
     fontFamily: "Inter-Medium",
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
     gap: 12,
-    marginRight: -10
+    marginRight: 0
   },
 
   actionBox: {

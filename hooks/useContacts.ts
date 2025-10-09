@@ -1,14 +1,16 @@
 // hooks/useContacts.ts
-import { useState, useEffect, useCallback } from 'react';
-import EncryptedContactStorage, { StoredContact } from '@/utils/encryptedStore';
-import * as Contacts from 'expo-contacts';
-import { useUser } from '@/contexts/UserContexts';
-import axios, {AxiosError} from 'axios';
-import { SERVER_BASE_URL } from '../constants/Paths';
+import { useState, useEffect, useCallback } from "react";
+import EncryptedContactStorage, { StoredContact } from "@/utils/encryptedStore";
+import * as Contacts from "expo-contacts";
+import { useUser } from "@/contexts/UserContexts";
+import axios, { AxiosError } from "axios";
+import { SERVER_BASE_URL } from "../constants/Paths";
 
 export const useContacts = () => {
   const [recentContacts, setRecentContacts] = useState<StoredContact[]>([]);
-  const [savedBeneficiaries, setSavedBeneficiaries] = useState<StoredContact[]>([]);
+  const [savedBeneficiaries, setSavedBeneficiaries] = useState<StoredContact[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
 
   // Load stored contacts on mount
@@ -23,11 +25,11 @@ export const useContacts = () => {
         EncryptedContactStorage.getRecentContacts(),
         EncryptedContactStorage.getBeneficiaries()
       ]);
-      
+
       setRecentContacts(recent);
       setSavedBeneficiaries(beneficiaryList);
     } catch (error) {
-      console.error('Error loading stored contacts:', error);
+      console.error("Error loading stored contacts:", error);
     } finally {
       setLoading(false);
     }
@@ -43,15 +45,24 @@ export const useContacts = () => {
     await loadStoredContacts();
   }, []);
 
-  const searchStoredContacts = useCallback((query: string) => {
-    const recentResults = EncryptedContactStorage.searchContacts(recentContacts, query);
-    const savedResults = EncryptedContactStorage.searchContacts(savedBeneficiaries, query);
-    
-    return {
-      recent: recentResults,
-      saved: savedResults
-    };
-  }, [recentContacts, savedBeneficiaries]);
+  const searchStoredContacts = useCallback(
+    (query: string) => {
+      const recentResults = EncryptedContactStorage.searchContacts(
+        recentContacts,
+        query
+      );
+      const savedResults = EncryptedContactStorage.searchContacts(
+        savedBeneficiaries,
+        query
+      );
+
+      return {
+        recent: recentResults,
+        saved: savedResults
+      };
+    },
+    [recentContacts, savedBeneficiaries]
+  );
 
   return {
     recentContacts,
@@ -65,8 +76,6 @@ export const useContacts = () => {
 };
 
 // hooks/useVpayContacts.ts
-
-
 
 type BackendContact = {
   displayName?: string;
@@ -86,29 +95,36 @@ export const useVpayContacts = () => {
    * Matches given phone numbers against backend vPay users
    */
   const matchContactsWithVpay = async (
-    phoneNumbers: Array<{ name: string; phoneNumber: string }>
+    phoneNumbers: Array<{ phoneNumber: string }>
   ): Promise<StoredContact[]> => {
     try {
+      // Extract just the numbers into an array of strings
+      const formattedNumbers = phoneNumbers.map((c) => c.phoneNumber);
+
+      console.log("Sending phone numbers:", formattedNumbers);
+
       const response = await axios.post<BackendContact[]>(
         `${SERVER_BASE_URL}/user/contact-users/resolve`,
-        { phoneNumbers },
+        { phone: formattedNumbers }, // 👈 changed key and format
         config
-
       );
 
-      return response.data.map((contact) => ({
-        name: contact.displayName || contact.name || "Unknown",
-        handle: contact.vpayTag || `@${contact.username ?? "unknown"}`,
-        flag: contact.country || "NG",
-        image: contact.profileImage,
-        frequency: 0,
-      }));
+const contacts = response.data?.data ?? []; // ✅ safely get the array
+
+return contacts.map((contacts) => ({
+  name: contacts.displayName || contacts.name || "Unknown",
+  handle: contacts.vpayTag || `@${contacts.username ?? "unknown"}`,
+  flag: contacts.country || "NG",
+  image: contacts.profileImage,
+  frequency: 0,
+}));
+
     } catch (err) {
       const error = err as AxiosError;
       console.error("Error matching contacts with backend:", {
         message: error.message,
         status: error.response?.status,
-        data: error.response?.data,
+        data: error.response?.data
       });
       return [];
     }
@@ -129,17 +145,14 @@ export const useVpayContacts = () => {
       }
 
       const { data: phoneContacts } = await Contacts.getContactsAsync({
-        fields: [Contacts.Fields.Name, Contacts.Fields.PhoneNumbers],
+        fields: [Contacts.Fields.Name, Contacts.Fields.PhoneNumbers]
       });
 
       const phoneNumbers = phoneContacts
-        .filter(
-          (c) => c.phoneNumbers && c.phoneNumbers.length > 0
-        )
+        .filter((c) => c.phoneNumbers && c.phoneNumbers.length > 0)
         .map((c) => ({
           name: c.name || "Unknown",
-          phoneNumber:
-            c.phoneNumbers?.[0]?.number?.replace(/\D/g, "") || "",
+          phoneNumber: c.phoneNumbers?.[0]?.number?.replace(/\D/g, "") || ""
         }))
         .filter((c) => c.phoneNumber.length >= 10);
 
@@ -175,6 +188,6 @@ export const useVpayContacts = () => {
     vpayContacts,
     loading,
     loadVpayContacts,
-    searchVpayContacts,
+    searchVpayContacts
   };
 };

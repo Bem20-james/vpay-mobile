@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { ThemedText } from "./ThemedText";
+import { ThemedText } from "../ThemedText";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 
@@ -46,37 +46,37 @@ const RecentTransfers: React.FC<Props> = ({ beneficiaries, recents }) => {
   const data = activeTab === "Recents" ? recents : beneficiaries;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.tabContainer}>
+    <View style={RecentTransferstyles.container}>
+      <View style={RecentTransferstyles.tabContainer}>
         <Pressable
           onPress={() => setActiveTab("Recents")}
-          style={styles.tabWrapper}
+          style={RecentTransferstyles.tabWrapper}
         >
           <ThemedText
             lightColor={activeTab === "Recents" ? "#218DC9" : "#9B9B9B"}
             darkColor={activeTab === "Recents" ? "#218DC9" : "#9B9B9B"}
-            style={styles.tabText}
+            style={RecentTransferstyles.tabText}
           >
             Recents
           </ThemedText>
           {activeTab === "Recents" && (
-            <View style={styles.activeTabIndicator} />
+            <View style={RecentTransferstyles.activeTabIndicator} />
           )}
         </Pressable>
 
         <Pressable
           onPress={() => setActiveTab("Beneficiaries")}
-          style={styles.tabWrapper}
+          style={RecentTransferstyles.tabWrapper}
         >
           <ThemedText
             lightColor={activeTab === "Beneficiaries" ? "#218DC9" : "#9B9B9B"}
             darkColor={activeTab === "Beneficiaries" ? "#218DC9" : "#9B9B9B"}
-            style={styles.tabText}
+            style={RecentTransferstyles.tabText}
           >
             Beneficiaries
           </ThemedText>
           {activeTab === "Beneficiaries" && (
-            <View style={styles.activeTabIndicator} />
+            <View style={RecentTransferstyles.activeTabIndicator} />
           )}
         </Pressable>
       </View>
@@ -89,7 +89,7 @@ const RecentTransfers: React.FC<Props> = ({ beneficiaries, recents }) => {
         renderItem={({ item }) => (
           <TouchableOpacity
             style={[
-              styles.itemContainer,
+              RecentTransferstyles.itemContainer,
               {
                 backgroundColor: isDark
                   ? Colors.dark.accentBg
@@ -99,19 +99,19 @@ const RecentTransfers: React.FC<Props> = ({ beneficiaries, recents }) => {
             onPress={() => {}}
             activeOpacity={0.7}
           >
-            <View style={styles.itemContent}>
+            <View style={RecentTransferstyles.itemContent}>
               <View>
                 <ThemedText
                   lightColor="#252525"
                   darkColor="#FFFFFF"
-                  style={styles.primaryText}
+                  style={RecentTransferstyles.primaryText}
                 >
                   {item.label}
                 </ThemedText>
                 <ThemedText
                   lightColor="#9B9B9B"
                   darkColor="#9B9B9B"
-                  style={styles.label}
+                  style={RecentTransferstyles.label}
                 >
                   {item.subtitle}
                 </ThemedText>
@@ -119,7 +119,7 @@ const RecentTransfers: React.FC<Props> = ({ beneficiaries, recents }) => {
 
               <View
                 style={[
-                  styles.iconCircle,
+                  RecentTransferstyles.iconCircle,
                   { backgroundColor: item.backgroundColor }
                 ]}
               >
@@ -137,12 +137,12 @@ const RecentTransfers: React.FC<Props> = ({ beneficiaries, recents }) => {
       <Pressable
         onPress={() => router.push("/transactions")}
         style={({ pressed }) => [
-          styles.moreBtn,
+          RecentTransferstyles.moreBtn,
           { opacity: pressed ? 0.7 : 1 }
         ]}
       >
         <ThemedText
-          style={styles.viewAllText}
+          style={RecentTransferstyles.viewAllText}
           lightColor="#218DC9"
           darkColor="#218DC9"
         >
@@ -159,7 +159,7 @@ const RecentTransfers: React.FC<Props> = ({ beneficiaries, recents }) => {
   );
 };
 
-const styles = StyleSheet.create({
+export const RecentTransferstyles  = StyleSheet.create({
   container: {
     marginTop: 15
   },
@@ -175,12 +175,12 @@ const styles = StyleSheet.create({
   tabText: {
     fontFamily: "Inter-Medium",
     fontSize: 14,
-    paddingBottom: 8
+    paddingBottom: 10
   },
   activeTabIndicator: {
-    height: 1,
+    height: 2,
     borderRadius: 10,
-    backgroundColor: "#F1FAFF",
+    backgroundColor: "#208BC9",
     width: "100%",
     position: "absolute",
     bottom: 0

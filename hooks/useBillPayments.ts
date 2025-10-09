@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Toast from "react-native-toast-message";
 import { SERVER_BASE_URL } from "../constants/Paths";
 import { useUser } from "@/contexts/UserContexts";
@@ -17,6 +17,99 @@ interface CableTvData {
 interface Response {
   success: boolean;
   message?: string;
+}
+
+interface CableTvProvider {
+  id: number;
+  country_name: string;
+  country_code: string;
+  country_dial_code: string;
+}
+
+interface ProviderRes<T> {
+  error: number;
+  response_code: number;
+  message: string;
+  success: boolean;
+  result: any[];
+}
+
+function useFetchCableTvProviders() {
+  const [tvProviders, setTvProviders] = useState<CableTvProvider[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const { config} = useUser()
+
+  const fetchData = async () => {
+    setLoading(true);
+
+    try {
+      const response = await axios.get<ProviderRes<CableTvProvider[]>>(
+        `${SERVER_BASE_URL}/user/cabletv/providers`, config
+      );
+
+      const result = response.data
+      console.log("Response data:", result);
+
+      if (result.success && result.response_code === 200) {
+        setTvProviders(result.result);
+      } 
+
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      const errorMessage =
+        axiosError.response?.data ||
+        "An error occurred while fetching TV providers.";
+
+      console.error("Error fetching data:", errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  return { tvProviders, loading, refetch: fetchData };
+}
+
+function useFetchElectricityProviders() {
+  const [powerProviders, setPowerProviders] = useState<CableTvProvider[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const { config} = useUser()
+
+  const fetchData = async () => {
+    setLoading(true);
+
+    try {
+      const response = await axios.get<ProviderRes<CableTvProvider[]>>(
+        `${SERVER_BASE_URL}/user/electricity/providers`, config
+      );
+
+      const result = response.data
+      console.log("Response data:", result);
+
+      if (result.success && result.response_code === 200) {
+        setPowerProviders(result.result);
+      } 
+
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      const errorMessage =
+        axiosError.response?.data ||
+        "An error occurred while fetching TV providers.";
+
+      console.error("Error fetching data:", errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  return { powerProviders, loading, refetch: fetchData };
 }
 
 const usePayCableTv = () => {
@@ -71,4 +164,8 @@ const usePayCableTv = () => {
   return { payCableTv, isLoading, error };
 };
 
-export {usePayCableTv};
+export {
+  useFetchCableTvProviders,
+  usePayCableTv,
+  useFetchElectricityProviders
+};

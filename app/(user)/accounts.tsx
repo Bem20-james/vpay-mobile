@@ -3,13 +3,13 @@ import { View, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/ThemedText";
 import Navigator from "@/components/Navigator";
-import images from "@/constants/Images";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { PaymentOption } from "@/components/PaymentOption";
 import { useFetchUserAssets } from "@/hooks/useUser";
 import { MotiView } from "moti";
 import AccountBottomSheet from "@/components/BottomSheets/Accounts";
 import { Colors } from "@/constants/Colors";
+import { SERVER_IMAGE_URL } from "@/constants/Paths";
 
 interface FiatAccount {
   fiat_currency_name: string;
@@ -29,7 +29,7 @@ interface CryptoAccount {
   balance: string;
   wallet_address: string;
   price?: string;
-  token_image?: string;
+  token_image: string;
 }
 
 const Accounts: React.FC = () => {
@@ -114,7 +114,7 @@ const Accounts: React.FC = () => {
                   key={`crypto-${index}`}
                   name={item.token_symbol}
                   label={item.token_name}
-                  image={item.token_image || images.logodark}
+                  image={{ uri: `${SERVER_IMAGE_URL}/${item?.token_image}` }}
                   balance={item.balance}
                   price={item.price}
                   type="crypto"

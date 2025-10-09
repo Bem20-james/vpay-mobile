@@ -18,7 +18,6 @@ const SettingsScreen: React.FC = () => {
   const [securityLock, setSecurityLock] = useState(false);
   const [make2FAVisible, setMake2FAVisible] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
-  const [hideBalance, setHideBalance] = useState(false);
   const colorScheme = useColorScheme();
   const boxBackgroundColor =
     colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
@@ -26,7 +25,6 @@ const SettingsScreen: React.FC = () => {
   const logout = useLogout();
   const { clearUser } = useUser();
 
-  console.log("hide Balance:", hideBalance)
 
   useEffect(() => {
     (async () => {
@@ -83,19 +81,7 @@ const SettingsScreen: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    (async () => {
-      const res = await getData<boolean>("hideBalance");
-      if (res.success && res.data !== null) {
-        setHideBalance(res.data);
-      }
-    })();
-  }, []);
 
-  const toggleHideBalance = async (value: boolean) => {
-    setHideBalance(value);
-    await storeData("hideBalance", value);
-  };
 
   if (make2FAVisible) {
     return (
@@ -143,14 +129,6 @@ const SettingsScreen: React.FC = () => {
                 hasChevron
                 onPress={() => router.push("/verification")}
                 iconColor="#218DC9"
-              />
-
-              <SettingItem
-                title="Hide Balance"
-                label="Hide your balance on the app"
-                hasSwitch
-                switchValue={hideBalance}
-                onSwitchChange={toggleHideBalance}
               />
 
               <SettingItem
@@ -244,7 +222,7 @@ const styles = StyleSheet.create({
     marginBottom: 12
   },
   bottomSection: {
-    marginTop: 40,
+    marginTop: 30,
     paddingBottom: 32
   }
 });

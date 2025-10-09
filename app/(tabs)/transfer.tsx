@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
-import RecentTransfers from "@/components/RecentTransfers";
+import RecentTransfers from "@/components/Recents/RecentTransfers";
 import Navigator from "@/components/Navigator";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
@@ -21,20 +21,9 @@ const TransferScreen: React.FC = () => {
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.container}>
-          <Navigator title="Send Money" showBackIcon={false} />
+        <Navigator title="Send Money" showBackIcon={false} />
 
-          <ThemedText style={styles.infoText}>
-            Free monthly transfers to other banks:
-            <ThemedText
-              style={styles.highlightText}
-              lightColor="#000000"
-              darkColor="#FFFFFF"
-            >
-              10
-            </ThemedText>
-          </ThemedText>
-
+        <View>
           <View style={{ flex: 1 }}>
             <QuickActionsSection
               actions={transferOptions.map((action) => {
@@ -60,20 +49,8 @@ const TransferScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   safeArea: {
-    flex: 1
-  },
-  container: {
+    flex: 1,
     marginHorizontal: 10
-  },
-  infoText: {
-    fontSize: 13,
-    fontFamily: "Questrial",
-    textAlign: "left",
-    color: "#a0a0a0"
-  },
-  highlightText: {
-    fontSize: 12,
-    fontFamily: "Inter-Medium"
   }
 });
 

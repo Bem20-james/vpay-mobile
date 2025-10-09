@@ -25,7 +25,7 @@ interface Item {
 interface CustomChipProps {
   items: Item[];
   selectedItem?: string | number | null;
-  onSelect: (id: string | number) => void;
+  onSelect: (item: Item) => void;
   containerStyle?: object;
   itemStyle?: object;
   isLoading?: boolean;
@@ -53,7 +53,7 @@ const CustomChip: React.FC<CustomChipProps> = ({
           isSelected && styles.selectedItem,
           itemStyle
         ]}
-        onPress={() => onSelect(item.id)}
+        onPress={() => onSelect(item)}
       >
         {item.icon ? (
           <MaterialIcons
@@ -80,38 +80,6 @@ const CustomChip: React.FC<CustomChipProps> = ({
       </TouchableOpacity>
     );
   };
-
-  // Skeleton loader using MotiView
-  // if (isLoading) {
-  //   const placeholders = Array.from({ length: 4 }).map((_, i) => ({ id: i })); // 6 fake items
-  //   return (
-  //     <FlatList
-  //       data={placeholders}
-  //       keyExtractor={(item) => `skeleton-${item.id}`}
-  //       numColumns={2}
-  //       key={"grid"}
-  //       style={[styles.list, containerStyle]}
-  //       contentContainerStyle={styles.gridContent}
-  //       renderItem={() => (
-  //         <MotiView
-  //           from={{ opacity: 0.3 }}
-  //           animate={{ opacity: 1 }}
-  //           transition={{
-  //             type: "timing",
-  //             duration: 800,
-  //             loop: true,
-  //           }}
-  //           style={[
-  //             styles.itemContainer,
-  //             {
-  //               backgroundColor: colorScheme === "dark" ? "#333" : "#E0E0E0",
-  //             },
-  //           ]}
-  //         />
-  //       )}
-  //     />
-  //   );
-  // }
 
   return (
     <FlatList
@@ -148,7 +116,7 @@ const styles = StyleSheet.create({
     height: 45
   },
   selectedItem: {
-    borderWidth: 1,
+    borderWidth: 0.7,
     borderColor: "#208BC9",
     backgroundColor: "#0A3A52"
   },

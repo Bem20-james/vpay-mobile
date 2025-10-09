@@ -78,7 +78,7 @@ const VpayTag = ({ onBack }: SendScreenProps) => {
     const delayedSearch = setTimeout(async () => {
       if (query.trim() && query.startsWith("@")) {
         try {
-          await resolveTag(query);
+          await resolveTag({ vpayTag: query });
         } catch (error) {
           console.log("Tag not found or network error");
         }
@@ -91,7 +91,7 @@ const VpayTag = ({ onBack }: SendScreenProps) => {
   if (storedLoading) {
     return (
       <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
-        <Navigator title="Vpay tag" />
+        <Navigator title="Vpay Tag" />
         <View
           style={[
             styles.container,
@@ -113,16 +113,10 @@ const VpayTag = ({ onBack }: SendScreenProps) => {
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
       <ScrollView>
-        <Navigator title="Vpay tag" />
+        <Navigator title="Vpay Tag" />
         <View style={styles.container}>
           {/* Search */}
           <View style={styles.searchContainer}>
-            <Feather
-              name="search"
-              size={20}
-              color="#208BC9"
-              style={styles.searchIcon}
-            />
             <TextInput
               style={styles.searchInput}
               placeholder="@VpayTag"

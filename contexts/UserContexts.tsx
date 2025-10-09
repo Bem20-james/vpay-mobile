@@ -31,6 +31,7 @@ export interface User {
     code: string;
     dial_code: string;
     name: string;
+    currency: string;
   };
   kyc?: {
     address: number;

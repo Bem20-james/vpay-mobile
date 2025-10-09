@@ -8,22 +8,6 @@ import { Colors } from "@/constants/Colors";
 import AssetsBottomSheet from "./BottomSheets/Assets";
 import { useFetchUserAssets } from "@/hooks/useUser";
 
-const currencies = [
-  {
-    code: "NGN",
-    name: "Nigerian Naira",
-    flag: "🇳🇬",     
-    balance: 1500.25
-  },
-  {
-    code: "GHS",
-    name: "Ghana Cedi",
-    flag: "🇬🇭",
-    balance: 2000.12
-  },
-  { code: "USD", name: "US Dollar", flag: "🇺🇸", balance: 123.45 }
-];
-
 type CurrencyFieldProps = {
   onBack?: () => void;
   title?: string;
@@ -52,33 +36,62 @@ const CurrencyField = ({
     <View>
       <View style={[styles.inputBox, { backgroundColor: bgColor }]}>
         <ThemedText style={styles.label}>Amount</ThemedText>
-        <View style={[styles.splitInput, { backgroundColor: inputBgColor }]}>
-          <Pressable
-            style={styles.currencySelector}
-            onPress={() => setShowCurrencySheet(true)}
-          >
-            <ThemedText style={{ fontSize: 18 }}>
-              {selectedCurrency.flag}
-            </ThemedText>
-            <ThemedText style={styles.currencyCode}>
-              {selectedCurrency.code}
-            </ThemedText>
-            <Ionicons name="chevron-down" size={16} color="#aaa" />
-          </Pressable>
-
-          <TextInput
-            value={amount}
-            onChangeText={setAmount}
-            keyboardType="number-pad"
-            placeholder="0.00"
-            placeholderTextColor="#aaaaaa"
-            style={[styles.amountInput, { color: txtColor }]}
-          />
-        </View>
-
-        <ThemedText style={styles.balances}>
-          Balance: ₦ {selectedCurrency.balance.toFixed(2)}
-        </ThemedText>
+          <View style={[styles.splitInput, { backgroundColor: inputBgColor }]}>
+            <Pressable
+              style={styles.currencySelector}
+              onPress={() => {
+                console.log("🔍 Currency selector pressed. Current:", selectedCurrency);
+                setShowCurrencySheet(true);
+              }}
+            >
+              {selectedCurrency ? (
+                <>
+                  <View style={styles.flagWrapper}>
+                    {selectedCurrency.image ? (
+                      <Image
+                        source={{ uri: `${SERVER_IMAGE_URL}/${selectedCurrency.image}` }}
+                        style={styles.flag}
+                      />
+                    ) : selectedCurrency.code ? (
+                      <CountryFlag
+                        isoCode={selectedCurrency.code}
+                        size={20}
+                        style={styles.flag}
+                      />
+                    ) : (
+                      <Image
+                        source={images.logodark}
+                        style={styles.logo}
+                      />
+                    )}
+                  </View>
+                  <ThemedText style={styles.currencyCode}>
+                    { selectedCurrency.currency_code ? (
+                      selectedCurrency.currency_code
+                    ) : (
+                      selectedCurrency.code
+                    )}
+                  </ThemedText>
+                </>
+              ) : (
+                <ThemedText style={styles.currencyCode}>Select</ThemedText>
+              )}
+              <Ionicons name="chevron-down" size={18} color="#aaa" />
+            </Pressable>
+            <TextInput
+              value={amount}
+              onChangeText={setAmount}
+              keyboardType="number-pad"
+              placeholder="0.00"
+              placeholderTextColor="#aaaaaa"
+              style={[styles.amountInput, { color: txtColor }]}
+            />
+          </View>
+            {selectedCurrency?.balance !== undefined && (
+              <ThemedText style={styles.balances}>
+                Balance: ₦ {Number(selectedCurrency.balance).toFixed(2)}
+              </ThemedText>
+            )}
       </View>
 
       <AssetsBottomSheet

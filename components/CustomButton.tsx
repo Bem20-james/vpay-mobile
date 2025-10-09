@@ -127,11 +127,11 @@ const CustomButton: React.FC<CustomButtonProps> = ({
         (isLoading || disabled) && { opacity: 0.5 }
       ]}
     >
-      {isLoading ? (
+      {/* {isLoading ? (
         <ThemedText>
           <ActivityIndicator size="small" color={finalLoadingColor} />
         </ThemedText>
-      ) : (
+      ) : ( */}
         <View style={styles.contentWrap}>
           {icon && <View style={styles.iconWrap}>{icon}</View>}
           <ThemedText
@@ -149,7 +149,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
             {title}
           </ThemedText>
         </View>
-      )}
+      {/* )} */}
     </TouchableOpacity>
   );
 };

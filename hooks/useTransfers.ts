@@ -134,10 +134,18 @@ const useSendLocal = () => {
     setError(null);
 
     try {
+      const { account_password, ...rest } = data;
+
       const response = await axios.post<FiatResponse>(
         `${SERVER_BASE_URL}/user/fiat/send/local`,
-        data,
-        config
+        rest, // send the rest of the fields as body
+        {
+          ...config, // keep existing headers (e.g., Authorization)
+          headers: {
+            ...config.headers,
+            "activity_pin": account_password, // <- send password in header
+          },
+        }
       );
 
       const result = response.data;

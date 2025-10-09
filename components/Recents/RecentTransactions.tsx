@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { ThemedText } from "./ThemedText";
+import { ThemedText } from "../ThemedText";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
@@ -52,13 +52,13 @@ const RecentTransaction: React.FC<Props> = ({
           style={({ pressed }) => [styles.more, { opacity: pressed ? 0.7 : 1 }]}
         >
           <ThemedText
-            style={{ fontFamily: "Inter-SemiBold" }}
+            style={{ fontFamily: "Inter-SemiBold", fontSize: 13 }}
             lightColor="#218DC9"
             darkColor="#218DC9"
           >
             see more
           </ThemedText>
-          <Entypo name="chevron-small-right" size={20} color={"#218DC9"} />
+          <Entypo name="chevron-small-right" size={20} color={"#218DC9"} style={{marginTop:3}} />
         </Pressable>
       </View>
       <FlatList
@@ -126,13 +126,13 @@ const styles = StyleSheet.create({
   },
   hero: {
     flexDirection: "row",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10
   },
   title: {
-    marginBottom: 10,
     fontFamily: "Inter-Medium",
-    fontWeight: 500,
-    fontSize: 14,
+    fontSize: 13,
     letterSpacing: 0
   },
   more: {

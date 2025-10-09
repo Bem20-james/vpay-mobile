@@ -14,8 +14,8 @@ import { ThemedText } from "@/components/ThemedText";
 import Toast from "react-native-toast-message";
 import { useLoader } from "@/contexts/LoaderContext";
 import { useLocalSearchParams, useNavigation } from "expo-router";
-import { useSendLocal } from "@/hooks/useTransfers";
 import Navigator from "@/components/Navigator";
+import { useTransactionDispatcher } from "@/hooks/useTransactionDispatcher";
 
 interface NumberButtonProps {
   number: string;
@@ -30,22 +30,16 @@ const AuthorizationPin: React.FC = () => {
   const [pin, setPin] = useState<string>("");
   const maxPinLength: number = 4;
   const { showLoader, hideLoader } = useLoader();
-  const { sendFunds } = useSendLocal();
   const navigation = useNavigation();
 
-  const {
-    account_number,
-    currency,
-    amount,
-    description,
-    account_password
-  } = useLocalSearchParams<{
-    account_number: string;
-    currency: string;
-    amount: string;
-    description?: string;
-    account_password: string;
-  }>();
+  const { account_number, currency, amount, description, account_password } =
+    useLocalSearchParams<{
+      account_number: string;
+      currency: string;
+      amount: string;
+      description?: string;
+      account_password: string;
+    }>();
 
   const handleNumberPress = (number: string): void => {
     if (pin.length < maxPinLength) {
@@ -63,7 +57,7 @@ const AuthorizationPin: React.FC = () => {
   };
 
   const renderPinDots = (): JSX.Element[] => {
-    return Array.from({ length: maxPinLength }, (_, index) =>
+    return Array.from({ length: maxPinLength }, (_, index) => (
       <View
         key={index}
         style={[
@@ -71,34 +65,38 @@ const AuthorizationPin: React.FC = () => {
           { backgroundColor: index < pin.length ? "#3B82F6" : "#BFDBFE" }
         ]}
       />
-    );
+    ));
   };
 
-  const NumberButton: React.FC<NumberButtonProps> = ({ number, onPress }) =>
+  const NumberButton: React.FC<NumberButtonProps> = ({ number, onPress }) => (
     <TouchableOpacity
       style={styles.numberButton}
       onPress={() => onPress(number)}
       activeOpacity={0.7}
     >
-      <ThemedText style={styles.numberText}>
-        {number}
-      </ThemedText>
-    </TouchableOpacity>;
+      <ThemedText style={styles.numberText}>{number}</ThemedText>
+    </TouchableOpacity>
+  );
 
   console.log("Current PIN:", pin);
+
+  const { transactionType, payload } = useLocalSearchParams<{
+    transactionType: string;
+    payload: any;
+  }>();
+
+  const { executeTransaction } = useTransactionDispatcher();
 
   const handleTransfer = async (finalPin: string) => {
     showLoader();
     try {
-      const success = await sendFunds({
-        account_number,
-        currency,
-        amount,
-        description,
-        account_password: finalPin // send the entered pin
-      });
+      const success = await executeTransaction(
+        transactionType,
+        payload,
+        finalPin
+      );
       if (success) {
-        setPin(""); // clear pin after success
+        setPin("");
         Toast.show({
           type: "success",
           text1: "Transaction completed successfully"
@@ -106,7 +104,7 @@ const AuthorizationPin: React.FC = () => {
         navigation.goBack();
       }
     } catch (error) {
-      setPin(""); // reset pin on failure
+      setPin("");
       Toast.show({
         type: "error",
         text1:
@@ -140,9 +138,7 @@ const AuthorizationPin: React.FC = () => {
               To complete this transaction, enter your 4-digit PIN
             </ThemedText>
 
-            <View style={styles.pinDotsContainer}>
-              {renderPinDots()}
-            </View>
+            <View style={styles.pinDotsContainer}>{renderPinDots()}</View>
 
             {/* Keypad */}
             <View style={styles.keypad}>
@@ -211,6 +207,7 @@ const styles = StyleSheet.create({
     borderRadius: 6
   },
   keypad: {
+    marginTop: 50,
     width: "100%",
     maxWidth: 300,
     flexDirection: "row",

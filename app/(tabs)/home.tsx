@@ -20,13 +20,14 @@ import CountryFlag from "react-native-country-flag";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { styles } from "@/styles/home";
 import QuickActionsSection from "@/components/QuickAction";
-import RecentTransaction from "@/components/RecentTransactions";
+import RecentTransaction from "@/components/Recents/RecentTransactions"
 import { quickActions, billOptions } from "@/assets/data";
 import { trnxHistory } from "@/assets/data";
 import StickyHeader from "@/components/StickyHeader";
 import OptionsBottomSheet from "@/components/BottomSheets/Options";
 import { useUser } from "@/contexts/UserContexts";
 import { Colors } from "@/constants/Colors";
+import { useFetchUserAssets } from "@/hooks/useUser";
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
@@ -43,8 +44,7 @@ export default function HomeScreen() {
   const headerOpacity = useRef(new Animated.Value(0)).current;
   const headerTranslateY = useRef(new Animated.Value(-50)).current;
   const { user} = useUser()
-
-  console.log("user:", user)
+  const {assets, loading} = useFetchUserAssets()
 
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
@@ -230,7 +230,7 @@ export default function HomeScreen() {
           </View>
         </ThemedView>
 
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, marginHorizontal: 10 }}>
           <QuickActionsSection
             actions={quickActions.map((action) => {
               if (action.label === "Pay bills") {

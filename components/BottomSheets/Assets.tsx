@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet, Image } from "react-native";
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { Portal } from "@gorhom/portal";
 import { ThemedText } from "../ThemedText";
@@ -7,21 +7,31 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { FontAwesome } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
+import CountryFlag from "react-native-country-flag";
+import { SERVER_IMAGE_URL } from "@/constants/Paths";
+import { btmSheetStyles } from "@/styles/bottomsheets";
 
-interface Currency {
-  code: string;
-  name: string;
-  flag: string;
+interface FiatAsset {
   balance: number;
+  country_code: string;
+  fiat_currency_name: string;
+  currency_code: string;
+}
+
+interface CryptoAsset {
+  token_name: string;
+  token_symbol: string;
+  balance: number;
+  token_image: string;
 }
 
 interface Props {
   isVisible: boolean;
   onClose: () => void;
-  currencies: Currency[];
-  onSelectCurrency: (currency: Currency) => void;
+  assets: { fiat: FiatAsset[]; crypto: CryptoAsset[] };
+  onSelectCurrency: (currency: any) => void;
   snapPoints?: string[];
-  selectedCurrency: Currency;
+  selectedCurrency: any;
   title?: string;
   isLoading?: boolean;
 }
@@ -29,11 +39,11 @@ interface Props {
 const AssetsBottomSheet = ({
   isVisible,
   onClose,
-  currencies,
+  assets,
   onSelectCurrency,
   selectedCurrency,
-  snapPoints = ["35%"],
-  title = "Select Currency",
+  snapPoints = ["40%"],
+  title = "Select Wallet",
   isLoading = false
 }: Props) => {
   const colorScheme = useColorScheme();
@@ -47,6 +57,36 @@ const AssetsBottomSheet = ({
 
   if (!isVisible) return null;
 
+  const fiatItems =
+    assets?.fiat?.map((item) => ({
+      name: item.fiat_currency_name,
+      country_code: item.country_code,
+      currency_code: item.currency_code,
+      balance: item.balance,
+      type: "fiat"
+    })) || [];
+
+  const cryptoItems =
+    assets?.crypto?.map((item) => ({
+      name: item.token_name,
+      country_code: item.token_symbol,
+      image: item.token_image,
+      balance: item.balance,
+      type: "crypto"
+    })) || [];
+
+  const combinedData = [...fiatItems, ...cryptoItems];
+
+  const renderSkeleton = () => (
+    <View
+      style={{
+        height: 40,
+        borderRadius: 6,
+        backgroundColor: "#e0e0e0"
+      }}
+    />
+  );
+
   return (
     <Portal>
       <BottomSheet
@@ -54,6 +94,7 @@ const AssetsBottomSheet = ({
         index={0}
         snapPoints={snapPoints}
         enablePanDownToClose
+        handleIndicatorStyle={btmSheetStyles.indicatorHandle}
         onClose={onClose}
         backgroundStyle={{
           backgroundColor:
@@ -65,48 +106,71 @@ const AssetsBottomSheet = ({
         <View style={styles.header}>
           <ThemedText style={styles.title}>{title}</ThemedText>
         </View>
-        <BottomSheetFlatList
-          data={currencies}
-          keyExtractor={(item) => item.code}
-          contentContainerStyle={{ paddingBottom: 24 }}
-          renderItem={({ item }) => {
-            const isSelected = item.code === selectedCurrency.code;
 
-            return (
-              <TouchableOpacity
-                style={styles.item}
-                onPress={() => {
-                  onSelectCurrency(item);
-                  sheetRef.current?.close();
-                }}
-              >
-                <View style={styles.flagWrapper}>
-                  <ThemedText style={styles.flag}>{item.flag}</ThemedText>
-                </View>
+        {isLoading ? (
+          // show 5 skeleton placeholders
+          <View style={{ padding: 16 }}>
+            {Array.from({ length: 5 }).map((_, idx) => (
+              <View key={idx} style={{ marginBottom: 16 }}>
+                {renderSkeleton()}
+              </View>
+            ))}
+          </View>
+        ) : (
+          <BottomSheetFlatList
+            data={combinedData}
+            keyExtractor={(item) => `${item.type}-${item.country_code}`}
+            contentContainerStyle={{ paddingBottom: 24 }}
+            renderItem={({ item }: { item: any }) => {
+              const isSelected = item.country_code === selectedCurrency.country_code;
 
-                <View style={styles.labelWrapper}>
-                  <ThemedText style={styles.label}>
-                    {item.name} ({item.code})
-                  </ThemedText>
-                </View>
+              return (
+                <TouchableOpacity
+                  style={styles.item}
+                  onPress={() => {
+                    onSelectCurrency(item);
+                    sheetRef.current?.close();
+                  }}
+                >
+                  <View style={styles.flagWrapper}>
+                    {"image" in item && item.image ? (
+                      <Image
+                        source={{ uri: `${SERVER_IMAGE_URL}/${item.image}` }}
+                        style={styles.flag}
+                      />
+                    ) : (
+                      <CountryFlag
+                        isoCode={item.country_code}
+                        size={20}
+                        style={{ borderRadius: 3 }}
+                      />
+                    )}
+                  </View>
 
-                <View style={styles.amountWrapper}>
-                  <ThemedText style={styles.amount}>
-                    {getSymbolFromCurrency(item.code) || "₦"}
-                    {item.balance.toFixed(2)}
-                  </ThemedText>
-                  {isSelected && (
-                    <FontAwesome
-                      name="dot-circle-o"
-                      size={15}
-                      color="#208BC9"
-                    />
-                  )}
-                </View>
-              </TouchableOpacity>
-            );
-          }}
-        />
+                  <View style={styles.labelWrapper}>
+                    <ThemedText style={styles.label}>{item.name}</ThemedText>
+                  </View>
+
+                  <View style={styles.amountWrapper}>
+                    <ThemedText style={styles.amount}>
+                      {"currency_code" in item && item.currency_code
+                        ? getSymbolFromCurrency(item.currency_code)
+                        : ""}
+                      {item.balance.toFixed(2)}
+                    </ThemedText>
+                    {isSelected && (
+                      <FontAwesome
+                        name="dot-circle-o"
+                        size={15}
+                        color="#208BC9"
+                      />
+                    )}
+                  </View>
+                </TouchableOpacity>
+              );
+            }}
+          />
+        )}
       </BottomSheet>
     </Portal>
   );
@@ -145,13 +209,15 @@ const styles = StyleSheet.create({
     gap: 6
   },
   flagWrapper: {
-    backgroundColor: "#E5F9FF",
-    padding: 6,
+    padding: 5,
     borderRadius: 50,
     marginRight: 12
   },
   flag: {
-    fontSize: 18
+    width: 30,
+    height: 30,
+    resizeMode: "contain",
+    borderRadius: 20
   },
   labelWrapper: {
     flex: 1

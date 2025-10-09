@@ -8,59 +8,87 @@ import { StatusBar } from "expo-status-bar";
 import Navigator from "@/components/Navigator";
 import FormField from "@/components/FormFields";
 import CustomButton from "@/components/CustomButton";
-import CustomChip from "@/components/CustomChips";
-import images from "@/constants/Images";
 import CustomTab from "@/components/CustomTabs";
 import TabContent from "@/components/TabContents";
 import { Colors } from "@/constants/Colors";
-import CurrencyField from "@/components/CurrencyField";
+import ProvidersInputField from "@/components/ProvidersInputField";
+import ProvidersBottomSheet from "@/components/BottomSheets/Providers";
+import { useFetchElectricityProviders } from "@/hooks/useBillPayments";
 
 const ElectricityScreen = () => {
   const colorScheme = useColorScheme();
-  const boxBackgroundColor =
-    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
-  const statusBarBg =
-    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const isDark = colorScheme === "dark";
+  const boxBackgroundColor = isDark
+    ? Colors.dark.background
+    : Colors.light.background;
+  const statusBarBg = isDark ? Colors.dark.background : Colors.light.background;
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("Airtime");
+
+  const [activeTab, setActiveTab] = useState("Prepaid");
+  const [selectedProvider, setSelectedProvider] = useState<any>(null);
+  const [showSheet, setShowSheet] = useState(false);
+
+  const { powerProviders, loading } = useFetchElectricityProviders();
+  console.log("electricity providers:", powerProviders);
 
   return (
     <SafeAreaView
       style={[styles.safeArea, { backgroundColor: boxBackgroundColor }]}
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Navigator title="Electricity" />
+        <ThemedText
+          lightColor="#9B9B9B"
+          darkColor="#EEF3FB"
+          style={styles.subtitle}
+        >
+          Top up your prepaid or postpaid meters with ease
+        </ThemedText>
         <View style={styles.container}>
-          <Navigator title="Electricity" />
-          <ThemedText
-            lightColor="#9B9B9B"
-            darkColor="#EEF3FB"
-            style={styles.subtitle}
-          >
-            Top up your prepaid or postpaid meters with ease
-          </ThemedText>
-
           <CustomTab
             tabs={["Prepaid", "Postpaid"]}
             onTabChange={setActiveTab}
           />
 
-          <View>
-            <FormField
-              handleChangeText={(value) => {}}
-              isDropdown
-              onDropdownPress={() => {}}
-              placeholder="Select power company"
-            />
-            <FormField
-              placeholder={"Meter number"}
-              handleChangeText={() => {}}
-              keyboardType="phone-pad"
-              isIcon
-              iconName="developer-board"
-            />
+            <TabContent activeTab={activeTab} tabKey="Prepaid">
 
-            <CurrencyField />
-          </View>
+            <View style={{ marginTop: 20 }}>
+              <ProvidersInputField
+                value={selectedProvider}
+                placeholder="Select Electricity Provider"
+                onPressDropdown={() => setShowSheet(true)}
+              />
+
+              <FormField
+                placeholder={"Smartcard/IUC Number"}
+                handleChangeText={() => {}}
+                otherStyles={{ marginTop: 15 }}
+                keyboardType="default"
+                isIcon
+                iconName="credit-card"s
+              />
+            </View>
+          </TabContent>
+
+            <TabContent activeTab={activeTab} tabKey="Postpaid">
+
+            <View style={{ marginTop: 10 }}>
+              <ProvidersInputField
+                value={selectedProvider}
+                placeholder="Select Cable Provider"
+                onPressDropdown={() => setShowSheet(true)}
+              />
+
+              <FormField
+                placeholder={"Smartcard/IUC Number"}
+                handleChangeText={() => {}}
+                otherStyles={{ marginTop: 15 }}
+                keyboardType="default"
+                isIcon
+                iconName="credit-card"
+              />
+            </View>
+          </TabContent>
 
           <CustomButton
             title={"Continue"}
@@ -71,6 +99,14 @@ const ElectricityScreen = () => {
           />
         </View>
       </ScrollView>
+
+      <ProvidersBottomSheet
+        isVisible={showSheet}
+        onClose={() => setShowSheet(false)}
+        onSelect={setSelectedProvider}
+        data={powerProviders || []}
+        loading={loading}
+      />
       <StatusBar style="dark" backgroundColor={statusBarBg} />
     </SafeAreaView>
   );
@@ -79,7 +115,7 @@ const ElectricityScreen = () => {
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: 10,
-    marginTop: 15
+    marginTop: 7
   },
   safeArea: {
     flex: 1,

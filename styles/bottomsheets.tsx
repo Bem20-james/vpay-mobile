@@ -20,7 +20,7 @@ export const btmSheetStyles = StyleSheet.create({
     borderBottomWidth: 0.5
   },
   label: {
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: "Questrial"
   },
   value: {
@@ -39,7 +39,7 @@ export const btmSheetStyles = StyleSheet.create({
   },
   item: {
     paddingVertical: 12,
-    paddingHorizontal: 16,
+    gap:5,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center"

@@ -11,13 +11,12 @@ import FormField from "@/components/FormFields";
 import CustomButton from "@/components/CustomButton";
 import CustomChip from "@/components/CustomChips";
 import { Colors } from "@/constants/Colors";
-import CurrencyField from "@/components/CurrencyField";
 
 const methods = [
-  { id: "1", text: "Betnaija", image: images.mtn },
-  { id: "2", text: "SportBet", image: images.ninemobile },
-  { id: "3", text: "BetBaba", image: images.glo },
-  { id: "4", text: "PariPesa", image: images.airtel }
+  { id: "1", provider_name: "Betnaija", image: images.mtn },
+  { id: "2", provider_name: "SportBet", image: images.ninemobile },
+  { id: "3", provider_name: "BetBaba", image: images.glo },
+  { id: "4", provider_name: "PariPesa", image: images.airtel }
 ];
 
 const BettingScreen = () => {
@@ -35,20 +34,19 @@ const BettingScreen = () => {
       style={[styles.safeArea, { backgroundColor: boxBackgroundColor }]}
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Navigator title="Betting" />
+        <ThemedText
+          lightColor="#9B9B9B"
+          darkColor="#EEF3FB"
+          style={styles.subtitle}
+        >
+          Fund your betting wallets easily
+        </ThemedText>
         <View style={styles.container}>
-          <Navigator title="Betting" />
-          <ThemedText
-            lightColor="#9B9B9B"
-            darkColor="#EEF3FB"
-            style={styles.subtitle}
-          >
-            Fund your betting wallets easily
-          </ThemedText>
-
           <CustomChip
             items={methods}
             selectedItem={selectedCategory}
-            onSelect={(id) => setSelectedCategory(id)}
+            onSelect={(provider) => setSelectedCategory(provider.provider_name)}
             containerStyle={{ marginVertical: 20 }}
           />
 
@@ -60,8 +58,6 @@ const BettingScreen = () => {
               isLeftIcon
               iconName="person"
             />
-
-            <CurrencyField />
           </View>
 
           <CustomButton

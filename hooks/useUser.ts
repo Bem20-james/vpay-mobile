@@ -54,6 +54,7 @@ function useFetchUserAssets() {
         config
       );
       const result = response.data;
+      console.log("Assets response:", result);
 
       if (result.code === 0) {
         setAssets(result.result);

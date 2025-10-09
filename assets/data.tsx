@@ -1,10 +1,26 @@
 import { ActionItem } from "@/components/QuickAction";
-import { HistoryItem } from "@/components/RecentTransactions";
+import { HistoryItem } from "@/components/Recents/RecentTransactions";
 import { OptionItem } from "@/components/BottomSheets/Options";
-import { TransferItem } from "@/components/RecentTransfers";
-import { Beneficiaries } from "@/components/RecentTransfers";
+import { TransferItem } from "@/components/Recents/RecentTransfers";
+import { Beneficiaries } from "@/components/Recents/RecentTransfers";
+import { AirtimeDataBeneficiaries, AirtimeDataRecents } from "@/components/Recents/AirtimeDataTrnx";
+import images from "@/constants/Images";
 
 export const quickActions: ActionItem[] = [
+  {
+    label: "To Vpay",
+    icon: "contactless-payment-circle",
+    backgroundColor: "#fff1eb",
+    iconColor: "#208DC9",
+    route: "/(transfers)/vpay-tag"
+  },
+  {
+    label: "To Bank",
+    icon: "bank",
+    backgroundColor: "#d2ebf1ff",
+    iconColor: "#0a7ea4",
+    route: "/(transfers)/local-bank"
+  },
   {
     label: "Airtime",
     icon: "phone",
@@ -407,4 +423,50 @@ export const countries = [
     name: "Rwanda",
     countryCode: "RW"
   }
+];
+
+export const airtimeDataRecents: AirtimeDataRecents[] = [
+  {
+    label: "GLO GH",
+    phone: "022788951",
+    image: images.logolight,
+  },
+  {
+    label: "9MOBILE NG",
+    phone: "09033788951",
+    image: images.logolight,
+  },
+  {
+    label: "MTN NG",
+    phone: "09122879851",
+    image: images.logolight,
+  },
+  {
+    label: "AIRTEL NG",
+    phone: "07044517951",
+    image: images.logolight,
+  },
+];
+
+export const airtimDataBeneficiaries: AirtimeDataBeneficiaries[] = [
+  {
+    label: "MTN NG",
+    phone: "0917943851",
+    image: images.logolight,
+  },
+  {
+    label: "AIRTEL NG",
+    phone: "09122879851",
+    image: images.logolight,
+  },
+  {
+    label: "GLO GH",
+    phone: "122879851",
+    image: images.logolight,
+  },
+  {
+    label: "9MOBILE NG",
+    phone: "0903879851",
+    image: images.logolight,
+  },
 ];

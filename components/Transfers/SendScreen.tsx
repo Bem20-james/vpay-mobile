@@ -1,5 +1,5 @@
 import { ScrollView, View, TextInput, Pressable, Image } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navigator from "@/components/Navigator";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { ThemedText } from "@/components/ThemedText";
@@ -11,24 +11,24 @@ import ReviewBottomSheet from "../BottomSheets/Review";
 import { Colors } from "@/constants/Colors";
 import { router } from "expo-router";
 import { useFetchUserAssets } from "@/hooks/useUser";
+import CountryFlag from "react-native-country-flag";
+import { SERVER_IMAGE_URL } from "@/constants/Paths";
+import { useLoader } from "@/contexts/LoaderContext"; // ✅ import loader context
+import images from "@/constants/Images";
 
-type AccountDetails = {
-  bank: string;
-  accountNumber: string;
-  name: string;
+type AccountDetails = { 
+  bank: string; 
+  accountNumber: string; 
+  name: string; 
+}; 
+
+type SendScreenProps = { 
+  onBack: () => void; 
+  title?: string; 
+  accountDetails: AccountDetails; 
 };
 
-type SendScreenProps = {
-  onBack: () => void;
-  title?: string;
-  accountDetails: AccountDetails;
-};
-
-const SendScreen = ({
-  onBack,
-  title = "Send to local",
-  accountDetails
-}: SendScreenProps) => {
+const SendScreen = ({ onBack, title = "Send to local", accountDetails } : SendScreenProps) => {
   const colorScheme = useColorScheme();
   const bgColor =
     colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
@@ -37,11 +37,32 @@ const SendScreen = ({
   const inputBgColor =
     colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
   const { assets, loading } = useFetchUserAssets();
-  console.log("Fetched Assets:", assets);
 
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
-  const [selectedCurrency, setSelectedCurrency] = useState(assets[0]);
+  const [selectedCurrency, setSelectedCurrency] = useState<any>(null);
+
+  const { showLoader, hideLoader } = useLoader();
+
+  const fiatAssets = assets?.fiat || [];
+  const cryptoAssets = assets?.crypto || [];
+  const allAssets = [...fiatAssets, ...cryptoAssets];
+
+  // set default only after assets load
+  useEffect(() => {
+    if (allAssets.length > 0 && !selectedCurrency) {
+      setSelectedCurrency(allAssets[0]);
+    }
+  }, [allAssets, selectedCurrency]);
+
+  useEffect(() => {
+    if (loading) {
+      showLoader({ message: "Loading assets..." });
+    } else {
+      hideLoader();
+    }
+  }, [loading]);
+
   const [showCurrencySheet, setShowCurrencySheet] = useState(false);
   const [showDetailsSheet, setDetailsShowSheet] = useState(false);
 
@@ -77,17 +98,45 @@ const SendScreen = ({
           <View style={[styles.splitInput, { backgroundColor: inputBgColor }]}>
             <Pressable
               style={styles.currencySelector}
-              onPress={() => setShowCurrencySheet(true)}
+              onPress={() => {
+                console.log("🔍 Currency selector pressed. Current:", selectedCurrency);
+                setShowCurrencySheet(true);
+              }}
             >
-              <ThemedText style={{ fontSize: 18 }}>
-                {selectedCurrency.flag}
-              </ThemedText>
-              <ThemedText style={styles.currencyCode}>
-                {selectedCurrency.code}
-              </ThemedText>
-              <Ionicons name="chevron-down" size={16} color="#aaa" />
+              {selectedCurrency ? (
+                <>
+                  <View style={styles.flagWrapper}>
+                    {selectedCurrency.image ? (
+                      <Image
+                        source={{ uri: `${SERVER_IMAGE_URL}/${selectedCurrency.image}` }}
+                        style={styles.flag}
+                      />
+                    ) : selectedCurrency.code ? (
+                      <CountryFlag
+                        isoCode={selectedCurrency.code}
+                        size={20}
+                        style={styles.flag}
+                      />
+                    ) : (
+                      <Image
+                        source={images.logodark}
+                        style={styles.logo}
+                      />
+                    )}
+                  </View>
+                  <ThemedText style={styles.currencyCode}>
+                    { selectedCurrency.currency_code ? (
+                      selectedCurrency.currency_code
+                    ) : (
+                      selectedCurrency.code
+                    )}
+                  </ThemedText>
+                </>
+              ) : (
+                <ThemedText style={styles.currencyCode}>Select</ThemedText>
+              )}
+              <Ionicons name="chevron-down" size={18} color="#aaa" />
             </Pressable>
-
             <TextInput
               value={amount}
               onChangeText={setAmount}
@@ -97,10 +146,11 @@ const SendScreen = ({
               style={[styles.amountInput, { color: txtColor }]}
             />
           </View>
-
-          <ThemedText style={styles.balances}>
-            Balance: ₦ {selectedCurrency.balance.toFixed(2)}
-          </ThemedText>
+            {selectedCurrency?.balance !== undefined && (
+              <ThemedText style={styles.balances}>
+                Balance: ₦ {Number(selectedCurrency.balance).toFixed(2)}
+              </ThemedText>
+            )}
         </View>
 
         {/* Note Section */}
@@ -116,12 +166,12 @@ const SendScreen = ({
         </View>
       </View>
 
-      {/* Currency Selection */}
       <AssetsBottomSheet
         isVisible={showCurrencySheet}
         onClose={() => setShowCurrencySheet(false)}
-        currencies={assets}
-        onSelectCurrency={currency => {
+        assets={assets}
+        onSelectCurrency={(currency) => {
+          console.log("Selected currency:", currency);
           setSelectedCurrency(currency);
           setShowCurrencySheet(false);
         }}
@@ -131,6 +181,7 @@ const SendScreen = ({
 
       {/* Review Sheet */}
       <ReviewBottomSheet
+        type="transfer"
         isVisible={showDetailsSheet}
         onClose={() => setDetailsShowSheet(false)}
         onPay={handlePay}
@@ -142,7 +193,6 @@ const SendScreen = ({
         selectedAsset={selectedCurrency}
       />
 
-      {/* Continue Button */}
       <View style={{ position: "relative" }}>
         <View
           style={{ position: "absolute", bottom: -300, left: 10, right: 10 }}

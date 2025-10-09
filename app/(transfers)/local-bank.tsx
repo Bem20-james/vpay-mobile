@@ -3,9 +3,7 @@ import {
   View,
   ScrollView,
   TextInput,
-  FlatList,
   ActivityIndicator,
-  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
@@ -16,13 +14,13 @@ import CustomButton from "@/components/CustomButton";
 import FormField from "@/components/FormFields";
 import SendScreen from "@/components/Transfers/SendScreen";
 import BanksBottomSheet from "@/components/BottomSheets/Banks";
-import { RenderItem } from "@/components/RenderItems";
 import { TransferStyles as styles } from "@/styles/transfers";
 import { styles as formStyles } from "@/styles/formfield";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { useFetchNgnBanks } from "@/hooks/useGeneral";
 import { useLookUpUser } from "@/hooks/useTransfers";
+import Toast from "react-native-toast-message";
 
 const LocalBank = () => {
   const colorScheme = useColorScheme();
@@ -33,20 +31,16 @@ const LocalBank = () => {
   const txtColor =
     colorScheme === "dark" ? Colors.light.accentBg : Colors.dark.background;
 
-  // State
   const [showSendScreen, setShowSendScreen] = useState(false);
   const [showBanksSheet, setShowBanksSheet] = useState(false);
 
   const [accountNumber, setAccountNumber] = useState("");
   const [selectedBank, setSelectedBank] = useState<any>(null);
-  const [accountName, setAccountName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
   const { banks, loading: banksLoading } = useFetchNgnBanks();
   const { acctInfo, lookup } = useLookUpUser();
-
-  console.log("Acct information:", acctInfo);
 
   // Avoid duplicate lookups
   const prevLookupParams = useRef({ accountNumber: "", bankCode: "" });
@@ -56,11 +50,7 @@ const LocalBank = () => {
     let isMounted = true;
 
     const fetchAccountName = async () => {
-      if (
-        accountNumber.length === 10 &&
-        selectedBank &&
-        isMounted
-      ) {
+      if (accountNumber.length === 10 && selectedBank && isMounted) {
         if (
           prevLookupParams.current.accountNumber === accountNumber &&
           prevLookupParams.current.bankCode === selectedBank.code
@@ -75,17 +65,13 @@ const LocalBank = () => {
 
         setIsLoading(true);
         setError("");
-        setAccountName("");
 
         const success = await stableLookup({
           bank_code: selectedBank.code,
           account_number: accountNumber,
         });
 
-        console.log("Lookup success:", success, acctInfo);
-        if (success) {
-          setAccountName(acctInfo?.account_name ?? "");
-        } else {
+        if (!success) {
           setError("Account not found");
         }
 
@@ -98,31 +84,24 @@ const LocalBank = () => {
     return () => {
       isMounted = false;
     };
-  }, [accountNumber, selectedBank, stableLookup, acctInfo]);
+  }, [accountNumber, selectedBank, stableLookup]);
 
   const handleBankSelect = (bank: { name: string; code: string }) => {
     setSelectedBank(bank);
     setShowBanksSheet(false);
-    setAccountName("");
     setError("");
   };
 
   const handleContinue = () => {
-    if (!accountName) {
-      Alert.alert("Error", "Please wait for account lookup to complete");
+    if (!acctInfo?.account_name) {
+      Toast.show({
+        type: "error",
+        text1: "Please wait for account lookup to complete",
+      });
       return;
     }
-
     setShowSendScreen(true);
   };
-
-  const beneficiaries = [
-    { name: "Mhembe Kelvin", handle: "@terdoo", isRecent: true, frequency: 1 },
-    { name: "Mama Praise", handle: "@mama", isRecent: true, frequency: 1 },
-    { name: "Samson Adi", handle: "@samadi", isRecent: true, frequency: 1 },
-    { name: "Don Culione", handle: "@deDon", isRecent: true, frequency: 1 },
-    { name: "Jimie Doe", handle: "@jimie", isRecent: true, frequency: 1 },
-  ];
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
@@ -133,6 +112,15 @@ const LocalBank = () => {
           <Navigator title="Send to Local Bank" />
           <View style={styles.container}>
             <FormField
+              title="Bank"
+              value={selectedBank?.name || ""}
+              handleChangeText={() => {}}
+              placeholder="Select Bank"
+              isDropdown
+              onDropdownPress={() => setShowBanksSheet(true)}
+            />
+
+            <FormField
               title="Account Number"
               value={accountNumber}
               handleChangeText={setAccountNumber}
@@ -141,18 +129,8 @@ const LocalBank = () => {
               maxLength={10}
             />
 
-            {/* Bank */}
-            <FormField
-              title="Bank"
-              value={selectedBank?.name || ""}
-              handleChangeText={() => { }}
-              placeholder="Select Bank"
-              isDropdown
-              onDropdownPress={() => setShowBanksSheet(true)}
-            />
-
             {/* Account Name */}
-            <View style={{ marginTop: 16 }}>
+            <View style={{ marginTop: 7 }}>
               <ThemedText
                 type="default"
                 style={{ marginLeft: 6, marginBottom: 8 }}
@@ -166,8 +144,8 @@ const LocalBank = () => {
                     borderColor: error
                       ? "#FF6B6B"
                       : colorScheme === "dark"
-                        ? "#414141"
-                        : "#d7d7d7",
+                      ? "#414141"
+                      : "#d7d7d7",
                     height: 45,
                     flexDirection: "row",
                     alignItems: "center",
@@ -182,16 +160,16 @@ const LocalBank = () => {
                     style={[
                       formStyles.input,
                       {
-                        color: accountName ? txtColor : "#9B9B9B",
-                        fontSize: accountName ? 15 : 12,
+                        color: acctInfo?.account_name ? txtColor : "#9B9B9B",
+                        fontSize: acctInfo?.account_name ? 15 : 12,
                         fontFamily: "Questrial",
-                        fontWeight: accountName ? "600" : "400",
+                        fontWeight: acctInfo?.account_name ? "700" : "400",
                         flex: 1,
                       },
                     ]}
                     placeholder="Account name will appear here"
                     placeholderTextColor="#9B9B9B"
-                    value={accountName}
+                    value={acctInfo?.account_name ?? ""}
                     editable={false}
                   />
                 )}
@@ -217,46 +195,34 @@ const LocalBank = () => {
               handlePress={handleContinue}
               btnStyles={{
                 marginTop: 32,
-                opacity: accountNumber.length === 10 &&
+                opacity:
+                  accountNumber.length === 10 &&
                   selectedBank &&
-                  accountName
-                  ? 1
-                  : 0.6,
+                  acctInfo?.account_name
+                    ? 1
+                    : 0.6,
               }}
               disabled={
-                !(accountNumber.length === 10 && selectedBank && accountName)
-              }
-            />
-
-            {/* Recent Beneficiaries */}
-            <FlatList
-              data={beneficiaries}
-              keyExtractor={(item) => item.handle}
-              nestedScrollEnabled
-              scrollEnabled={false}
-              renderItem={({ item }) => <RenderItem item={item} />}
-              ListHeaderComponent={
-                <ThemedText style={[styles.sectionHeader, { marginTop: 30 }]}>
-                  Recent Beneficiaries
-                </ThemedText>
+                !(accountNumber.length === 10 && selectedBank && acctInfo?.account_name)
               }
             />
           </View>
-            <BanksBottomSheet
-              isVisible={showBanksSheet}
-              onClose={() => setShowBanksSheet(false)}
-              data={banks}
-              onSelect={handleBankSelect}
-              isLoading={banksLoading}
-            />
+
+          <BanksBottomSheet
+            isVisible={showBanksSheet}
+            onClose={() => setShowBanksSheet(false)}
+            data={banks}
+            onSelect={handleBankSelect}
+            isLoading={banksLoading}
+          />
         </ScrollView>
       ) : (
-        <SendScreen 
+        <SendScreen
           onBack={() => setShowSendScreen(false)}
           accountDetails={{
             accountNumber,
             bank: selectedBank?.name ?? "",
-            name: accountName,
+            name: acctInfo?.account_name ?? "",
           }}
         />
       )}
