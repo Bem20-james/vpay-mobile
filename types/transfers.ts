@@ -4,14 +4,21 @@ export type SendScreenProps = {
 };
 
 export interface ResolveTag {
-  vpay_tag: string;
+  username: string;
+  firstname: string;
+  lastname: string;
+  avatar?: string;
+  phone: string | number;
+  number: string | number;
+  country_code: string;
+  bank: string;
 }
 
 export interface ResolveRes {
-  error: number;
+  code: number;
   message: string;
   success: boolean;
-  result: ResolveTag[];
+  result: ResolveTag;
 }
 
 export interface LookUpDataRes {

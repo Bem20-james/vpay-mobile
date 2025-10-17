@@ -6,8 +6,7 @@ import CustomButton from "@/components/CustomButton";
 import { Colors } from "@/constants/Colors";
 import { useLoader } from "@/contexts/LoaderContext";
 import ReviewBottomSheet from "@/components/BottomSheets/Review";
-import MobileDataField from "@/components/ServiceOptionsField";
-import { useFetchDataOptions } from "@/hooks/useDataPurchase";
+import ServiceOptionsField from "@/components/ServiceOptionsField";
 import { ThemedText } from "./ThemedText";
 import { Ionicons } from "@expo/vector-icons";
 import CountryFlag from "react-native-country-flag";
@@ -16,6 +15,7 @@ import { SERVER_IMAGE_URL } from "@/constants/Paths";
 import getSymbolFromCurrency from "currency-symbol-map";
 import AssetsBottomSheet from "./BottomSheets/Assets";
 import { useFetchUserAssets } from "@/hooks/useUser";
+import { useServiceOptions } from "@/hooks/useServiceOptions";
 
 type Currency = {
   country_code?: string;
@@ -25,23 +25,23 @@ type Currency = {
   balance: number;
 };
 
-type InputProps = {
-  quickAmounts?: number[];
+type ServicesDispatcherProps = {
+  type: "data" | "electricity" | "cable";
   title?: string;
-  phoneNumber: string;
+  number: string;
   provider: string;
-  methodtitle?: string;
-  onBack?: () => void;
+  name?: string;
   onCurrencyChange?: (currency: Currency) => void;
-  onAmountChange?: (amount: string, hasError: boolean) => void;
 };
 
-const DataOptionsSelect = ({
+const ServicesDispatcher = ({
+  type,
   title = "Payment method",
-  phoneNumber,
+  number,
   provider,
+  name,
   onCurrencyChange
-}: InputProps) => {
+}: ServicesDispatcherProps) => {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
@@ -52,7 +52,9 @@ const DataOptionsSelect = ({
   const router = useRouter();
   const { showLoader, hideLoader } = useLoader();
 
-  const { options, loading: optionsLoading } = useFetchDataOptions(provider);
+  // ✅ Unified API data fetch using our custom hook
+  console.log("sending provider in lowercase:", provider)
+  const { options, loading: optionsLoading } = useServiceOptions(type, provider);
   const { assets, loading } = useFetchUserAssets();
 
   const [selectedAmount, setSelectedAmount] = useState<any>(null);
@@ -66,12 +68,6 @@ const DataOptionsSelect = ({
 
   useEffect(() => {
     if (allAssets?.length > 0 && !selectedCurrency) {
-      setSelectedCurrency(allAssets[0]);
-    }
-  }, [allAssets, selectedCurrency]);
-
-  useEffect(() => {
-    if (allAssets.length > 0 && !selectedCurrency) {
       const firstAsset = allAssets[0];
       setSelectedCurrency(firstAsset);
       onCurrencyChange?.(firstAsset);
@@ -91,19 +87,45 @@ const DataOptionsSelect = ({
     router.push({
       pathname: "/(transfers)/authorization-pin",
       params: {
-        transactionType: "airtime",
-        payload: [phoneNumber, selectedCurrency, selectedAmount, provider]
+        transactionType: type, // ✅ dynamic transaction type
+        payload: [number, selectedCurrency, selectedAmount, provider]
       }
     });
   };
 
   return (
     <>
-      <View style={optionsstyles.container}>
+      <View style={optionsStyles.container}>
+        <View
+          style={[
+            styles.recipient,
+            { backgroundColor: bgColor, marginTop: 20 }
+          ]}
+        >
+          <Image
+            source={require("@/assets/images/adaptive-icon.png")}
+            style={styles.logo}
+          />
+          <View>
+            <ThemedText style={styles.recipientName}>{name}</ThemedText>
+            <ThemedText style={styles.recipientDetails}>
+              {number} {provider}
+            </ThemedText>
+          </View>
+        </View>
+
+        {/* ✅ Generic options component */}
+        <ServiceOptionsField
+          type={type}
+          title={title}
+          data={options}
+          onSelect={(option) => setSelectedAmount(option?.amount)}
+        />
+
         <View
           style={[styles.inputBox, { backgroundColor: bgColor, marginTop: 20 }]}
         >
-          <ThemedText style={styles.label}>{title}</ThemedText>
+          <ThemedText style={styles.label}>{"Payment Method"}</ThemedText>
           <View
             style={[
               styles.splitInput,
@@ -112,7 +134,7 @@ const DataOptionsSelect = ({
             ]}
           >
             <View>
-              <ThemedText style={optionsstyles.descTxt}>Wallet</ThemedText>
+              <ThemedText style={optionsStyles.descTxt}>Select wallet</ThemedText>
               <Pressable
                 style={styles.currencySelector}
                 onPress={() => setShowCurrencySheet(true)}
@@ -149,7 +171,7 @@ const DataOptionsSelect = ({
             </View>
 
             <View>
-              <ThemedText style={optionsstyles.descTxt}>Balance</ThemedText>
+              <ThemedText style={optionsStyles.descTxt}>Balance</ThemedText>
               {selectedCurrency?.balance !== undefined && (
                 <ThemedText style={styles.mainBal}>
                   <ThemedText
@@ -176,15 +198,10 @@ const DataOptionsSelect = ({
           )}
         </View>
 
-        <MobileDataField
-          bundles={options}
-          onSelectBundle={(bundle) => setSelectedAmount(bundle?.amount)}
-        />
-
         <CustomButton
           title={"Continue"}
           handlePress={() => setShowReviewSheet(true)}
-          btnStyles={{ marginTop: 10 }}
+          btnStyles={{ marginTop: 30 }}
           variant="primary"
           size="medium"
           disabled={!selectedAmount}
@@ -205,12 +222,12 @@ const DataOptionsSelect = ({
       />
 
       <ReviewBottomSheet
-        type="data"
+        type={"data"}
         isVisible={showReviewSheet}
         onClose={() => setShowReviewSheet(false)}
         onPay={handlePay}
         amount={selectedAmount}
-        phoneNumber={phoneNumber}
+        phoneNumber={number}
         provider={provider}
         rate="10"
         selectedAsset={selectedCurrency}
@@ -219,15 +236,15 @@ const DataOptionsSelect = ({
   );
 };
 
-const optionsstyles = StyleSheet.create({
+const optionsStyles = StyleSheet.create({
   container: {
     marginHorizontal: 7
   },
-
   descTxt: {
     fontFamily: "Questrial",
     fontSize: 12,
     color: "#2c404aff"
-  }
+  },
 });
-export default DataOptionsSelect;
+
+export default ServicesDispatcher;

@@ -1,9 +1,5 @@
 import React, { useRef } from "react";
-import {
-  TouchableOpacity,
-  View,
-  ActivityIndicator,
-} from "react-native";
+import { TouchableOpacity, View, ActivityIndicator } from "react-native";
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { Portal } from "@gorhom/portal";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -53,6 +49,7 @@ const OptionsBottomSheet = ({
         index={0}
         snapPoints={snapPoints}
         enablePanDownToClose
+        handleIndicatorStyle={btmSheetStyles.indicatorHandle}
         onClose={onClose}
         backgroundStyle={{
           backgroundColor:

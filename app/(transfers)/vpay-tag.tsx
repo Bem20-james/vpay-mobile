@@ -1,29 +1,44 @@
-import { ScrollView, View, TextInput, ActivityIndicator } from "react-native";
-import React, { useState, useEffect, useMemo } from "react";
-import Navigator from "@/components/Navigator";
+import React, { useState, useMemo, useEffect } from "react";
+import {
+  ScrollView,
+  View,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Navigator from "@/components/Navigator";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { StatusBar } from "expo-status-bar";
-import { ThemedText } from "@/components/ThemedText";
-import { Feather } from "@expo/vector-icons";
 import { TransferStyles as styles } from "@/styles/transfers";
 import { Colors } from "@/constants/Colors";
-import { SendScreenProps } from "@/types/transfers";
 import { useResolveVpayTag } from "@/hooks/useTransfers";
 import { useContacts, useVpayContacts } from "@/hooks/useContacts";
-import ContactSection from "../../components/ContactSection";
+import ContactSection from "@/components/ContactSection";
+import RecentBeneficiaries from "@/components/Recents/RecentsBeneficiaries";
+import SendScreen from "@/components/Transfers/SendScreen";
+import { StoredContact } from "@/utils/encryptedStore";
+import { ThemedText } from "@/components/ThemedText";
 
-const VpayTag = ({ onBack }: SendScreenProps) => {
+const VpayTag = () => {
   const colorScheme = useColorScheme();
-  const backgroundColor =
-    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
-  const statusBarBg =
-    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const isDark = colorScheme === "dark";
+  const backgroundColor = isDark
+    ? Colors.dark.background
+    : Colors.light.background;
 
+  const [selectedVpayUser, setSelectedVpayUser] = useState<any | null>(null);
+  const [showSendScreen, setShowSendScreen] = useState(false);
   const [query, setQuery] = useState("");
-  const [vpayContactsLoaded, setVpayContactsLoaded] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
-  const { resolveTag } = useResolveVpayTag();
+  // ✅ API hook
+  const { resolveTag, acctInfo, loading: apiLoading } = useResolveVpayTag();
+  console.log("acct info in vpaytag:", acctInfo)
+
+  // ✅ Local contacts
   const {
     recentContacts,
     savedBeneficiaries,
@@ -38,15 +53,7 @@ const VpayTag = ({ onBack }: SendScreenProps) => {
     searchVpayContacts
   } = useVpayContacts();
 
-  // Load Vpay contacts on component mount
-  useEffect(() => {
-    if (!vpayContactsLoaded) {
-      loadVpayContacts();
-      setVpayContactsLoaded(true);
-    }
-  }, []);
-
-  // Filter contacts based on search query
+  // ✅ Filter local results before calling backend
   const filteredContacts = useMemo(() => {
     if (!query.trim()) {
       return {
@@ -60,9 +67,9 @@ const VpayTag = ({ onBack }: SendScreenProps) => {
     const vpayResults = searchVpayContacts(query);
 
     return {
-      recent: storedResults.recent,
-      saved: storedResults.saved,
-      vpay: vpayResults
+      recent: storedResults.recent ?? [],
+      saved: storedResults.saved ?? [],
+      vpay: vpayResults ?? []
     };
   }, [
     query,
@@ -73,98 +80,143 @@ const VpayTag = ({ onBack }: SendScreenProps) => {
     searchVpayContacts
   ]);
 
-  // Handle backend tag resolution when user finishes typing
+  // ✅ Search effect: only hit backend when all local searches are empty
   useEffect(() => {
-    const delayedSearch = setTimeout(async () => {
-      if (query.trim() && query.startsWith("@")) {
+    const timeout = setTimeout(async () => {
+      const hasLocalResults =
+        filteredContacts.recent.length > 0 ||
+        filteredContacts.saved.length > 0 ||
+        filteredContacts.vpay.length > 0;
+
+      if (query.trim() && !hasLocalResults) {
+        setIsSearching(true);
+        setSearchError(null);
+
         try {
-          await resolveTag({ vpayTag: query });
-        } catch (error) {
-          console.log("Tag not found or network error");
+          await resolveTag({ vpay_tag: query.trim() });
+        } catch (err) {
+          console.log("Resolve tag failed:", err);
+          setSearchError("User not found");
+        } finally {
+          setIsSearching(false);
         }
       }
-    }, 500);
+    }, 600);
 
-    return () => clearTimeout(delayedSearch);
-  }, [query, resolveTag]);
+    return () => clearTimeout(timeout);
+  }, [query, filteredContacts, resolveTag]);
 
-  if (storedLoading) {
-    return (
-      <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
-        <Navigator title="Vpay Tag" />
-        <View
-          style={[
-            styles.container,
-            { justifyContent: "center", alignItems: "center" }
-          ]}
-        >
-          <ActivityIndicator size="large" color="#208BC9" />
-          <ThemedText style={{ marginTop: 10 }}>Loading contacts...</ThemedText>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  const handleSelect = (contact: any) => {
+    setSelectedVpayUser(contact);
+    setShowSendScreen(true);
+  };
 
-  const hasAnyContacts =
-    filteredContacts.recent.length > 0 ||
-    filteredContacts.saved.length > 0 ||
-    filteredContacts.vpay.length > 0;
+  const showAcctInfo = acctInfo && !apiLoading && !filteredContacts.vpay.length;
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
-      <ScrollView>
-        <Navigator title="Vpay Tag" />
-        <View style={styles.container}>
-          {/* Search */}
-          <View style={styles.searchContainer}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="@VpayTag"
-              placeholderTextColor="#041723"
-              value={query}
-              onChangeText={setQuery}
-              autoCapitalize="none"
-            />
-          </View>
+      {!showSendScreen ? (
+        <ScrollView>
+          <Navigator title="Vpay Tag" />
 
-          {/* Recent Beneficiaries */}
-          <ContactSection
-            title="Recent Beneficiaries"
-            contacts={filteredContacts.recent}
-            keyPrefix="recent"
-            sectionHeaderStyle={[styles.sectionHeader, { marginTop: 5 }]}
-          />
-
-          {/* Saved Beneficiaries */}
-          <ContactSection
-            title="Saved Beneficiaries"
-            contacts={filteredContacts.saved}
-            keyPrefix="saved"
-            sectionHeaderStyle={styles.sectionHeader}
-          />
-
-          {/* Vpay Contacts */}
-          <ContactSection
-            title="Vpay Contacts"
-            contacts={filteredContacts.vpay}
-            keyPrefix="vpay"
-            loading={vpayLoading}
-            onRefresh={loadVpayContacts}
-            emptyMessage="No contacts using Vpay found"
-            sectionHeaderStyle={styles.sectionHeader}
-          />
-
-          {/* No results */}
-          {!hasAnyContacts && !vpayLoading && (
-            <View style={{ marginTop: 50, alignItems: "center" }}>
-              <ThemedText style={{ opacity: 0.6 }}>
-                {query.trim() ? "No contacts found" : "No contacts available"}
-              </ThemedText>
+          <View style={styles.container}>
+            {/* 🔍 Search input */}
+            <View style={styles.searchContainer}>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="@vpaytag"
+                placeholderTextColor="#041723"
+                value={query}
+                onChangeText={setQuery}
+                autoCapitalize="none"
+              />
             </View>
-          )}
-        </View>
-      </ScrollView>
-      <StatusBar style="dark" backgroundColor={statusBarBg} />
+
+            {/* 🔍 Searching indicator */}
+            {(isSearching || apiLoading) && (
+              <View style={{ marginTop: 15, alignItems: "center" }}>
+                <ActivityIndicator size="small" color="#999" />
+                <ThemedText style={{ opacity: 0.6, marginTop: 8 }}>
+                  Searching for {query}...
+                </ThemedText>
+              </View>
+            )}
+
+            {/* ❌ Search Error */}
+            {searchError && (
+              <ThemedText
+                style={{ color: "red", textAlign: "center", marginTop: 10 }}
+              >
+                {searchError}
+              </ThemedText>
+            )}
+
+            {/* ✅ Backend result */}
+            {showAcctInfo && (
+              <TouchableOpacity
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 10,
+                  backgroundColor: "#1A1A1A",
+                  padding: 10,
+                  borderRadius: 10,
+                  marginTop: 10
+                }}
+                onPress={() => handleSelect(acctInfo)}
+              >
+                <Image
+                  source={{
+                    uri: acctInfo?.avatar ?? "https://placehold.co/100"
+                  }}
+                  style={{ width: 40, height: 40, borderRadius: 20 }}
+                />
+                <View>
+                  <ThemedText style={{ fontSize: 14, fontWeight: "600" }}>
+                    {acctInfo?.username}
+                  </ThemedText>
+                  <ThemedText style={{ fontSize: 12, color: "#999" }}>
+                    {acctInfo?.firstname || acctInfo?.lastname}
+                  </ThemedText>
+                </View>
+              </TouchableOpacity>
+            )}
+
+            {/* 🕓 Local Contacts Sections */}
+            {!query && (
+              <>
+                <RecentBeneficiaries
+                  title="Recent"
+                  recents={filteredContacts.recent}
+                  loading={storedLoading}
+                  beneficiaries={filteredContacts.saved}
+                  onSelect={handleSelect}
+                />
+                <ContactSection
+                  title="Vpay Contacts"
+                  contacts={filteredContacts.vpay}
+                  loading={vpayLoading}
+                  onRefresh={loadVpayContacts}
+                  emptyMessage="No contacts using Vpay found"
+                  onSelect={handleSelect}
+                />
+              </>
+            )}
+          </View>
+        </ScrollView>
+      ) : (
+        <SendScreen
+          onBack={() => setShowSendScreen(false)}
+          title="Send to Vpay Tag"
+          accountDetails={{
+            accountNumber: "",
+            bank: selectedVpayUser?.handle ?? "",
+            name: selectedVpayUser?.name ?? ""
+          }}
+        />
+      )}
+
+      <StatusBar style="dark" backgroundColor={backgroundColor} />
     </SafeAreaView>
   );
 };

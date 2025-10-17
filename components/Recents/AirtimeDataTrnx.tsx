@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   TextInput,
   TouchableOpacity,
   Pressable,
   FlatList,
-  Image
+  Image,
 } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { Colors } from "@/constants/Colors";
@@ -13,58 +13,61 @@ import { TransferStyles } from "@/styles/transfers";
 import { Feather } from "@expo/vector-icons";
 import { ThemedText } from "../ThemedText";
 import { RecentTransferstyles as styles } from "./RecentTransfers";
-import images from "@/constants/Images";
 
-export interface AirtimeDataRecents {
+export interface ContactItem {
   label: string;
-  image: any;
-  phone: string;
-}
-
-export interface AirtimeDataBeneficiaries {
-  label: string;
-  image: any;
-  phone: string;
+  image?: any;
+  identifier: string; // could be phone, username, or account number
 }
 
 interface Props {
+  /** Component title (e.g. "Select Beneficiary", "Select Recipient") */
   title?: string;
-  recents: AirtimeDataRecents[];
-  beneficiaries: AirtimeDataBeneficiaries[];
+  /** Array of recent transactions */
+  recents?: ContactItem[];
+  /** Array of saved beneficiaries */
+  beneficiaries?: ContactItem[];
+  /** Placeholder text for search input */
+  searchPlaceholder?: string;
+  /** Called when a contact is selected */
+  onSelect?: (contact: ContactItem) => void;
+  /** Optional filter for query search */
+  searchBy?: keyof ContactItem;
 }
 
-const AirtimeDataTrnxs: React.FC<Props> = ({ beneficiaries, recents }) => {
+const ContactsSection: React.FC<Props> = ({
+  title = "Select Beneficiary",
+  recents = [],
+  beneficiaries = [],
+  searchPlaceholder = "Search contact",
+  onSelect,
+  searchBy = "identifier",
+}) => {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
-  const [query, setQuery] = useState("");
 
-  const [activeTab, setActiveTab] = useState<"Recents" | "Beneficiaries">(
-    "Recents"
-  );
-  const data = activeTab === "Recents" ? recents : beneficiaries;
+  const [query, setQuery] = useState("");
+  const [activeTab, setActiveTab] = useState<"Recents" | "Beneficiaries">("Recents");
+
+  const currentData = activeTab === "Recents" ? recents : beneficiaries;
+
+  const filteredData = currentData.filter((item) => {
+    if (!query.trim()) return true;
+    const field = item[searchBy] ?? "";
+    return field.toLowerCase().includes(query.toLowerCase());
+  });
 
   return (
-    <View
-      style={[
-        TransferStyles.inputBox,
-        { backgroundColor: bgColor, marginTop: 20 }
-      ]}
-    >
-      <ThemedText style={TransferStyles.label}>
-        {"Select Beneficiary"}
-      </ThemedText>
+    <View style={[TransferStyles.inputBox, { backgroundColor: bgColor, marginTop: 20 }]}>
+      <ThemedText style={TransferStyles.label}>{title}</ThemedText>
 
+      {/* Search Input */}
       <View style={[TransferStyles.searchContainer, { marginBottom: 20 }]}>
-        <Feather
-          name="search"
-          size={20}
-          color="#208BC9"
-          style={TransferStyles.searchIcon}
-        />
+        <Feather name="search" size={20} color="#208BC9" style={TransferStyles.searchIcon} />
         <TextInput
           style={TransferStyles.searchInput}
-          placeholder="Search phone number"
+          placeholder={searchPlaceholder}
           placeholderTextColor="#989898"
           value={query}
           onChangeText={setQuery}
@@ -72,44 +75,31 @@ const AirtimeDataTrnxs: React.FC<Props> = ({ beneficiaries, recents }) => {
         />
       </View>
 
+      {/* Tabs */}
       <View style={styles.tabContainer}>
-        <Pressable
-          onPress={() => setActiveTab("Recents")}
-          style={styles.tabWrapper}
-        >
-          <ThemedText
-            lightColor={activeTab === "Recents" ? "#218DC9" : "#9B9B9B"}
-            darkColor={activeTab === "Recents" ? "#218DC9" : "#9B9B9B"}
-            style={styles.tabText}
+        {["Recents", "Beneficiaries"].map((tab) => (
+          <Pressable
+            key={tab}
+            onPress={() => setActiveTab(tab as "Recents" | "Beneficiaries")}
+            style={styles.tabWrapper}
           >
-            Recent
-          </ThemedText>
-          {activeTab === "Recents" && (
-            <View style={styles.activeTabIndicator} />
-          )}
-        </Pressable>
-
-        <Pressable
-          onPress={() => setActiveTab("Beneficiaries")}
-          style={styles.tabWrapper}
-        >
-          <ThemedText
-            lightColor={activeTab === "Beneficiaries" ? "#218DC9" : "#9B9B9B"}
-            darkColor={activeTab === "Beneficiaries" ? "#218DC9" : "#9B9B9B"}
-            style={styles.tabText}
-          >
-            Beneficiaries
-          </ThemedText>
-          {activeTab === "Beneficiaries" && (
-            <View style={styles.activeTabIndicator} />
-          )}
-        </Pressable>
+            <ThemedText
+              lightColor={activeTab === tab ? "#218DC9" : "#9B9B9B"}
+              darkColor={activeTab === tab ? "#218DC9" : "#9B9B9B"}
+              style={styles.tabText}
+            >
+              {tab}
+            </ThemedText>
+            {activeTab === tab && <View style={styles.activeTabIndicator} />}
+          </Pressable>
+        ))}
       </View>
 
+      {/* List */}
       <FlatList
-        data={data}
-        keyExtractor={(item, index) => `${item.label}-${index}`}
-        nestedScrollEnabled={true}
+        data={filteredData}
+        keyExtractor={(item, index) => `${item.identifier}-${index}`}
+        nestedScrollEnabled
         scrollEnabled={false}
         renderItem={({ item }) => (
           <TouchableOpacity
@@ -117,29 +107,23 @@ const AirtimeDataTrnxs: React.FC<Props> = ({ beneficiaries, recents }) => {
               marginTop: 7,
               padding: 10,
               borderTopColor: isDark ? "#0b2230ff" : "#9db5c0ff",
-              borderTopWidth: 0.5
+              borderTopWidth: 0.5,
             }}
-            onPress={() => {}}
+            onPress={() => onSelect?.(item)}
             activeOpacity={0.7}
           >
-            <View
-              style={{
-                flexDirection: "row",
-                gap:20,
-                alignItems: "center"
-              }}
-            >
-              <View>
+            <View style={{ flexDirection: "row", gap: 20, alignItems: "center" }}>
+              {item.image && (
                 <Image
                   source={item.image}
                   style={{
                     width: 30,
                     height: 30,
                     borderRadius: 20,
-                    objectFit: "contain"
+                    objectFit: "contain",
                   }}
                 />
-              </View>
+              )}
               <View>
                 <ThemedText
                   lightColor="#252525"
@@ -153,7 +137,7 @@ const AirtimeDataTrnxs: React.FC<Props> = ({ beneficiaries, recents }) => {
                   darkColor="#9B9B9B"
                   style={styles.label}
                 >
-                  {item.phone}
+                  {item.identifier}
                 </ThemedText>
               </View>
             </View>
@@ -165,4 +149,4 @@ const AirtimeDataTrnxs: React.FC<Props> = ({ beneficiaries, recents }) => {
   );
 };
 
-export default AirtimeDataTrnxs;
+export default ContactsSection;

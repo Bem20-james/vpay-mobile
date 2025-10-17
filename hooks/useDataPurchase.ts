@@ -96,7 +96,6 @@ function useFetchDataOptions(provider?: string) {
   return { options, loading, refetch: fetchOptions };
 }
 
-
 const usePurchaseData = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

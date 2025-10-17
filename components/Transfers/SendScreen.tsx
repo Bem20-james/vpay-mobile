@@ -16,19 +16,23 @@ import { SERVER_IMAGE_URL } from "@/constants/Paths";
 import { useLoader } from "@/contexts/LoaderContext"; // ✅ import loader context
 import images from "@/constants/Images";
 
-type AccountDetails = { 
-  bank: string; 
-  accountNumber: string; 
-  name: string; 
-}; 
-
-type SendScreenProps = { 
-  onBack: () => void; 
-  title?: string; 
-  accountDetails: AccountDetails; 
+type AccountDetails = {
+  bank: string;
+  accountNumber: string;
+  name: string;
 };
 
-const SendScreen = ({ onBack, title = "Send to local", accountDetails } : SendScreenProps) => {
+type SendScreenProps = {
+  onBack: () => void;
+  title?: string;
+  accountDetails: AccountDetails;
+};
+
+const SendScreen = ({
+  onBack,
+  title = "Send to local",
+  accountDetails
+}: SendScreenProps) => {
   const colorScheme = useColorScheme();
   const bgColor =
     colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
@@ -74,10 +78,8 @@ const SendScreen = ({ onBack, title = "Send to local", accountDetails } : SendSc
   return (
     <ScrollView>
       <Navigator title={title} onBack={onBack} />
-
-      {/* Recipient Section */}
       <View style={styles.container}>
-        <View style={[styles.recipientContainer, { backgroundColor: bgColor }]}>
+        <View style={[styles.recipient, { backgroundColor: bgColor }]}>
           <Image
             source={require("@/assets/images/adaptive-icon.png")}
             style={styles.logo}
@@ -92,44 +94,35 @@ const SendScreen = ({ onBack, title = "Send to local", accountDetails } : SendSc
           </View>
         </View>
 
-        {/* Amount Section */}
         <View style={[styles.inputBox, { backgroundColor: bgColor }]}>
           <ThemedText style={styles.label}>Amount</ThemedText>
           <View style={[styles.splitInput, { backgroundColor: inputBgColor }]}>
             <Pressable
               style={styles.currencySelector}
-              onPress={() => {
-                console.log("🔍 Currency selector pressed. Current:", selectedCurrency);
-                setShowCurrencySheet(true);
-              }}
+              onPress={() => setShowCurrencySheet(true)}
             >
               {selectedCurrency ? (
                 <>
                   <View style={styles.flagWrapper}>
                     {selectedCurrency.image ? (
                       <Image
-                        source={{ uri: `${SERVER_IMAGE_URL}/${selectedCurrency.image}` }}
+                        source={{
+                          uri: `${SERVER_IMAGE_URL}/${selectedCurrency?.image}`
+                        }}
                         style={styles.flag}
                       />
-                    ) : selectedCurrency.code ? (
+                    ) : (
                       <CountryFlag
-                        isoCode={selectedCurrency.code}
+                        isoCode={selectedCurrency?.country_code || ""}
                         size={20}
                         style={styles.flag}
                       />
-                    ) : (
-                      <Image
-                        source={images.logodark}
-                        style={styles.logo}
-                      />
                     )}
                   </View>
+
                   <ThemedText style={styles.currencyCode}>
-                    { selectedCurrency.currency_code ? (
-                      selectedCurrency.currency_code
-                    ) : (
-                      selectedCurrency.code
-                    )}
+                    {selectedCurrency?.currency_code ||
+                      selectedCurrency?.country_code}
                   </ThemedText>
                 </>
               ) : (
@@ -146,15 +139,17 @@ const SendScreen = ({ onBack, title = "Send to local", accountDetails } : SendSc
               style={[styles.amountInput, { color: txtColor }]}
             />
           </View>
-            {selectedCurrency?.balance !== undefined && (
-              <ThemedText style={styles.balances}>
-                Balance: ₦ {Number(selectedCurrency.balance).toFixed(2)}
-              </ThemedText>
-            )}
+          {selectedCurrency?.balance !== undefined && (
+            <ThemedText style={styles.balances}>
+              Balance: ₦ {Number(selectedCurrency.balance).toFixed(2)}
+            </ThemedText>
+          )}
         </View>
 
         {/* Note Section */}
-        <View style={[styles.inputBox, { backgroundColor: bgColor }]}>
+        <View
+          style={[styles.inputBox, { backgroundColor: bgColor, marginTop: 20 }]}
+        >
           <ThemedText style={styles.label}>Description</ThemedText>
           <TextInput
             value={note}

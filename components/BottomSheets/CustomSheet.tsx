@@ -6,6 +6,7 @@ import { ThemedText } from "../ThemedText";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { FontAwesome } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
+import { btmSheetStyles } from "@/styles/bottomsheets";
 
 interface Props {
   isVisible: boolean;
@@ -43,6 +44,7 @@ const CustomSheet: React.FC<Props> = ({
         ref={sheetRef}
         index={0}
         snapPoints={snapPoints}
+        handleIndicatorStyle={btmSheetStyles.indicatorHandle}
         enablePanDownToClose
         onClose={onClose}
         backgroundStyle={{

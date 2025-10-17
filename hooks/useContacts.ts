@@ -77,14 +77,23 @@ export const useContacts = () => {
 
 // hooks/useVpayContacts.ts
 
-type BackendContact = {
-  displayName?: string;
-  name?: string;
-  vpayTag?: string;
-  username?: string;
-  country?: string;
-  profileImage?: string;
-};
+interface ContactResult {
+  username: string;
+  firstname: string;
+  lastname: string;
+  avatar?: string;
+  phone: string | number;
+  number: string | number;
+  country_code: string;
+  bank: string;
+}
+
+interface ContactRes {
+  success: boolean;
+  code: number;
+  message?: string;
+  result: ContactResult[];
+}
 
 export const useVpayContacts = () => {
   const [vpayContacts, setVpayContacts] = useState<StoredContact[]>([]);
@@ -98,27 +107,29 @@ export const useVpayContacts = () => {
     phoneNumbers: Array<{ phoneNumber: string }>
   ): Promise<StoredContact[]> => {
     try {
-      // Extract just the numbers into an array of strings
       const formattedNumbers = phoneNumbers.map((c) => c.phoneNumber);
 
-      console.log("Sending phone numbers:", formattedNumbers);
-
-      const response = await axios.post<BackendContact[]>(
+      const response = await axios.post<ContactRes>(
         `${SERVER_BASE_URL}/user/contact-users/resolve`,
-        { phone: formattedNumbers }, // 👈 changed key and format
+        { phone: formattedNumbers },
         config
       );
 
-const contacts = response.data?.data ?? []; // ✅ safely get the array
+      const contacts = response.data?.result ?? [];
+      console.log("contacts res:", contacts)
 
-return contacts.map((contacts) => ({
-  name: contacts.displayName || contacts.name || "Unknown",
-  handle: contacts.vpayTag || `@${contacts.username ?? "unknown"}`,
-  flag: contacts.country || "NG",
-  image: contacts.profileImage,
-  frequency: 0,
-}));
-
+      return contacts.map((contact) => ({
+        name: contact.firstname
+          ? `${contact.firstname} ${contact.lastname || ""}`.trim()
+          : "Unknown",
+        handle: contact.username ? `@${contact.username}` : "@unknown",
+        flag: contact.country_code,
+        image: contact.avatar,
+        frequency: 0,
+        phoneNumber: contact.number,
+        accountNumber: contact.phone,
+        bank: contact.bank
+      }));
     } catch (err) {
       const error = err as AxiosError;
       console.error("Error matching contacts with backend:", {
@@ -164,7 +175,7 @@ return contacts.map((contacts) => ({
       const matchedContacts = await matchContactsWithVpay(phoneNumbers);
       setVpayContacts(matchedContacts);
     } catch (error) {
-      console.error("❌ Error loading Vpay contacts:", error);
+      console.error("Error loading Vpay contacts:", error);
     } finally {
       setLoading(false);
     }

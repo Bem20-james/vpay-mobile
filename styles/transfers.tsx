@@ -98,6 +98,13 @@ export const TransferStyles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 30
   },
+  recipient: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 15
+  },
   logo: {
     width: 40,
     height: 40,
@@ -122,7 +129,7 @@ export const TransferStyles = StyleSheet.create({
     borderRadius: 10
   },
   label: {
-    color: "#9B9B9B",
+    color: "#5f5f5f",
     fontSize: 12,
     fontFamily: "Questrial",
     marginBottom: 8

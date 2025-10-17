@@ -118,18 +118,20 @@ const TransactionPinScreen: React.FC = () => {
         style={{ paddingHorizontal: 7 }}
         showsVerticalScrollIndicator={false}
       >
-         <Navigator title="Change Pin" />
+        <Navigator title="Change Pin" />
         <View style={styles.container}>
-          {colorScheme === "dark" ? (
-            <Image source={images.logolight} style={styles.logo} />
-          ) : (
-            <Image source={images.logodark} style={styles.logo} />
-          )}
           <View style={styles.content}>
-            <ThemedText style={styles.title}>
+            <ThemedText
+              lightColor="#252525"
+              darkColor="#9B9B9B"
+              style={styles.title}
+            >
+              Change transaction PIN
+            </ThemedText>
+            <ThemedText style={styles.subtitle}>
               {step === "create"
-                ? "Create a transaction PIN"
-                : "Confirm your transaction PIN"}
+                ? "Enter your current transaction PIN"
+                : "Enter your new transaction PIN"}
             </ThemedText>
 
             <View style={styles.pinDotsContainer}>{renderPinDots()}</View>
@@ -173,9 +175,7 @@ const TransactionPinScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%",
-    height: "100%",
-    justifyContent: "center",
+    flex: 1,
     paddingHorizontal: 20
   },
   logo: {
@@ -186,12 +186,15 @@ const styles = StyleSheet.create({
     marginVertical: 10
   },
   content: {
-    flex: 1,
     alignItems: "center",
-    paddingHorizontal: 0
+    marginTop: 20
   },
   title: {
-    fontSize: 16,
+    fontSize: 15,
+    fontFamily: "Questrial"
+  },
+  subtitle: {
+    fontSize: 14,
     fontFamily: "Questrial",
     marginBottom: 50
   },
@@ -207,6 +210,7 @@ const styles = StyleSheet.create({
     borderRadius: 6
   },
   keypad: {
+    marginTop: 50,
     width: "100%",
     maxWidth: 300,
     flexDirection: "row",

@@ -3,7 +3,7 @@ import { useState } from "react";
 import Toast from "react-native-toast-message";
 import { SERVER_BASE_URL } from "../constants/Paths";
 import { useUser } from "@/contexts/UserContexts";
-import {  LookUpParams, ResolveTag, ResolveRes } from "@/types/transfers";
+import { ResolveTag, ResolveRes } from "@/types/transfers";
 
 interface SendFiatData {
   account_number: string;
@@ -32,33 +32,36 @@ interface LookUpResponse {
 }
 
 function useResolveVpayTag() {
-  const [acctInfo, setAcctInfo] = useState<ResolveTag[]>([]);
+    const [acctInfo, setAcctInfo] = useState<ResolveTag | null>(null);
+  
   const [loading, setLoading] = useState<boolean>(false);
   const { config } = useUser();
 
-  const resolveTag = async (data: ResolveTag): Promise<boolean> => {
+  const resolveTag = async (data: { vpay_tag: string }): Promise<boolean> => {
     setLoading(true);
     const { vpay_tag } = data;
-    const url = `${SERVER_BASE_URL}/user/tag/resolve/${encodeURIComponent(vpay_tag)}`;
+
+    const url = `${SERVER_BASE_URL}/user/tag/resolve/?vpay_tag=${encodeURIComponent(
+      vpay_tag
+    )}`;
 
     try {
-      const response = await axios.get<ResolveRes>(url, config);
+      const response = await axios.post<ResolveRes>(url, {}, config);
 
-      const result = response.data
-      console.log("resolved tag res:", result)
-      console.log(result)
+      const res = response.data;
+      console.log("Resolved tag response:", res);
 
-      if (result.success && result.error === 0) {
-        setAcctInfo(result.result);
+      if (res.code === 0) {
+        setAcctInfo(res?.result);
         return true;
       } else {
         Toast.show({
           type: "error",
-          text1: response.data.message || "Failed to look up user.",
+          text1: res.message || "Failed to look up user."
         });
         return false;
       }
-    } catch (error: unknown) {
+    } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
       const errorMessage =
         axiosError.response?.data?.message ||
@@ -80,7 +83,10 @@ function useLookUpUser() {
   const [loading, setLoading] = useState<boolean>(false);
   const { config } = useUser();
 
-  const fetchData = async (data: { account_number: string; bank_code: string }): Promise<boolean> => {
+  const fetchData = async (data: {
+    account_number: string;
+    bank_code: string;
+  }): Promise<boolean> => {
     setLoading(true);
 
     try {
@@ -88,13 +94,13 @@ function useLookUpUser() {
         `${SERVER_BASE_URL}/user/fiat/recipient/verify`,
         {
           account_number: data.account_number,
-          bank: "001", // hardcoded to access bank for now
+          bank: "001" // hardcoded to access bank for now
         },
         config
       );
       const result = response.data;
-      console.log("lookup response:", result)
-      console.log("acctInfo:", acctInfo)
+      console.log("lookup response:", result);
+      console.log("acctInfo:", acctInfo);
 
       if (result.success && result.code === 0) {
         setAcctInfo(result.result);
@@ -102,7 +108,7 @@ function useLookUpUser() {
       } else {
         Toast.show({
           type: "error",
-          text1: response.data.message || "Failed to look up user.",
+          text1: response.data.message || "Failed to look up user."
         });
         return false;
       }
@@ -123,7 +129,6 @@ function useLookUpUser() {
   return { acctInfo, loading, lookup: fetchData };
 }
 
-
 const useSendLocal = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -143,13 +148,13 @@ const useSendLocal = () => {
           ...config, // keep existing headers (e.g., Authorization)
           headers: {
             ...config.headers,
-            "activity_pin": account_password, // <- send password in header
-          },
+            activity_pin: account_password // <- send password in header
+          }
         }
       );
 
       const result = response.data;
-      console.log(result)
+      console.log(result);
       if (!result.success) {
         throw new Error(result.message || "Transaction failed");
       }
@@ -157,7 +162,7 @@ const useSendLocal = () => {
       if (response.status === 200) {
         Toast.show({
           type: "success",
-          text1: result.message || "Transfer Successful!",
+          text1: result.message || "Transfer Successful!"
         });
       }
 
@@ -167,13 +172,12 @@ const useSendLocal = () => {
         (err as AxiosError<{ message?: string }>)?.response?.data?.message ||
         (err as Error).message ||
         "Network or server error";
-        console.error("Error Response:", errorMessage)
+      console.error("Error Response:", errorMessage);
       setError(errorMessage);
       Toast.show({
         type: "error",
-        text1: errorMessage,
+        text1: errorMessage
       });
-      
 
       return { success: false, message: errorMessage };
     } finally {
@@ -184,9 +188,4 @@ const useSendLocal = () => {
   return { sendFunds, isLoading, error };
 };
 
-
-export {
-  useSendLocal,
-  useLookUpUser,
-  useResolveVpayTag
-};
+export { useSendLocal, useLookUpUser, useResolveVpayTag };

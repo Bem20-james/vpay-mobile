@@ -4,6 +4,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { ThemedText } from "./ThemedText";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
+import { SERVER_IMAGE_URL } from "@/constants/Paths";
 
 interface ProvidersInputFieldProps {
   value?: any;
@@ -30,7 +31,7 @@ const ProvidersInputField: React.FC<ProvidersInputFieldProps> = ({
       <View style={styles.left}>
         {value?.image && (
           <Image
-            source={{ uri: value.image }}
+            source={{ uri: `${SERVER_IMAGE_URL}/${value.image}` }}
             style={styles.image}
             resizeMode="contain"
           />

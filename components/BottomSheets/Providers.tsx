@@ -4,6 +4,8 @@ import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
+import { btmSheetStyles } from "@/styles/bottomsheets";
+import { SERVER_IMAGE_URL } from "@/constants/Paths";
 
 interface ProvidersBottomSheetProps {
   isVisible: boolean;
@@ -21,8 +23,10 @@ const ProvidersBottomSheet: React.FC<ProvidersBottomSheetProps> = ({
   loading = false
 }) => {
   const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+  const border = isDark ? "#414141" : "#d7d7d7";
   const sheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["40%", "70%"], []);
+  const snapPoints = useMemo(() => ["30%", "40%"], []);
 
   if (!isVisible) return null;
 
@@ -33,14 +37,11 @@ const ProvidersBottomSheet: React.FC<ProvidersBottomSheetProps> = ({
       snapPoints={snapPoints}
       enablePanDownToClose
       onClose={onClose}
+      handleIndicatorStyle={btmSheetStyles.indicatorHandle}
       backgroundStyle={{
-        backgroundColor:
-          colorScheme === "dark"
-            ? Colors.dark.background
-            : Colors.light.background
-      }}
-      handleIndicatorStyle={{
-        backgroundColor: "#ccc"
+        backgroundColor: isDark
+          ? Colors.dark.primaryBgDark
+          : Colors.light.accentBg
       }}
     >
       <View style={styles.header}>
@@ -72,7 +73,7 @@ const ProvidersBottomSheet: React.FC<ProvidersBottomSheetProps> = ({
             >
               {item.image && (
                 <Image
-                  source={{ uri: item.image }}
+                  source={{ uri: `${SERVER_IMAGE_URL}/${item.image}` }}
                   style={styles.image}
                   resizeMode="contain"
                 />
@@ -102,11 +103,13 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-SemiBold"
   },
   item: {
+    paddingVertical: 14,
+    paddingHorizontal: 5,
     flexDirection: "row",
+    gap: 5,
     alignItems: "center",
-    paddingVertical: 12,
-    borderBottomWidth: 0.5,
-    borderBottomColor: "#ddd"
+    borderBottomWidth: 0.7,
+    borderBottomColor: "#000000"
   },
   image: {
     width: 30,

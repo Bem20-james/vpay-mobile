@@ -1,10 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import {
-  View,
-  ScrollView,
-  TextInput,
-  ActivityIndicator,
-} from "react-native";
+import { View, ScrollView, TextInput, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import Navigator from "@/components/Navigator";
@@ -24,12 +19,12 @@ import Toast from "react-native-toast-message";
 
 const LocalBank = () => {
   const colorScheme = useColorScheme();
-  const backgroundColor =
-    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
-  const statusBarBg =
-    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
-  const txtColor =
-    colorScheme === "dark" ? Colors.light.accentBg : Colors.dark.background;
+  const isDark = colorScheme === "dark";
+  const backgroundColor = isDark
+    ? Colors.dark.background
+    : Colors.light.background;
+  const statusBarBg = isDark ? Colors.dark.background : Colors.light.background;
+  const txtColor = isDark ? Colors.light.accentBg : Colors.dark.background;
 
   const [showSendScreen, setShowSendScreen] = useState(false);
   const [showBanksSheet, setShowBanksSheet] = useState(false);
@@ -55,12 +50,12 @@ const LocalBank = () => {
           prevLookupParams.current.accountNumber === accountNumber &&
           prevLookupParams.current.bankCode === selectedBank.code
         ) {
-          return; // avoid duplicate lookup
+          return;
         }
 
         prevLookupParams.current = {
           accountNumber,
-          bankCode: selectedBank.code,
+          bankCode: selectedBank.code
         };
 
         setIsLoading(true);
@@ -68,7 +63,7 @@ const LocalBank = () => {
 
         const success = await stableLookup({
           bank_code: selectedBank.code,
-          account_number: accountNumber,
+          account_number: accountNumber
         });
 
         if (!success) {
@@ -96,7 +91,7 @@ const LocalBank = () => {
     if (!acctInfo?.account_name) {
       Toast.show({
         type: "error",
-        text1: "Please wait for account lookup to complete",
+        text1: "Please wait for account lookup to complete"
       });
       return;
     }
@@ -149,8 +144,8 @@ const LocalBank = () => {
                     height: 45,
                     flexDirection: "row",
                     alignItems: "center",
-                    paddingHorizontal: 8,
-                  },
+                    paddingHorizontal: 8
+                  }
                 ]}
               >
                 {isLoading ? (
@@ -160,12 +155,12 @@ const LocalBank = () => {
                     style={[
                       formStyles.input,
                       {
-                        color: acctInfo?.account_name ? txtColor : "#9B9B9B",
+                        color: acctInfo?.account_name ? txtColor : "#208bc9",
                         fontSize: acctInfo?.account_name ? 15 : 12,
                         fontFamily: "Questrial",
                         fontWeight: acctInfo?.account_name ? "700" : "400",
-                        flex: 1,
-                      },
+                        flex: 1
+                      }
                     ]}
                     placeholder="Account name will appear here"
                     placeholderTextColor="#9B9B9B"
@@ -181,7 +176,7 @@ const LocalBank = () => {
                     color: "#FF6B6B",
                     fontSize: 12,
                     marginTop: 4,
-                    marginLeft: 6,
+                    marginLeft: 6
                   }}
                 >
                   {error}
@@ -189,7 +184,6 @@ const LocalBank = () => {
               ) : null}
             </View>
 
-            {/* Continue Button */}
             <CustomButton
               title="Continue"
               handlePress={handleContinue}
@@ -200,10 +194,15 @@ const LocalBank = () => {
                   selectedBank &&
                   acctInfo?.account_name
                     ? 1
-                    : 0.6,
+                    : 0.6
               }}
               disabled={
-                !(accountNumber.length === 10 && selectedBank && acctInfo?.account_name)
+                !(
+                  !isLoading &&
+                  accountNumber.length === 10 &&
+                  selectedBank &&
+                  acctInfo?.account_name
+                )
               }
             />
           </View>
@@ -222,7 +221,7 @@ const LocalBank = () => {
           accountDetails={{
             accountNumber,
             bank: selectedBank?.name ?? "",
-            name: acctInfo?.account_name ?? "",
+            name: acctInfo?.account_name ?? ""
           }}
         />
       )}

@@ -10,6 +10,7 @@ import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { ThemedText } from "./ThemedText";
 import { Colors } from "@/constants/Colors";
 import { AntDesign } from "@expo/vector-icons";
+import { useLoader } from "@/contexts/LoaderContext";
 
 // ---- shared canonical type ----
 export const OTP_METHODS = ["email", "sms", "authenticator"] as const;
@@ -54,6 +55,7 @@ function OtpMediumModal<T extends readonly OtpMethod[] = typeof OTP_METHODS>({
   const bgColor =
     colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
   const isDark = colorScheme === "dark";
+  const { showLoader, hideLoader } = useLoader();
 
   // Auto-submit if only one method (skip UI)
   useEffect(() => {
