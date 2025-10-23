@@ -3,37 +3,18 @@ import { useState } from "react";
 import Toast from "react-native-toast-message";
 import { SERVER_BASE_URL } from "../constants/Paths";
 import { useUser } from "@/contexts/UserContexts";
-import { ResolveTag, ResolveRes } from "@/types/transfers";
-
-interface SendFiatData {
-  account_number: string;
-  currency: string;
-  amount: string;
-  description?: string;
-  account_password: string;
-}
-
-interface FiatResponse {
-  success: boolean;
-  message?: string;
-}
-
-interface LookUpResult {
-  account_name: string;
-  account_number: string;
-  bank_id: number;
-}
-
-interface LookUpResponse {
-  success: boolean;
-  code: number;
-  message?: string;
-  result: LookUpResult;
-}
+import {
+  ResolveTag,
+  ResolveRes,
+  SendFiatData,
+  LookUpResponse,
+  LookUpResult,
+  FiatResponse
+} from "@/types/transfers";
 
 function useResolveVpayTag() {
-    const [acctInfo, setAcctInfo] = useState<ResolveTag | null>(null);
-  
+  const [acctInfo, setAcctInfo] = useState<ResolveTag | null>(null);
+
   const [loading, setLoading] = useState<boolean>(false);
   const { config } = useUser();
 
@@ -50,6 +31,7 @@ function useResolveVpayTag() {
 
       const res = response.data;
       console.log("Resolved tag response:", res);
+      console.log("response code", res.code);
 
       if (res.code === 0) {
         setAcctInfo(res?.result);
@@ -57,7 +39,7 @@ function useResolveVpayTag() {
       } else {
         Toast.show({
           type: "error",
-          text1: res.message || "Failed to look up user."
+          text1: res.message || "Failed to resolve tag user."
         });
         return false;
       }
@@ -65,7 +47,7 @@ function useResolveVpayTag() {
       const axiosError = error as AxiosError<{ message?: string }>;
       const errorMessage =
         axiosError.response?.data?.message ||
-        "An error occurred while looking up user.";
+        "An error occurred while resolving user.";
 
       console.error("Error fetching data:", errorMessage);
       Toast.show({ type: "error", text1: errorMessage });

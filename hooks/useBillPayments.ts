@@ -3,50 +3,17 @@ import { useState, useEffect } from "react";
 import Toast from "react-native-toast-message";
 import { SERVER_BASE_URL } from "../constants/Paths";
 import { useUser } from "@/contexts/UserContexts";
-
-interface CableTvData {
-  fiatToken: string;
-  provider: string;
-  number: string;
-  code: string;
-  amount: string;
-  phone: string;
-  authorization_pin: string;
-}
-
-interface Response {
-  success: boolean;
-  message?: string;
-}
-
-interface CableTvProvider {
-  id: number;
-  country_name: string;
-  country_code: string;
-  country_dial_code: string;
-}
-
-interface ProviderRes<T> {
-  error: number;
-  code: number;
-  message: string;
-  success: boolean;
-  result: any[];
-}
-
-interface LookUpResult {
-  provider: string;
-  customerName: string;
-  smartNumber: string;
-  status: string | boolean;
-}
-
-interface LookUpResponse {
-  success: boolean;
-  code: number;
-  message?: string;
-  result: LookUpResult;
-}
+import {
+  ProviderRes,
+  CableTvProvider,
+  LookUpResponse,
+  LookUpResult,
+  CableTvData,
+  Response,
+  BettingProvider,
+  BettingResult,
+  BettingLookUpRes
+} from "@/types/services";
 
 function useFetchCableTvProviders() {
   const [tvProviders, setTvProviders] = useState<CableTvProvider[]>([]);
@@ -123,6 +90,96 @@ function useFetchElectricityProviders() {
   }, []);
 
   return { powerProviders, loading, refetch: fetchData };
+}
+
+function useFetchBettingProviders() {
+  const [betProvider, setBetProvider] = useState<BettingProvider[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const { config } = useUser();
+
+  const fetchData = async () => {
+    setLoading(true);
+
+    try {
+      const response = await axios.get<ProviderRes<BettingProvider[]>>(
+        `${SERVER_BASE_URL}/user/bet/providers`,
+        config
+      );
+
+      const result = response.data;
+      console.log("Response data:", result);
+
+      if (result.code === 0) {
+        setBetProvider(result.result);
+      }
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      const errorMessage =
+        axiosError.response?.data ||
+        "An error occurred while fetching betting providers.";
+
+      console.error("Error fetching data:", errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  return { betProvider, loading, refetch: fetchData };
+}
+
+function useLookUpBetCustomer() {
+  const [customer, setCustomer] = useState<BettingResult | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const { config } = useUser();
+
+  const fetchData = async (data: {
+    provider: string;
+    account: string;
+  }): Promise<boolean> => {
+    setLoading(true);
+
+    try {
+      const response = await axios.post<BettingLookUpRes>(
+        `${SERVER_BASE_URL}/user/bet/verify-wallet`,
+        {
+          provider: data.provider,
+          account: data.account
+        },
+        config
+      );
+
+      console.log("lookup response:", response);
+      const result = response.data;
+
+      if (result.code === 0) {
+        setCustomer(result.result);
+        return true;
+      } else {
+        Toast.show({
+          type: "error",
+          text1: response.data.message || "Failed to look up subscriber."
+        });
+        return false;
+      }
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      const errorMessage =
+        axiosError.response?.data?.message ||
+        "An error occurred while looking up subscriber.";
+
+      console.error("Error fetching data:", errorMessage);
+      Toast.show({ type: "error", text1: errorMessage });
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { customer, loading, lookup: fetchData };
 }
 
 function useLookUpTvSubscriber() {
@@ -374,5 +431,7 @@ export {
   useLookUpTvSubscriber,
   useLookUpElectricityUser,
   useFetchCableTvOptions,
-  useFetchElectricityOptions
+  useFetchElectricityOptions,
+  useFetchBettingProviders,
+  useLookUpBetCustomer
 };

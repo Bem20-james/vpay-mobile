@@ -282,6 +282,7 @@ const ElectricityScreen = () => {
             name={customer?.customerName}
             number={meterNumber}
             provider={selectedProvider?.provider_name}
+            logo={selectedProvider?.image}
           />
         )}
       </ScrollView>

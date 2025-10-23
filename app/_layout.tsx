@@ -96,6 +96,14 @@ export default function RootLayout() {
                     options={{ headerShown: false }}
                   />
                   <Stack.Screen name="+not-found" />
+                  <Stack.Screen
+                    name="transaction-failed"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="transaction-success"
+                    options={{ headerShown: false }}
+                  />
                 </Stack>
 
                 <Toast

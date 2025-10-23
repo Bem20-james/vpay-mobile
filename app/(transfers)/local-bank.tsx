@@ -221,7 +221,7 @@ const LocalBank = () => {
           accountDetails={{
             accountNumber,
             bank: selectedBank?.name ?? "",
-            name: acctInfo?.account_name ?? ""
+            accountName: acctInfo?.account_name ?? ""
           }}
         />
       )}

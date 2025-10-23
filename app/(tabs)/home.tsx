@@ -20,7 +20,7 @@ import CountryFlag from "react-native-country-flag";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { styles } from "@/styles/home";
 import QuickActionsSection from "@/components/QuickAction";
-import RecentTransaction from "@/components/Recents/RecentTransactions"
+import RecentTransaction from "@/components/Recents/RecentTransactions";
 import { quickActions, billOptions } from "@/assets/data";
 import { trnxHistory } from "@/assets/data";
 import StickyHeader from "@/components/StickyHeader";
@@ -28,23 +28,37 @@ import OptionsBottomSheet from "@/components/BottomSheets/Options";
 import { useUser } from "@/contexts/UserContexts";
 import { Colors } from "@/constants/Colors";
 import { useFetchUserAssets } from "@/hooks/useUser";
+import { MotiView } from "moti";
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
-  const backgroundColor = colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
-  const statusBarBg = colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const isDark = colorScheme === "dark";
+  const backgroundColor = isDark
+    ? Colors.dark.background
+    : Colors.light.background;
+  const statusBarBg = isDark ? Colors.dark.background : Colors.light.background;
   const router = useRouter();
   const [showBalance, setShowBalance] = useState(false);
-  const symbolNGN = getSymbolFromCurrency("NGN");
-  const symbolUSD = getSymbolFromCurrency("USD");
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
 
   // Animated values for sticky header
   const scrollY = useRef(new Animated.Value(0)).current;
   const headerOpacity = useRef(new Animated.Value(0)).current;
   const headerTranslateY = useRef(new Animated.Value(-50)).current;
-  const { user} = useUser()
-  const {assets, loading} = useFetchUserAssets()
+  const { user } = useUser();
+
+  const countryCode = user?.country?.code;
+  const { assets, loading } = useFetchUserAssets();
+  const fiatAssets: {
+    country_code?: string;
+    currency_code?: string;
+    balance?: number;
+  }[] = assets?.fiat || [];
+
+  const localWallet = fiatAssets.find(
+    (wallet) => wallet.country_code === countryCode
+  );
+  const usdWallet = fiatAssets.find((wallet) => wallet.currency_code === "USD");
 
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
@@ -114,7 +128,10 @@ export default function HomeScreen() {
               lightColor="#252525"
               style={{ fontFamily: "Inter", fontSize: 15 }}
             >
-              Hello, <Text style={{ fontFamily: "Inter-Bold" }}>{user?.firstname}</Text>
+              Hello,{" "}
+              <Text style={{ fontFamily: "Inter-Bold" }}>
+                {user?.firstname}
+              </Text>
               {String.fromCodePoint(0x1f44b)}
             </ThemedText>
           </View>
@@ -156,58 +173,96 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.balances}>
-            <View style={styles.actionButton}>
-              <View style={styles.dFlex}>
-                <CountryFlag
-                  isoCode="NG"
-                  size={15}
-                  style={{ borderRadius: 5 }}
-                />
-                <ThemedText
-                  lightColor="#F8F8F8"
-                  darkColor="#F8F8F8"
-                  style={styles.currencyCode}
-                >
-                  NGN
-                </ThemedText>
-              </View>
+            {loading && showBalance ? (
+              <>
+                {[1, 2].map((i) => (
+                  <MotiView
+                    key={i}
+                    from={{ opacity: 0.3 }}
+                    animate={{ opacity: 1 }}
+                    transition={{
+                      type: "timing",
+                      duration: 800,
+                      loop: true
+                    }}
+                    style={{
+                      height: 35,
+                      width: "50%",
+                      borderRadius: 6,
+                      backgroundColor: "#0A2D4A",
+                      marginLeft: i === 1 ? 0 : 10
+                    }}
+                  />
+                ))}
+              </>
+            ) : (
+              <>
+                <View style={styles.actionButton}>
+                  <View style={styles.dFlex}>
+                    <CountryFlag
+                      isoCode={localWallet?.country_code || "NG"}
+                      size={15}
+                      style={{ borderRadius: 3 }}
+                    />
+                    <ThemedText
+                      lightColor="#F8F8F8"
+                      darkColor="#F8F8F8"
+                      style={styles.currencyCode}
+                    >
+                      {localWallet?.currency_code || ""}
+                    </ThemedText>
+                  </View>
 
-              <ThemedText
-                lightColor="#FFFFFF"
-                darkColor="#FFFFFF"
-                style={styles.balAmount}
-              >
-                {showBalance ? `${symbolNGN} 42,000.00` : "******"}
-              </ThemedText>
-            </View>
+                  <ThemedText
+                    lightColor="#FFFFFF"
+                    darkColor="#FFFFFF"
+                    style={styles.balAmount}
+                  >
+                    {showBalance
+                      ? `${getSymbolFromCurrency(
+                          localWallet?.currency_code || ""
+                        )} ${Number(
+                          localWallet?.balance || 0
+                        ).toLocaleString()}`
+                      : "******"}
+                  </ThemedText>
+                </View>
 
-            <View style={styles.border}></View>
+                <View style={styles.border}></View>
 
-            <View style={styles.actionButton}>
-              <View style={styles.dFlex}>
-                <CountryFlag
-                  isoCode="US"
-                  size={15}
-                  style={{ borderRadius: 5 }}
-                />
-                <ThemedText
-                  lightColor="#F8F8F8"
-                  darkColor="#F8F8F8"
-                  style={styles.currencyCode}
-                >
-                  USD
-                </ThemedText>
-              </View>
+                {/* USD wallet */}
+                <View style={styles.actionButton}>
+                  <View style={styles.dFlex}>
+                    <CountryFlag
+                      isoCode="US"
+                      size={15}
+                      style={{ borderRadius: 5 }}
+                    />
+                    <ThemedText
+                      lightColor="#F8F8F8"
+                      darkColor="#F8F8F8"
+                      style={styles.currencyCode}
+                    >
+                      USD
+                    </ThemedText>
+                  </View>
 
-              <ThemedText
-                lightColor="#FFFFFF"
-                darkColor="#FFFFFF"
-                style={styles.balAmount}
-              >
-                {showBalance ? `${symbolUSD} 1,000.00` : "******"}
-              </ThemedText>
-            </View>
+                  <ThemedText
+                    lightColor="#FFFFFF"
+                    darkColor="#FFFFFF"
+                    style={styles.balAmount}
+                  >
+                    {showBalance
+                      ? `${getSymbolFromCurrency("USD")} ${Number(
+                          usdWallet?.balance || 0
+                        ).toLocaleString()}`
+                      : "******"}
+                  </ThemedText>
+                </View>
+              </>
+            )}
           </View>
+
           <View style={{ marginTop: 7 }}>
             <Pressable
               onPress={() => router.push("/accounts")}

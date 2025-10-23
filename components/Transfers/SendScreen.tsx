@@ -1,4 +1,11 @@
-import { ScrollView, View, TextInput, Pressable, Image } from "react-native";
+import {
+  ScrollView,
+  View,
+  TextInput,
+  Pressable,
+  Image,
+  ActivityIndicator
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import Navigator from "@/components/Navigator";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
@@ -13,40 +20,46 @@ import { router } from "expo-router";
 import { useFetchUserAssets } from "@/hooks/useUser";
 import CountryFlag from "react-native-country-flag";
 import { SERVER_IMAGE_URL } from "@/constants/Paths";
-import { useLoader } from "@/contexts/LoaderContext"; // ✅ import loader context
-import images from "@/constants/Images";
+import { useLoader } from "@/contexts/LoaderContext";
+import { useRateConversion } from "@/hooks/useGeneral";
 
 type AccountDetails = {
   bank: string;
   accountNumber: string;
-  name: string;
+  accountName: string;
+  username?: string;
+  avatar?: string;
 };
 
 type SendScreenProps = {
   onBack: () => void;
   title?: string;
+  type?: string;
+  navig?: boolean;
   accountDetails: AccountDetails;
 };
 
 const SendScreen = ({
   onBack,
   title = "Send to local",
-  accountDetails
+  type,
+  accountDetails,
+  navig = true
 }: SendScreenProps) => {
   const colorScheme = useColorScheme();
-  const bgColor =
-    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
-  const txtColor =
-    colorScheme === "dark" ? Colors.light.accentBg : Colors.dark.background;
-  const inputBgColor =
-    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const isDark = colorScheme === "dark";
+  const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
+  const txtColor = isDark ? Colors.light.accentBg : Colors.dark.background;
+  const inputBgColor = isDark
+    ? Colors.dark.background
+    : Colors.light.background;
   const { assets, loading } = useFetchUserAssets();
 
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [selectedCurrency, setSelectedCurrency] = useState<any>(null);
-
   const { showLoader, hideLoader } = useLoader();
+  const { rate, loading: rateLoading, refetch } = useRateConversion();
 
   const fiatAssets = assets?.fiat || [];
   const cryptoAssets = assets?.crypto || [];
@@ -67,6 +80,22 @@ const SendScreen = ({
     }
   }, [loading]);
 
+  useEffect(() => {
+    const fetchConversion = async () => {
+      if (amount && selectedCurrency) {
+        await refetch({
+          base_currency: selectedCurrency.currency_code || "",
+          target_currency: "NGN", // modify this later to be dynamic
+          amount: Number(amount)
+        });
+      }
+    };
+
+    const delayDebounce = setTimeout(fetchConversion, 600); // debounce input
+
+    return () => clearTimeout(delayDebounce);
+  }, [amount, selectedCurrency]);
+
   const [showCurrencySheet, setShowCurrencySheet] = useState(false);
   const [showDetailsSheet, setDetailsShowSheet] = useState(false);
 
@@ -77,20 +106,52 @@ const SendScreen = ({
 
   return (
     <ScrollView>
-      <Navigator title={title} onBack={onBack} />
+      {navig && <Navigator title={title} onBack={onBack} />}
       <View style={styles.container}>
         <View style={[styles.recipient, { backgroundColor: bgColor }]}>
-          <Image
-            source={require("@/assets/images/adaptive-icon.png")}
-            style={styles.logo}
-          />
-          <View>
+          {accountDetails.avatar ? (
+            <Image
+              source={{ uri: `${SERVER_IMAGE_URL}/${accountDetails.avatar}` }}
+              style={styles.logo}
+            />
+          ) : (
+            <View
+              style={{
+                width: 50,
+                height: 50,
+                borderRadius: 25,
+                backgroundColor: Colors.light.tint, // pick a brand color
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <ThemedText
+                style={{
+                  color: "#fff",
+                  fontSize: 22,
+                  fontFamily: "Inter-Bold",
+                  textTransform: "uppercase"
+                }}
+              >
+                {accountDetails?.accountName?.charAt(0) || "?"}
+              </ThemedText>
+            </View>
+          )}
+
+          <View style={{ marginLeft: 10 }}>
             <ThemedText style={styles.recipientName}>
-              {accountDetails.name}
+              {accountDetails.accountName}
             </ThemedText>
-            <ThemedText style={styles.recipientDetails}>
-              {accountDetails.accountNumber} {accountDetails.bank}
-            </ThemedText>
+            <View style={{ flexDirection: "row", gap: 5 }}>
+              <ThemedText style={styles.recipientDetails}>
+                {type === "vpaytag"
+                  ? "@" + accountDetails.username
+                  : accountDetails.accountNumber}
+              </ThemedText>
+              <ThemedText style={styles.recipientDetails}>
+                {type !== "vpaytag" && accountDetails.bank}
+              </ThemedText>
+            </View>
           </View>
         </View>
 
@@ -141,9 +202,50 @@ const SendScreen = ({
           </View>
           {selectedCurrency?.balance !== undefined && (
             <ThemedText style={styles.balances}>
-              Balance: ₦ {Number(selectedCurrency.balance).toFixed(2)}
+              Available Balance: ₦ {Number(selectedCurrency.balance).toFixed(2)}
             </ThemedText>
           )}
+
+          {rateLoading ? (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 5
+              }}
+            >
+              <ActivityIndicator size="small" color={Colors.light.tint} />
+              <ThemedText
+                style={{
+                  marginLeft: 5,
+                  color: "#80D1FF",
+                  fontSize: 13,
+                  fontFamily: "Questrial"
+                }}
+              >
+                Calculating rates and fees...
+              </ThemedText>
+            </View>
+          ) : rate ? (
+            <View
+              style={{
+                borderTopColor: "#2c404aff",
+                borderTopWidth: 1,
+                marginTop: 15
+              }}
+            >
+              <ThemedText
+                style={{
+                  marginTop: 5,
+                  color: "#80D1FF",
+                  fontSize: 14,
+                  fontFamily: "Questrial"
+                }}
+              >
+                ≈ {rate.converted_amount.toFixed(2)} {rate.target_currency}
+              </ThemedText>
+            </View>
+          ) : null}
         </View>
 
         {/* Note Section */}
@@ -176,14 +278,14 @@ const SendScreen = ({
 
       {/* Review Sheet */}
       <ReviewBottomSheet
-        type="transfer"
+        type="vpay"
         isVisible={showDetailsSheet}
         onClose={() => setDetailsShowSheet(false)}
         onPay={handlePay}
         amount={amount}
         bank={accountDetails.bank}
         accountNumber={accountDetails.accountNumber}
-        name={accountDetails.name}
+        name={accountDetails.accountName}
         rate="5"
         selectedAsset={selectedCurrency}
       />

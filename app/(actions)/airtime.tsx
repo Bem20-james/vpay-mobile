@@ -15,13 +15,15 @@ import ContactsModal from "@/components/ContactsModal";
 import { useLoader } from "@/contexts/LoaderContext";
 import ReviewBottomSheet from "@/components/BottomSheets/Review";
 import ProviderInput from "@/components/PhoneInputField";
+import { useUser } from "@/contexts/UserContexts";
 
 const AirtimeScreen = () => {
   const colorScheme = useColorScheme();
-  const boxBackgroundColor =
-    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
-  const statusBarBg =
-    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const isDark = colorScheme === "dark";
+  const boxBackgroundColor = isDark
+    ? Colors.dark.background
+    : Colors.light.background;
+  const statusBarBg = isDark ? Colors.dark.background : Colors.light.background;
   const router = useRouter();
 
   const [selectedProvider, setSelectedProvider] = useState<any>(null);
@@ -33,10 +35,11 @@ const AirtimeScreen = () => {
   const [amount, setAmount] = useState("");
   const [amountError, setAmountError] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<any>(null);
-  console.log("💰 Selected Currency in AirtimeScreen:", selectedCurrency);
-
   const { providers, loading } = useFetchAirtimeProviders();
   const { showLoader, hideLoader } = useLoader();
+  const { user } = useUser();
+
+  const countryCode = user?.country?.code;
 
   //Contacts fetcher
   const fetchContacts = async () => {
@@ -103,15 +106,14 @@ const AirtimeScreen = () => {
             handleChangeText={setPhoneNumber}
             placeholder="Phone number"
             providers={providers}
-            userCountryCode={"NG"}
+            userCountryCode={countryCode ?? ""}
             onProviderSelect={(provider) => {
-              console.log("Selected provider:", provider);
               setSelectedProvider(provider);
             }}
             onContactPress={fetchContacts}
           />
 
-          <View style={{ marginTop: 20 }}>
+          <View style={{ marginTop: 15 }}>
             <AmountInputField
               onAmountChange={(val, hasError) => {
                 setAmount(val);

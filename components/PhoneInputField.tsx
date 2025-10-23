@@ -30,6 +30,7 @@ interface ProviderInputProps {
   userCountryCode: string;
   onProviderSelect?: (provider: ProviderItem) => void;
   onContactPress?: () => void;
+  maxLength?: number;
 }
 
 const ProviderInput: React.FC<ProviderInputProps> = ({
@@ -39,7 +40,8 @@ const ProviderInput: React.FC<ProviderInputProps> = ({
   providers,
   userCountryCode,
   onProviderSelect,
-  onContactPress
+  onContactPress,
+  maxLength
 }) => {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
@@ -105,6 +107,7 @@ const ProviderInput: React.FC<ProviderInputProps> = ({
           value={value}
           onChangeText={handleChangeText}
           keyboardType="phone-pad"
+          maxLength={maxLength}
         />
 
         <TouchableOpacity onPress={onContactPress}>

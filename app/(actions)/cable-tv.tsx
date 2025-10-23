@@ -46,10 +46,6 @@ const CableTVScreen = () => {
   const [showSendScreen, setShowSendScreen] = useState(false);
   const navigation = useNavigation();
 
-  console.log("lookep up subscriber:", subscriber);
-    console.log("selected provider:", selectedProvider?.provider_name);
-
-
   const prevLookupParams = useRef({ userNumber: "", provider: "" });
   const stableLookup = useCallback(lookup, []);
 
@@ -221,7 +217,7 @@ const CableTVScreen = () => {
               title={"Continue"}
               handlePress={handleContinue}
               btnStyles={{
-                marginTop: 32,
+                marginTop: 30,
                 opacity:
                   userNumber.length === 10 &&
                   selectedProvider &&
@@ -248,6 +244,7 @@ const CableTVScreen = () => {
             name={subscriber?.customerName}
             number={userNumber}
             provider={selectedProvider?.provider_name}
+            logo={selectedProvider?.image}
           />
         )}
       </ScrollView>

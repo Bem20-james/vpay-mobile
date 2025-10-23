@@ -67,7 +67,7 @@ export const styles = StyleSheet.create({
     lineHeight: 15,
     letterSpacing: 0
   },
-  balAmount: { fontFamily: "Inter-Bold", fontSize: 16, marginVertical: 7 },
+  balAmount: { fontFamily: "Inter-Bold", fontSize: 18, marginVertical: 5 },
   actionButton: {
     padding: 8,
     borderRadius: 6,

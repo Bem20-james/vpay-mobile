@@ -41,7 +41,7 @@ interface Props {
   provider?: string;
 
   // Mode
-  type: "transfer" | "airtime" | "data";
+  type: "transfer" | "airtime" | "data" | "vpay";
 }
 
 const ReviewBottomSheet = ({
@@ -84,6 +84,19 @@ const ReviewBottomSheet = ({
       ? [
           { label: "Bank", value: bank },
           { label: "Account Number", value: accountNumber },
+          { label: "Name", value: name, transform: "uppercase" },
+          {
+            label: "Amount",
+            value: getSymbolFromCurrency(selectedAsset.currency_code) + amount
+          },
+          {
+            label: "Transaction fee",
+            value: getSymbolFromCurrency(selectedAsset.currency_code) + rate
+          }
+        ]
+      : type === "vpay"
+      ? [
+          { label: "username", value: bank },
           { label: "Name", value: name, transform: "uppercase" },
           {
             label: "Amount",
@@ -226,7 +239,7 @@ const ReviewBottomSheet = ({
               <View
                 style={{
                   position: "absolute",
-                  bottom: -90,
+                  bottom: -80,
                   left: 1,
                   right: 1
                 }}

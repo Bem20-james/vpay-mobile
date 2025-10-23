@@ -84,11 +84,7 @@ const AccountsBottomSheet: React.FC<Props> = ({
             <ThemedText style={styles.title}>{title}</ThemedText>
             <ThemedText style={styles.label}>{label}</ThemedText>
           </View>
-          <View
-            style={[
-              styles.customContent
-            ]}
-          >
+          <View style={[styles.customContent]}>
             {selectedType === "fiat" ? (
               <View style={{ gap: 5 }}>
                 <ThemedText style={styles.option}>Account Number</ThemedText>
@@ -138,9 +134,11 @@ const AccountsBottomSheet: React.FC<Props> = ({
                   />
                 </View>
                 <ThemedText style={styles.noticeText}>
-                  Your {selectedItem && "token_name" in selectedItem
+                  Your{" "}
+                  {selectedItem && "token_name" in selectedItem
                     ? selectedItem.token_name
-                    : ""} wallet address
+                    : ""}{" "}
+                  wallet address
                 </ThemedText>
               </>
             )}
@@ -150,16 +148,18 @@ const AccountsBottomSheet: React.FC<Props> = ({
             <ThemedText style={styles.value}>
               {(selectedItem as CryptoItem)?.wallet_address}
             </ThemedText>
-            <MaterialIcons
-              name="content-copy"
-              size={20}
-              color={"#208BC9"}
-              onPress={handleCopy}
-            />
+            {(selectedItem as CryptoItem)?.wallet_address && (
+              <MaterialIcons
+                name="content-copy"
+                size={20}
+                color={"#208BC9"}
+                onPress={handleCopy}
+              />
+            )}
           </View>
           <CustomButton
             title="Got it"
-            handlePress={() => { }}
+            handlePress={() => {}}
             btnStyles={{
               width: "100%",
               marginVertical: 20
@@ -235,7 +235,6 @@ const styles = StyleSheet.create({
   handleIndicator: {
     backgroundColor: "#208BC9"
   }
-
 });
 
 export default AccountsBottomSheet;

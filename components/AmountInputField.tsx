@@ -1,4 +1,11 @@
-import { View, TextInput, Pressable, FlatList, Image } from "react-native";
+import {
+  View,
+  TextInput,
+  Pressable,
+  FlatList,
+  Image,
+  ActivityIndicator
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { ThemedText } from "@/components/ThemedText";
@@ -12,6 +19,7 @@ import CountryFlag from "react-native-country-flag";
 import { SERVER_IMAGE_URL } from "@/constants/Paths";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { useUser } from "@/contexts/UserContexts";
+import { useRateConversion } from "@/hooks/useGeneral";
 
 type Currency = {
   country_code?: string;
@@ -76,6 +84,7 @@ const AmountInputField = ({
 
   const [showCurrencySheet, setShowCurrencySheet] = useState(false);
   const { showLoader, hideLoader } = useLoader();
+  const { rate, loading: rateLoading, refetch } = useRateConversion();
 
   useEffect(() => {
     if (loading) {
@@ -84,6 +93,22 @@ const AmountInputField = ({
       hideLoader();
     }
   }, [loading]);
+
+  useEffect(() => {
+    const fetchConversion = async () => {
+      if (amount && selectedCurrency) {
+        await refetch({
+          base_currency: selectedCurrency.currency_code || "",
+          target_currency: "NGN", // modify this later to be dynamic
+          amount: Number(amount)
+        });
+      }
+    };
+
+    const delayDebounce = setTimeout(fetchConversion, 600); // debounce input
+
+    return () => clearTimeout(delayDebounce);
+  }, [amount, selectedCurrency]);
 
   const validateBalance = (val: number, currency: Currency | null) => {
     if (currency && val > currency?.balance) {
@@ -176,10 +201,16 @@ const AmountInputField = ({
       </View>
 
       <View
-        style={[styles.inputBox, { backgroundColor: bgColor, marginTop: 20 }]}
+        style={[styles.inputBox, { backgroundColor: bgColor, marginTop: 15 }]}
       >
         <ThemedText style={styles.label}>{methodtitle}</ThemedText>
-        <View style={[styles.splitInput, styles.payMethod, { backgroundColor: inputBgColor }]}>
+        <View
+          style={[
+            styles.splitInput,
+            styles.payMethod,
+            { backgroundColor: inputBgColor }
+          ]}
+        >
           <Pressable
             style={styles.currencySelector}
             onPress={() => setShowCurrencySheet(true)}
@@ -236,6 +267,47 @@ const AmountInputField = ({
             {Number(selectedCurrency?.balance).toFixed(2)}
           </ThemedText>
         )}
+
+        {rateLoading ? (
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginTop: 5
+            }}
+          >
+            <ActivityIndicator size="small" color={Colors.light.tint} />
+            <ThemedText
+              style={{
+                marginLeft: 5,
+                color: "#80D1FF",
+                fontSize: 13,
+                fontFamily: "Questrial"
+              }}
+            >
+              Calculating rates and fees...
+            </ThemedText>
+          </View>
+        ) : rate ? (
+          <View
+            style={{
+              borderTopColor: "#2c404aff",
+              borderTopWidth: 1,
+              marginTop: 15
+            }}
+          >
+            <ThemedText
+              style={{
+                marginTop: 5,
+                color: "#80D1FF",
+                fontSize: 14,
+                fontFamily: "Questrial"
+              }}
+            >
+              ≈ {rate.converted_amount.toFixed(2)} {rate.target_currency}
+            </ThemedText>
+          </View>
+        ) : null}
 
         {error ? (
           <ThemedText

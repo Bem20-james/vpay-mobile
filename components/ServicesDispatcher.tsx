@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Pressable, Image } from "react-native";
+import { View, StyleSheet, Pressable, Image, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import CustomButton from "@/components/CustomButton";
@@ -16,6 +16,7 @@ import getSymbolFromCurrency from "currency-symbol-map";
 import AssetsBottomSheet from "./BottomSheets/Assets";
 import { useFetchUserAssets } from "@/hooks/useUser";
 import { useServiceOptions } from "@/hooks/useServiceOptions";
+import { useRateConversion } from "@/hooks/useGeneral";
 
 type Currency = {
   country_code?: string;
@@ -30,6 +31,7 @@ type ServicesDispatcherProps = {
   title?: string;
   number: string;
   provider: string;
+  logo?: any;
   name?: string;
   onCurrencyChange?: (currency: Currency) => void;
 };
@@ -39,6 +41,7 @@ const ServicesDispatcher = ({
   title = "Payment method",
   number,
   provider,
+  logo,
   name,
   onCurrencyChange
 }: ServicesDispatcherProps) => {
@@ -53,8 +56,10 @@ const ServicesDispatcher = ({
   const { showLoader, hideLoader } = useLoader();
 
   // ✅ Unified API data fetch using our custom hook
-  console.log("sending provider in lowercase:", provider)
-  const { options, loading: optionsLoading } = useServiceOptions(type, provider);
+  const { options, loading: optionsLoading } = useServiceOptions(
+    type,
+    provider
+  );
   const { assets, loading } = useFetchUserAssets();
 
   const [selectedAmount, setSelectedAmount] = useState<any>(null);
@@ -65,6 +70,7 @@ const ServicesDispatcher = ({
   const fiatAssets = assets?.fiat || [];
   const cryptoAssets = assets?.crypto || [];
   const allAssets = [...fiatAssets, ...cryptoAssets];
+  const { rate, loading: rateLoading, refetch } = useRateConversion();
 
   useEffect(() => {
     if (allAssets?.length > 0 && !selectedCurrency) {
@@ -81,6 +87,22 @@ const ServicesDispatcher = ({
       hideLoader();
     }
   }, [loading, optionsLoading]);
+
+  useEffect(() => {
+    const fetchConversion = async () => {
+      if (selectedAmount && selectedCurrency) {
+        await refetch({
+          base_currency: selectedCurrency.currency_code || "",
+          target_currency: "NGN", // modify this later to be dynamic
+          amount: Number(selectedAmount)
+        });
+      }
+    };
+
+    const delayDebounce = setTimeout(fetchConversion, 600); // debounce input
+
+    return () => clearTimeout(delayDebounce);
+  }, [selectedAmount, selectedCurrency]);
 
   const handlePay = () => {
     setShowReviewSheet(false);
@@ -103,13 +125,15 @@ const ServicesDispatcher = ({
           ]}
         >
           <Image
-            source={require("@/assets/images/adaptive-icon.png")}
+            source={{ uri: `${SERVER_IMAGE_URL}/${logo}` }}
             style={styles.logo}
           />
           <View>
-            <ThemedText style={styles.recipientName}>{name}</ThemedText>
+            <ThemedText style={styles.recipientName}>
+              {type === "data" ? number : name}
+            </ThemedText>
             <ThemedText style={styles.recipientDetails}>
-              {number} {provider}
+              {type === "data" ? "" : number} {provider}
             </ThemedText>
           </View>
         </View>
@@ -123,7 +147,7 @@ const ServicesDispatcher = ({
         />
 
         <View
-          style={[styles.inputBox, { backgroundColor: bgColor, marginTop: 20 }]}
+          style={[styles.inputBox, { backgroundColor: bgColor, marginTop: 15 }]}
         >
           <ThemedText style={styles.label}>{"Payment Method"}</ThemedText>
           <View
@@ -134,7 +158,9 @@ const ServicesDispatcher = ({
             ]}
           >
             <View>
-              <ThemedText style={optionsStyles.descTxt}>Select wallet</ThemedText>
+              <ThemedText style={optionsStyles.descTxt}>
+                Select wallet
+              </ThemedText>
               <Pressable
                 style={styles.currencySelector}
                 onPress={() => setShowCurrencySheet(true)}
@@ -196,12 +222,53 @@ const ServicesDispatcher = ({
               {Number(selectedCurrency?.balance).toFixed(2)}
             </ThemedText>
           )}
+
+          {rateLoading ? (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 5
+              }}
+            >
+              <ActivityIndicator size="small" color={Colors.light.tint} />
+              <ThemedText
+                style={{
+                  marginLeft: 5,
+                  color: "#80D1FF",
+                  fontSize: 13,
+                  fontFamily: "Questrial"
+                }}
+              >
+                Calculating rates and fees...
+              </ThemedText>
+            </View>
+          ) : rate ? (
+            <View
+              style={{
+                borderTopColor: "#2c404aff",
+                borderTopWidth: 1,
+                marginTop: 15
+              }}
+            >
+              <ThemedText
+                style={{
+                  marginTop: 5,
+                  color: "#80D1FF",
+                  fontSize: 14,
+                  fontFamily: "Questrial"
+                }}
+              >
+                ≈ {rate.converted_amount.toFixed(2)} {rate.target_currency}
+              </ThemedText>
+            </View>
+          ) : null}
         </View>
 
         <CustomButton
           title={"Continue"}
           handlePress={() => setShowReviewSheet(true)}
-          btnStyles={{ marginTop: 30 }}
+          btnStyles={{ marginTop: 60 }}
           variant="primary"
           size="medium"
           disabled={!selectedAmount}
@@ -244,7 +311,7 @@ const optionsStyles = StyleSheet.create({
     fontFamily: "Questrial",
     fontSize: 12,
     color: "#2c404aff"
-  },
+  }
 });
 
 export default ServicesDispatcher;

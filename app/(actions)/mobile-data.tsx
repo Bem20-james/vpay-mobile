@@ -14,27 +14,31 @@ import ProviderInput from "@/components/PhoneInputField";
 import { useFetchDataProviders } from "@/hooks/useDataPurchase";
 import AirtimeDataTrnxs from "@/components/Recents/AirtimeDataTrnx";
 import { airtimDataBeneficiaries, airtimeDataRecents } from "@/assets/data";
-import DataOptionsSelect from "@/components/DataOptionsSelect";
 import { useNavigation } from "expo-router";
+import ServicesDispatcher from "@/components/ServicesDispatcher";
+import { useUser } from "@/contexts/UserContexts";
 
 const DataScreen = () => {
   const colorScheme = useColorScheme();
-  const boxBackgroundColor =
-    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
-  const statusBarBg =
-    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const isDark = colorScheme === "dark";
+  const boxBackgroundColor = isDark
+    ? Colors.dark.background
+    : Colors.light.background;
+  const statusBarBg = isDark ? Colors.dark.background : Colors.light.background;
 
   const { providers, loading } = useFetchDataProviders();
   const { showLoader, hideLoader } = useLoader();
   const navigation = useNavigation();
 
   const [selectedProvider, setSelectedProvider] = useState<any>(null);
+  const [selectedProviderLogo, setSelectedProviderLogo] = useState<any>(null);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [contacts, setContacts] = useState<Contacts.Contact[]>([]);
   const [isContactsModalVisible, setIsContactsModalVisible] = useState(false);
   const [showDataBundles, setShowDataBundles] = useState(false);
+  const { user } = useUser();
 
-  console.log("Selected Provider:", selectedProvider);
+  const countryCode = user?.country?.code;
 
   useEffect(() => {
     if (loading) showLoader();
@@ -44,7 +48,6 @@ const DataScreen = () => {
   useEffect(() => {
     if (providers && providers.length > 0 && !selectedProvider) {
       setSelectedProvider(providers[0]?.provider_name);
-      console.log("Default provider set:", providers[0]);
     }
   }, [providers]);
 
@@ -74,7 +77,8 @@ const DataScreen = () => {
     setShowDataBundles(true);
   };
 
-  const isButtonDisabled = !phoneNumber || !selectedProvider;
+  const isButtonDisabled =
+    !phoneNumber || phoneNumber.length !== 11 || !selectedProvider;
 
   return (
     <SafeAreaView
@@ -84,7 +88,10 @@ const DataScreen = () => {
         <Navigator
           title="Buy Data"
           onBack={
-            showDataBundles ? () => setShowDataBundles(false) : navigation.goBack}
+            showDataBundles
+              ? () => setShowDataBundles(false)
+              : navigation.goBack
+          }
         />
 
         <ThemedText
@@ -101,10 +108,11 @@ const DataScreen = () => {
               handleChangeText={setPhoneNumber}
               placeholder="Phone number"
               providers={providers}
-              userCountryCode={"NG"}
+              userCountryCode={countryCode ?? ""}
+              maxLength={11}
               onProviderSelect={(provider) => {
-                console.log("Selected provider:", provider);
                 setSelectedProvider(provider.provider_name);
+                setSelectedProviderLogo(provider.image);
               }}
               onContactPress={fetchContacts}
             />
@@ -124,8 +132,12 @@ const DataScreen = () => {
             />
           </View>
         ) : (
-          <DataOptionsSelect
-            phoneNumber={phoneNumber}
+          <ServicesDispatcher
+            type="data"
+            title="Select Bundle"
+            name={""}
+            logo={selectedProviderLogo}
+            number={phoneNumber}
             provider={selectedProvider}
           />
         )}

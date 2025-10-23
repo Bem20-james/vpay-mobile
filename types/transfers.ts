@@ -5,8 +5,8 @@ export type SendScreenProps = {
 
 export interface ResolveTag {
   username: string;
-  firstname: string;
-  lastname: string;
+  accountname: string;
+  accountnumber: string;
   avatar?: string;
   phone: string | number;
   number: string | number;
@@ -30,9 +30,28 @@ export interface LookUpParams {
   bank_code: string;
 }
 
-export interface LookUpResponse {
-  error: number;
-  message: string;
+export interface SendFiatData {
+  account_number: string;
+  currency: string;
+  amount: string;
+  description?: string;
+  account_password: string;
+}
+
+export interface FiatResponse {
   success: boolean;
-  result: LookUpDataRes[];
+  message?: string;
+}
+
+export interface LookUpResult {
+  account_name: string;
+  account_number: string;
+  bank_id: number;
+}
+
+export interface LookUpResponse {
+  success: boolean;
+  code: number;
+  message?: string;
+  result: LookUpResult;
 }

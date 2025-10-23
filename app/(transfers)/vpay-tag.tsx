@@ -20,6 +20,7 @@ import RecentBeneficiaries from "@/components/Recents/RecentsBeneficiaries";
 import SendScreen from "@/components/Transfers/SendScreen";
 import { StoredContact } from "@/utils/encryptedStore";
 import { ThemedText } from "@/components/ThemedText";
+import CountryFlag from "react-native-country-flag";
 
 const VpayTag = () => {
   const colorScheme = useColorScheme();
@@ -36,7 +37,7 @@ const VpayTag = () => {
 
   // ✅ API hook
   const { resolveTag, acctInfo, loading: apiLoading } = useResolveVpayTag();
-  console.log("acct info in vpaytag:", acctInfo)
+  // console.log("selected vpaytag:", selectedVpayUser);
 
   // ✅ Local contacts
   const {
@@ -111,7 +112,7 @@ const VpayTag = () => {
     setShowSendScreen(true);
   };
 
-  const showAcctInfo = acctInfo && !apiLoading && !filteredContacts.vpay.length;
+  const showAcctInfo = acctInfo;
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
@@ -165,18 +166,26 @@ const VpayTag = () => {
                 }}
                 onPress={() => handleSelect(acctInfo)}
               >
-                <Image
-                  source={{
-                    uri: acctInfo?.avatar ?? "https://placehold.co/100"
-                  }}
-                  style={{ width: 40, height: 40, borderRadius: 20 }}
-                />
+                {acctInfo?.avatar ? (
+                  <Image
+                    source={{
+                      uri: acctInfo?.avatar ?? "https://placehold.co/100"
+                    }}
+                    style={{ width: 40, height: 40, borderRadius: 20 }}
+                  />
+                ) : (
+                  <CountryFlag
+                    isoCode={acctInfo.country_code ?? ""}
+                    size={20}
+                  />
+                )}
+
                 <View>
                   <ThemedText style={{ fontSize: 14, fontWeight: "600" }}>
-                    {acctInfo?.username}
+                    {acctInfo?.accountname}
                   </ThemedText>
                   <ThemedText style={{ fontSize: 12, color: "#999" }}>
-                    {acctInfo?.firstname || acctInfo?.lastname}
+                    {"@" + acctInfo?.username}
                   </ThemedText>
                 </View>
               </TouchableOpacity>
@@ -208,10 +217,15 @@ const VpayTag = () => {
         <SendScreen
           onBack={() => setShowSendScreen(false)}
           title="Send to Vpay Tag"
+          type="vpaytag"
           accountDetails={{
-            accountNumber: "",
-            bank: selectedVpayUser?.handle ?? "",
-            name: selectedVpayUser?.name ?? ""
+            accountNumber:
+              selectedVpayUser?.accountNumer ??
+              selectedVpayUser?.accountnumber ??
+              "",
+            bank: selectedVpayUser?.handle ?? selectedVpayUser?.username ?? "",
+            accountName: selectedVpayUser?.name ?? selectedVpayUser?.accountname ?? "",
+            username: selectedVpayUser?.username ?? selectedVpayUser?.handle ?? ""
           }}
         />
       )}

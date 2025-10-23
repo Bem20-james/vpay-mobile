@@ -23,7 +23,8 @@ function useRegister() {
     try {
       const response = await axios.post<AuthResponse>(
         `${SERVER_BASE_URL}/auth/user/register`,
-        data
+        data,
+        
       );
 
       const result = response?.data;
