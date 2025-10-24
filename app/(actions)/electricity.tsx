@@ -164,6 +164,7 @@ const ElectricityScreen = () => {
                     value={meterNumber}
                     handleChangeText={setMeterNumber}
                     otherStyles={{ marginTop: 7 }}
+                    maxLength={11}
                     keyboardType="default"
                     isIcon
                     iconName="electric-meter"
@@ -249,31 +250,42 @@ const ElectricityScreen = () => {
               </View>
             </TabContent>
 
-            <CustomButton
-              title={"Continue"}
-              handlePress={handleContinue}
-              btnStyles={{
-                marginTop: 32,
-                opacity:
-                  showSendScreen &&
-                  meterNumber.length === 11 &&
-                  selectedProvider &&
-                  customer?.customerName
-                    ? 1
-                    : 0.6
-              }}
-              disabled={
-                showSendScreen &&
-                !(
-                  !isLoading &&
-                  meterNumber.length === 11 &&
-                  selectedProvider &&
-                  customer?.customerName
-                )
-              }
-              variant="primary"
-              size="medium"
-            />
+            <View style={{ position: "relative" }}>
+              <View
+                style={{
+                  position: "absolute",
+                  bottom: -300,
+                  left: 0,
+                  right: 0
+                }}
+              >
+                <CustomButton
+                  title={"Continue"}
+                  handlePress={handleContinue}
+                  btnStyles={{
+                    marginTop: 32,
+                    opacity:
+                      showSendScreen &&
+                      meterNumber.length === 11 &&
+                      selectedProvider &&
+                      customer?.customerName
+                        ? 1
+                        : 0.6
+                  }}
+                  disabled={
+                    showSendScreen &&
+                    !(
+                      !isLoading &&
+                      meterNumber.length === 11 &&
+                      selectedProvider &&
+                      customer?.customerName
+                    )
+                  }
+                  variant="primary"
+                  size="medium"
+                />
+              </View>
+            </View>
           </View>
         ) : (
           <ServicesDispatcher

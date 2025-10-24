@@ -17,13 +17,25 @@ import CustomButton from "@/components/CustomButton";
 import { styles as formStyles } from "@/styles/formfield";
 import SendScreen from "./SendScreen";
 import { SendScreenProps } from "@/types/transfers";
+import { useMobileMoneyOperators } from "@/hooks/useGeneral";
+import ProvidersInputField from "../ProvidersInputField";
+import ProvidersBottomSheet from "../BottomSheets/Providers";
+import { TransferStyles } from "@/styles/transfers";
 
 const SendMobileMoney = ({ onBack }: SendScreenProps) => {
   const colorScheme = useColorScheme();
-  const txtColor =
-    colorScheme === "dark" ? Colors.light.accentBg : Colors.dark.background;
+  const isDark = colorScheme === "dark";
+  const txtColor = isDark ? Colors.light.accentBg : Colors.dark.background;
+  const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
+
   const [showSendScreen, setShowSendScreen] = useState(false);
   const screenHeight = Dimensions.get("window").height;
+
+  const [accountNumber, setAccountNumber] = useState("");
+  const [selectedProvider, setSelectedProvider] = useState<any>(null);
+  const [showSheet, setShowSheet] = useState(false);
+
+  const { loading, operators } = useMobileMoneyOperators();
 
   return (
     <React.Fragment>
@@ -31,22 +43,29 @@ const SendMobileMoney = ({ onBack }: SendScreenProps) => {
         <ScrollView showsVerticalScrollIndicator={false}>
           <Navigator title="Mobile Money" onBack={onBack} />
           <View style={styles.container}>
-            <FormField
-              title="Mobile money operator"
-              handleChangeText={() => {}}
-              isDropdown
-              onDropdownPress={() => {}}
-              placeholder="Select mobile money operator"
-            />
-            <FormField
-              title="Phone Number"
-              handleChangeText={() => {}}
-              placeholder="123456789"
+            <ProvidersInputField
+              value={selectedProvider}
+              placeholder="Select Mobile Money Provider"
+              onPressDropdown={() => setShowSheet(true)}
             />
 
-            <View>
+            <View
+              style={[
+                TransferStyles.inputBox,
+                { backgroundColor: bgColor, marginTop: 20 }
+              ]}
+            >
+              <FormField
+                title="Phone Number"
+                value={accountNumber}
+                handleChangeText={setAccountNumber}
+                placeholder="123456789"
+              />
+            </View>
+
+            <View style={{ marginTop: 20 }}>
               <ThemedText type="default" style={{ marginLeft: 6 }}>
-                Name
+                Account Name
               </ThemedText>
               <ThemedView
                 lightColor="transparent"
@@ -87,17 +106,25 @@ const SendMobileMoney = ({ onBack }: SendScreenProps) => {
           </View>
         </ScrollView>
       ) : (
-        <SendScreen title="Send to mobile money"           
+        <SendScreen
+          title="Send to mobile money"
           accountDetails={{
-            accountNumber: phone,
-            bank: selectedBank?.name ?? "",
-            name: accountName,
-          }} 
-          onBack={() => setShowSendScreen(false)} 
+            accountNumber: accountNumber,
+            bank: selectedProvider?.name ?? "",
+            accountName: accountName
+          }}
+          onBack={() => setShowSendScreen(false)}
         />
       )}
+      <ProvidersBottomSheet
+        isVisible={showSheet}
+        onClose={() => setShowSheet(false)}
+        onSelect={setSelectedProvider}
+        data={operators || []}
+        loading={loading}
+      />
     </React.Fragment>
-  );  
+  );
 };
 
 const styles = StyleSheet.create({

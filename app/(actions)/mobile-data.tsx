@@ -37,7 +37,6 @@ const DataScreen = () => {
   const [isContactsModalVisible, setIsContactsModalVisible] = useState(false);
   const [showDataBundles, setShowDataBundles] = useState(false);
   const { user } = useUser();
-
   const countryCode = user?.country?.code;
 
   useEffect(() => {

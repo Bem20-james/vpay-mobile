@@ -26,9 +26,8 @@ function useFetchCountries() {
       );
 
       const result = response.data;
-      console.log("Response data:", result);
 
-      if (result.success && result.error === 0) {
+      if (result.success && result.code === 0) {
         setCountries(result.result);
       }
     } catch (error: unknown) {
@@ -100,7 +99,9 @@ function useFetchNgnBanks() {
 function useRateConversion(initialData?: RateConversionRequest) {
   const [rate, setRate] = useState<Rates | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [data, setData] = useState<RateConversionRequest | undefined>(initialData);
+  const [data, setData] = useState<RateConversionRequest | undefined>(
+    initialData
+  );
 
   const fetchData = async (bodyData?: RateConversionRequest) => {
     setLoading(true);
@@ -140,5 +141,101 @@ function useRateConversion(initialData?: RateConversionRequest) {
   return { rate, loading, refetch: fetchData, setData };
 }
 
+function useFetchMobileMoneyCountries() {
+  const [MmCountries, setMmCountries] = useState<Country[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const {config} = useUser()
 
-export { useFetchCountries, useFetchNgnBanks, useRateConversion };
+  const fetchData = async () => {
+    setLoading(true);
+
+    try {
+      const response = await axios.get<GenericResponse<Country[]>>(
+        `${SERVER_BASE_URL}/mobile-money/countries`,
+        config
+      );
+
+      const result = response.data;
+      console.log("Response data:", result);
+
+      if (result.success && result.code === 0) {
+        setMmCountries(result.result);
+      }
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      const errorMessage =
+        axiosError.response?.data ||
+        "An error occurred while fetching countries.";
+
+      console.error("Error fetching data:", errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  return { MmCountries, loading, refetch: fetchData };
+}
+
+function useMobileMoneyOperators() {
+  const [operators, setOperators] = useState<Banks[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const { config } = useUser();
+
+  const fetchData = async (countryCode?: string) => {
+    setLoading(true);
+
+    if (!countryCode) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await axios.get<BanksRes>(
+        `${SERVER_BASE_URL}/mobile-money-providers/${countryCode}`,
+        config
+      );
+
+      const result = response.data;
+      console.log("mobile money response:", result);
+
+      if (result.success) {
+        setOperators(result.result);
+      } else {
+        if (response.data.error) {
+          Toast.show({
+            type: "error",
+            text1: response.data.message || "Failed to fetch banks."
+          });
+        }
+      }
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      const errorMessage =
+        axiosError.response?.data?.message ||
+        "An error occurred while fetching banks.";
+
+      console.error("Error fetching data:", errorMessage);
+      Toast.show({ type: "error", text1: errorMessage });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [config]);
+
+  return { operators, loading, refetch: fetchData };
+}
+
+export {
+  useFetchCountries,
+  useFetchNgnBanks,
+  useRateConversion,
+  useMobileMoneyOperators,
+  useFetchMobileMoneyCountries
+};

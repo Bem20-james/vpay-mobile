@@ -16,6 +16,7 @@ import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { useFetchNgnBanks } from "@/hooks/useGeneral";
 import { useLookUpUser } from "@/hooks/useTransfers";
 import Toast from "react-native-toast-message";
+import { TransferStyles } from "@/styles/transfers";
 
 const LocalBank = () => {
   const colorScheme = useColorScheme();
@@ -25,6 +26,7 @@ const LocalBank = () => {
     : Colors.light.background;
   const statusBarBg = isDark ? Colors.dark.background : Colors.light.background;
   const txtColor = isDark ? Colors.light.accentBg : Colors.dark.background;
+  const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
 
   const [showSendScreen, setShowSendScreen] = useState(false);
   const [showBanksSheet, setShowBanksSheet] = useState(false);
@@ -106,26 +108,41 @@ const LocalBank = () => {
         <ScrollView showsVerticalScrollIndicator={false}>
           <Navigator title="Send to Local Bank" />
           <View style={styles.container}>
-            <FormField
-              title="Bank"
-              value={selectedBank?.name || ""}
-              handleChangeText={() => {}}
-              placeholder="Select Bank"
-              isDropdown
-              onDropdownPress={() => setShowBanksSheet(true)}
-            />
+            <View
+              style={[TransferStyles.inputBox, { backgroundColor: bgColor }]}
+            >
+              <FormField
+                title="Bank"
+                value={selectedBank?.name || ""}
+                handleChangeText={() => {}}
+                placeholder="Select Bank"
+                isDropdown
+                onDropdownPress={() => setShowBanksSheet(true)}
+              />
+            </View>
 
-            <FormField
-              title="Account Number"
-              value={accountNumber}
-              handleChangeText={setAccountNumber}
-              placeholder="1234567890"
-              keyboardType="phone-pad"
-              maxLength={10}
-            />
-
+            <View
+              style={[
+                TransferStyles.inputBox,
+                { backgroundColor: bgColor, marginTop: 10 }
+              ]}
+            >
+              <FormField
+                title="Account Number"
+                value={accountNumber}
+                handleChangeText={setAccountNumber}
+                placeholder="1234567890"
+                keyboardType="phone-pad"
+                maxLength={10}
+              />
+            </View>
             {/* Account Name */}
-            <View style={{ marginTop: 7 }}>
+            <View
+              style={[
+                TransferStyles.inputBox,
+                { backgroundColor: bgColor, marginTop: 20 }
+              ]}
+            >
               <ThemedText
                 type="default"
                 style={{ marginLeft: 6, marginBottom: 8 }}
@@ -133,9 +150,12 @@ const LocalBank = () => {
                 Account Name
               </ThemedText>
               <ThemedView
+                lightColor="#14547C"
+                darkColor="#0A2D4A"
                 style={[
                   styles.inputField,
                   {
+                    borderRadius: 5,
                     borderColor: error
                       ? "#FF6B6B"
                       : colorScheme === "dark"
@@ -169,7 +189,6 @@ const LocalBank = () => {
                   />
                 )}
               </ThemedView>
-
               {error ? (
                 <ThemedText
                   style={{
@@ -183,28 +202,38 @@ const LocalBank = () => {
                 </ThemedText>
               ) : null}
             </View>
-
-            <CustomButton
-              title="Continue"
-              handlePress={handleContinue}
-              btnStyles={{
-                marginTop: 32,
-                opacity:
-                  accountNumber.length === 10 &&
-                  selectedBank &&
-                  acctInfo?.account_name
-                    ? 1
-                    : 0.6
-              }}
-              disabled={
-                !(
-                  !isLoading &&
-                  accountNumber.length === 10 &&
-                  selectedBank &&
-                  acctInfo?.account_name
-                )
-              }
-            />
+            <View style={{ position: "relative" }}>
+              <View
+                style={{
+                  position: "absolute",
+                  bottom: -310,
+                  left: 0,
+                  right: 0
+                }}
+              >
+                <CustomButton
+                  title="Continue"
+                  handlePress={handleContinue}
+                  btnStyles={{
+                    marginTop: 32,
+                    opacity:
+                      accountNumber.length === 10 &&
+                      selectedBank &&
+                      acctInfo?.account_name
+                        ? 1
+                        : 0.6
+                  }}
+                  disabled={
+                    !(
+                      !isLoading &&
+                      accountNumber.length === 10 &&
+                      selectedBank &&
+                      acctInfo?.account_name
+                    )
+                  }
+                />
+              </View>
+            </View>
           </View>
 
           <BanksBottomSheet

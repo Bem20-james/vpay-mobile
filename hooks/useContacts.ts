@@ -126,8 +126,8 @@ export const useVpayContacts = () => {
         flag: contact.country_code,
         image: contact.avatar,
         frequency: 0,
-        phoneNumber: contact.number,
-        accountNumber: contact.phone,
+        phoneNumber: contact.phone,
+        accountNumber: contact.number,
         bank: contact.bank
       }));
     } catch (err) {

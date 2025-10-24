@@ -121,16 +121,16 @@ const useSendLocal = () => {
     setError(null);
 
     try {
-      const { account_password, ...rest } = data;
+      const { activity_pin, ...rest } = data;
 
       const response = await axios.post<FiatResponse>(
         `${SERVER_BASE_URL}/user/fiat/send/local`,
-        rest, // send the rest of the fields as body
+        rest,
         {
-          ...config, // keep existing headers (e.g., Authorization)
+          ...config,
           headers: {
             ...config.headers,
-            activity_pin: account_password // <- send password in header
+            activity_pin: activity_pin
           }
         }
       );
@@ -138,14 +138,11 @@ const useSendLocal = () => {
       const result = response.data;
       console.log(result);
       if (!result.success) {
-        throw new Error(result.message || "Transaction failed");
+        return false
       }
 
-      if (response.status === 200) {
-        Toast.show({
-          type: "success",
-          text1: result.message || "Transfer Successful!"
-        });
+      if (result.success && result.code === 0) {
+        return true
       }
 
       return result;
@@ -169,5 +166,7 @@ const useSendLocal = () => {
 
   return { sendFunds, isLoading, error };
 };
+
+
 
 export { useSendLocal, useLookUpUser, useResolveVpayTag };

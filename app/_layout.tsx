@@ -104,6 +104,10 @@ export default function RootLayout() {
                     name="transaction-success"
                     options={{ headerShown: false }}
                   />
+                  <Stack.Screen
+                    name="setup-2FA"
+                    options={{ headerShown: false }}
+                  />
                 </Stack>
 
                 <Toast

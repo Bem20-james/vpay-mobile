@@ -18,9 +18,9 @@ import { useContacts, useVpayContacts } from "@/hooks/useContacts";
 import ContactSection from "@/components/ContactSection";
 import RecentBeneficiaries from "@/components/Recents/RecentsBeneficiaries";
 import SendScreen from "@/components/Transfers/SendScreen";
-import { StoredContact } from "@/utils/encryptedStore";
 import { ThemedText } from "@/components/ThemedText";
 import CountryFlag from "react-native-country-flag";
+import { router } from "expo-router";
 
 const VpayTag = () => {
   const colorScheme = useColorScheme();
@@ -35,11 +35,9 @@ const VpayTag = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
 
-  // ✅ API hook
   const { resolveTag, acctInfo, loading: apiLoading } = useResolveVpayTag();
-  // console.log("selected vpaytag:", selectedVpayUser);
 
-  // ✅ Local contacts
+  // Local contacts
   const {
     recentContacts,
     savedBeneficiaries,
@@ -54,7 +52,7 @@ const VpayTag = () => {
     searchVpayContacts
   } = useVpayContacts();
 
-  // ✅ Filter local results before calling backend
+  // Filter local results before calling backend
   const filteredContacts = useMemo(() => {
     if (!query.trim()) {
       return {
@@ -81,7 +79,7 @@ const VpayTag = () => {
     searchVpayContacts
   ]);
 
-  // ✅ Search effect: only hit backend when all local searches are empty
+  // Search effect: only hit backend when all local searches are empty
   useEffect(() => {
     const timeout = setTimeout(async () => {
       const hasLocalResults =
@@ -118,7 +116,7 @@ const VpayTag = () => {
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
       {!showSendScreen ? (
         <ScrollView>
-          <Navigator title="Vpay Tag" />
+          <Navigator title="Vpay Tag" onBack={router.back} />
 
           <View style={styles.container}>
             {/* 🔍 Search input */}
@@ -219,13 +217,12 @@ const VpayTag = () => {
           title="Send to Vpay Tag"
           type="vpaytag"
           accountDetails={{
-            accountNumber:
-              selectedVpayUser?.accountNumer ??
-              selectedVpayUser?.accountnumber ??
-              "",
-            bank: selectedVpayUser?.handle ?? selectedVpayUser?.username ?? "",
-            accountName: selectedVpayUser?.name ?? selectedVpayUser?.accountname ?? "",
-            username: selectedVpayUser?.username ?? selectedVpayUser?.handle ?? ""
+            accountNumber: selectedVpayUser?.accountNumber ?? "",
+            bank: selectedVpayUser?.bank ?? "",
+            accountName:
+              selectedVpayUser?.name ?? selectedVpayUser?.accountname ?? "",
+            username:
+              selectedVpayUser?.username ?? selectedVpayUser?.handle ?? ""
           }}
         />
       )}

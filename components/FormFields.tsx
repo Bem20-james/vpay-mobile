@@ -63,7 +63,7 @@ const FormField = ({
   iconName,
   error,
   dropdownIcon = (
-    <MaterialIcons name="arrow-drop-down" size={25} color="#838383" />
+    <MaterialIcons name="arrow-drop-down" size={28} color="#208bc9" />
   ),
   isPhoneInput = false,
   defaultCountry = {
@@ -97,7 +97,15 @@ const FormField = ({
   return (
     <ThemedView style={[otherStyles, { backgroundColor: DefaultTheme }]}>
       {title && (
-        <ThemedText type="default" style={{ marginLeft: 6, marginBottom: 5 }}>
+        <ThemedText
+          style={{
+            marginLeft: 6,
+            marginBottom: 5,
+            fontFamily: "Questrial",
+            fontSize: 12,
+            color: "#F5F5F5"
+          }}
+        >
           {title}
         </ThemedText>
       )}
@@ -164,7 +172,12 @@ const FormField = ({
 
         {isLeftIcon && iconName && (
           <View>
-            <MaterialIcons name={iconName} size={25} color="#208BC9" onPress={onIconPress} />
+            <MaterialIcons
+              name={iconName}
+              size={25}
+              color="#208BC9"
+              onPress={onIconPress}
+            />
           </View>
         )}
 

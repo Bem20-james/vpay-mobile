@@ -101,7 +101,20 @@ const SendScreen = ({
 
   const handlePay = () => {
     setDetailsShowSheet(false);
-    router.push("/(transfers)/authorization-pin");
+
+    router.push({
+      pathname: "/(transfers)/authorization-pin",
+      params: {
+        transactionType: "sendLocal",
+        payload: JSON.stringify({
+          account_number: accountDetails.accountNumber,
+          debit_asset: selectedCurrency?.currency_code,
+          amount,
+          bank: accountDetails.bank,
+          description: note
+        })
+      }
+    });
   };
 
   return (
@@ -145,7 +158,7 @@ const SendScreen = ({
             <View style={{ flexDirection: "row", gap: 5 }}>
               <ThemedText style={styles.recipientDetails}>
                 {type === "vpaytag"
-                  ? "@" + accountDetails.username
+                  ? accountDetails.username
                   : accountDetails.accountNumber}
               </ThemedText>
               <ThemedText style={styles.recipientDetails}>
@@ -278,13 +291,14 @@ const SendScreen = ({
 
       {/* Review Sheet */}
       <ReviewBottomSheet
-        type="vpay"
+        type={accountDetails.username ? "vpay" : "transfer"}
         isVisible={showDetailsSheet}
         onClose={() => setDetailsShowSheet(false)}
         onPay={handlePay}
         amount={amount}
+        username={accountDetails.username || ""}
         bank={accountDetails.bank}
-        accountNumber={accountDetails.accountNumber}
+        accountNumber={accountDetails.accountNumber || ""}
         name={accountDetails.accountName}
         rate="5"
         selectedAsset={selectedCurrency}

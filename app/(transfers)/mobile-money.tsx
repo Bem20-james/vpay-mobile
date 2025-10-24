@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  StyleSheet,
   View,
   ScrollView,
   TextInput,
@@ -16,10 +15,10 @@ import { ThemedText } from "@/components/ThemedText";
 import { KycStyles } from "@/styles/kyc";
 import { TransferStyles } from "@/styles/transfers";
 import { Feather } from "@expo/vector-icons";
-import { countries } from "@/assets/data";
 import CountryFlag from "react-native-country-flag";
 import { Colors } from "@/constants/Colors";
 import SendMobileMoney from "@/components/Transfers/SendMobileMoney";
+import { useFetchMobileMoneyCountries } from "@/hooks/useGeneral";
 
 const MobileMoney = () => {
   const colorScheme = useColorScheme();
@@ -29,6 +28,7 @@ const MobileMoney = () => {
     colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
   const [query, setQuery] = useState("");
   const [screenVisible, setScreenVisible] = useState(false);
+  const { MmCountries, loading } = useFetchMobileMoneyCountries();
 
   return (
     <SafeAreaView style={[KycStyles.safeArea, { backgroundColor }]}>
@@ -53,7 +53,7 @@ const MobileMoney = () => {
             </View>
             <View>
               <FlatList
-                data={countries}
+                data={MmCountries}
                 keyExtractor={(item, index) => `${item.id}-${index}`}
                 nestedScrollEnabled={true}
                 scrollEnabled={false}
@@ -66,7 +66,7 @@ const MobileMoney = () => {
                     <View style={TransferStyles.itemContent}>
                       <View style={[TransferStyles.iconCircle]}>
                         <CountryFlag
-                          isoCode={item.countryCode}
+                          isoCode={item.country_code}
                           size={15}
                           style={TransferStyles.flagItem}
                         />
@@ -77,7 +77,7 @@ const MobileMoney = () => {
                           darkColor="#FFFFFF"
                           style={TransferStyles.primaryText}
                         >
-                          {item.name}
+                          {item.country_name}
                         </ThemedText>
                       </View>
                     </View>
@@ -89,12 +89,11 @@ const MobileMoney = () => {
           </View>
         </ScrollView>
       ) : (
-        <SendMobileMoney onBack={() => setScreenVisible(false)} />
+        <SendMobileMoney selectedCountry={item.country_code} onBack={() => setScreenVisible(false)} />
       )}
       <StatusBar style="dark" backgroundColor={statusBarBg} />
     </SafeAreaView>
   );
 };
-
 
 export default MobileMoney;

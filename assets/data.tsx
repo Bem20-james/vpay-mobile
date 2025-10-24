@@ -3,8 +3,8 @@ import { HistoryItem } from "@/components/Recents/RecentTransactions";
 import { OptionItem } from "@/components/BottomSheets/Options";
 import { TransferItem } from "@/components/Recents/RecentTransfers";
 import { Beneficiaries } from "@/components/Recents/RecentTransfers";
-import { AirtimeDataBeneficiaries, AirtimeDataRecents } from "@/components/Recents/AirtimeDataTrnx";
 import images from "@/constants/Images";
+import { ContactItem } from "@/components/Recents/AirtimeDataTrnx";
 
 export const quickActions: ActionItem[] = [
   {
@@ -425,48 +425,48 @@ export const countries = [
   }
 ];
 
-export const airtimeDataRecents: AirtimeDataRecents[] = [
+export const airtimeDataRecents: ContactItem[] = [
   {
     label: "GLO GH",
-    phone: "022788951",
+    identifier: "022788951",
     image: images.logolight,
   },
   {
     label: "9MOBILE NG",
-    phone: "09033788951",
+    identifier: "09033788951",
     image: images.logolight,
   },
   {
     label: "MTN NG",
-    phone: "09122879851",
+    identifier: "09122879851",
     image: images.logolight,
   },
   {
     label: "AIRTEL NG",
-    phone: "07044517951",
+    identifier: "07044517951",
     image: images.logolight,
   },
 ];
 
-export const airtimDataBeneficiaries: AirtimeDataBeneficiaries[] = [
+export const airtimDataBeneficiaries: ContactItem[] = [
   {
     label: "MTN NG",
-    phone: "0917943851",
+    identifier: "0917943851",
     image: images.logolight,
   },
   {
     label: "AIRTEL NG",
-    phone: "09122879851",
+    identifier: "09122879851",
     image: images.logolight,
   },
   {
     label: "GLO GH",
-    phone: "122879851",
+    identifier: "122879851",
     image: images.logolight,
   },
   {
     label: "9MOBILE NG",
-    phone: "0903879851",
+    identifier: "0903879851",
     image: images.logolight,
   },
 ];

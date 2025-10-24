@@ -12,11 +12,9 @@ import { getData, storeData, removeData } from "@/utils/store";
 import * as LocalAuthentication from "expo-local-authentication";
 import { Colors } from "@/constants/Colors";
 import Toast from "react-native-toast-message";
-import Setup2FAScreen from "@/components/2FASetup";
 
 const SettingsScreen: React.FC = () => {
   const [securityLock, setSecurityLock] = useState(false);
-  const [make2FAVisible, setMake2FAVisible] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
   const colorScheme = useColorScheme();
   const boxBackgroundColor =
@@ -24,7 +22,6 @@ const SettingsScreen: React.FC = () => {
   const router = useRouter();
   const logout = useLogout();
   const { clearUser } = useUser();
-
 
   useEffect(() => {
     (async () => {
@@ -80,17 +77,6 @@ const SettingsScreen: React.FC = () => {
       router.push("/(auth)/login-index");
     }
   };
-
-
-
-  if (make2FAVisible) {
-    return (
-      <Setup2FAScreen
-        showBack={() => setMake2FAVisible(false)}
-        title="Enable Two-factor"
-      />
-    );
-  }
 
   return (
     <SafeAreaView
@@ -150,7 +136,7 @@ const SettingsScreen: React.FC = () => {
                 title="Setup 2FA"
                 label="Setup two-factor authentication"
                 hasChevron
-                onPress={() => setMake2FAVisible(true)}
+                onPress={() => router.push("/setup-2FA")}
               />
 
               <SettingItem

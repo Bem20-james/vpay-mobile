@@ -717,7 +717,7 @@ const useSetup2FA = () => {
       console.log("Server Response:", result);
 
       if (result?.code === 0) {
-        setData2FA(result.data)
+        setData2FA(result.result)
       }
 
       return false;

@@ -122,7 +122,8 @@ const AssetsBottomSheet = ({
             keyExtractor={(item) => `${item.type}-${item.country_code}`}
             contentContainerStyle={{ paddingBottom: 24 }}
             renderItem={({ item }: { item: any }) => {
-              const isSelected = item.country_code === selectedCurrency.country_code;
+              const isSelected =
+                item.country_code === selectedCurrency.country_code;
 
               return (
                 <TouchableOpacity
@@ -156,7 +157,7 @@ const AssetsBottomSheet = ({
                       {"currency_code" in item && item.currency_code
                         ? getSymbolFromCurrency(item.currency_code)
                         : ""}
-                      {item.balance.toFixed(2)}
+                      {(item.balance ?? 0).toFixed(2)}
                     </ThemedText>
                     {isSelected && (
                       <FontAwesome

@@ -30,6 +30,7 @@ interface Props {
   selectedAsset: Currency;
   snapPoints?: string[];
   title?: string;
+  username?: string;
 
   // Transfer-specific
   bank?: string;
@@ -58,7 +59,8 @@ const ReviewBottomSheet = ({
   provider,
   snapPoints = ["50", "60%"],
   title = "Review Details",
-  type
+  type,
+  username
 }: Props) => {
   const sheetRef = useRef<BottomSheet>(null);
   const colorScheme = useColorScheme();
@@ -96,7 +98,7 @@ const ReviewBottomSheet = ({
         ]
       : type === "vpay"
       ? [
-          { label: "username", value: bank },
+          { label: "username", value: username },
           { label: "Name", value: name, transform: "uppercase" },
           {
             label: "Amount",
@@ -229,7 +231,7 @@ const ReviewBottomSheet = ({
                     ]}
                   >
                     {getSymbolFromCurrency(selectedAsset.country_code) || "₦"}
-                    {selectedAsset.balance.toFixed(2)}
+                    {(selectedAsset.balance ?? 0).toFixed(2)}
                   </ThemedText>
                 </View>
               </TouchableOpacity>

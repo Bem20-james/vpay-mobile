@@ -71,18 +71,17 @@ const AirtimeScreen = () => {
       pathname: "/(transfers)/authorization-pin",
       params: {
         transactionType: "airtime",
-        payload: [
+        payload: JSON.stringify({
           phoneNumber,
           selectedCurrency,
           amount,
-          selectedProvider?.provider_name
-        ]
+          provider: selectedProvider?.provider_name
+        })
       }
     });
   };
 
-  const isContinueDisabled =
-    !selectedProvider || !phoneNumber || !amount || amountError;
+  const isContinueDisabled = !selectedProvider || !phoneNumber || !amount;
 
   return (
     <SafeAreaView
@@ -105,6 +104,7 @@ const AirtimeScreen = () => {
             value={phoneNumber}
             handleChangeText={setPhoneNumber}
             placeholder="Phone number"
+            maxLength={11}
             providers={providers}
             userCountryCode={countryCode ?? ""}
             onProviderSelect={(provider) => {

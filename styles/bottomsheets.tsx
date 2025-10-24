@@ -92,7 +92,8 @@ export const btmSheetStyles = StyleSheet.create({
     fontFamily: "Inter-SemiBold"
   },
   bottomSheetContent: {
-    paddingBottom: 24
+    paddingBottom: 24,
+    paddingHorizontal: 15
   },
   indicatorHandle: {
     backgroundColor: "#208BC9",

@@ -35,12 +35,13 @@ export interface SendFiatData {
   currency: string;
   amount: string;
   description?: string;
-  account_password: string;
+  activity_pin: string;
 }
 
 export interface FiatResponse {
   success: boolean;
   message?: string;
+  code?: number;
 }
 
 export interface LookUpResult {

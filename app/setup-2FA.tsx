@@ -4,38 +4,41 @@ import {
   ScrollView,
   StatusBar,
   StyleSheet,
-  TouchableOpacity,
+  TouchableOpacity
 } from "react-native";
 import { useSetup2FA, useEnable2FA } from "@/hooks/useAuthentication";
 import Toast from "react-native-toast-message";
 import { useUser } from "@/contexts/UserContexts";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Navigator from "./Navigator";
+import Navigator from "@/components/Navigator";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { Colors } from "@/constants/Colors";
-import { ThemedText } from "./ThemedText";
-import CustomButton from "./CustomButton";
+import { ThemedText } from "@/components/ThemedText";
+import CustomButton from "@/components/CustomButton";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import OtpVerification from "@/app/(auth)/otp-verification";
 import QRCode from "react-native-qrcode-svg";
+import { useRouter } from "expo-router";
 
 interface Props {
   showBack?: () => void;
   title?: string;
 }
 
-const Setup2FAScreen: React.FC<Props> = ({ showBack, title }) => {
+const Setup2FAScreen: React.FC<Props> = ({ showBack }) => {
   const { setup2FA, data2FA } = useSetup2FA();
   const { enable2FA } = useEnable2FA();
   const { user } = useUser();
   const email = user?.email;
   const [showOtpScreen, setShowOtpScreen] = useState(false);
+  const router = useRouter();
 
   const colorScheme = useColorScheme();
   const bgColor =
     colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
-  const isDark = colorScheme === "dark";
+
+    console.log("2FA data:", data2FA);
 
   // Fetch setup data on mount
   useEffect(() => {
@@ -63,7 +66,7 @@ const Setup2FAScreen: React.FC<Props> = ({ showBack, title }) => {
 
   const handleCopy = async () => {
     if (data2FA?.secret) {
-      console.log(data2FA?.secret)
+      console.log(data2FA?.secret);
       await Clipboard.setStringAsync(data2FA.secret);
       Toast.show({ type: "success", text1: "Copied to clipboard" });
     }
@@ -83,19 +86,24 @@ const Setup2FAScreen: React.FC<Props> = ({ showBack, title }) => {
 
   return (
     <SafeAreaView style={{ backgroundColor: bgColor, height: "100%" }}>
-      <ScrollView style={{ paddingHorizontal: 7 }} showsVerticalScrollIndicator={false}>
-        <Navigator onBack={showBack} title={title} />
+      <ScrollView
+        style={{ paddingHorizontal: 7 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <Navigator onBack={router.back} title="Setup Two-factor" />
         <View style={styles.container}>
-          <ThemedText style={{ fontFamily: "Inter-Bold", fontSize: 15, paddingVertical: 5 }}>
+          <ThemedText
+            style={{
+              fontFamily: "Inter-Bold",
+              fontSize: 15,
+              paddingVertical: 5
+            }}
+          >
             Scan this QR with your Authenticator App
           </ThemedText>
 
           {data2FA?.qrCodeUrl && (
-            <View
-              style={[
-                styles.customContent,
-              ]}
-            >
+            <View style={[styles.customContent]}>
               <View style={styles.qrContainer}>
                 <QRCode
                   value={data2FA.qrCodeUrl}
@@ -107,7 +115,9 @@ const Setup2FAScreen: React.FC<Props> = ({ showBack, title }) => {
             </View>
           )}
 
-          <ThemedText style={{ fontFamily: "Questrial", fontSize: 12, marginTop: 5 }}>
+          <ThemedText
+            style={{ fontFamily: "Questrial", fontSize: 12, marginTop: 5 }}
+          >
             Or enter this secret manually:
           </ThemedText>
 
@@ -115,7 +125,11 @@ const Setup2FAScreen: React.FC<Props> = ({ showBack, title }) => {
             <View style={styles.icon}>
               <ThemedText>{data2FA?.secret ?? "Loading..."}</ThemedText>
               <TouchableOpacity onPress={handleCopy}>
-                <MaterialIcons name="content-copy" size={25} color={"#208BC9"} />
+                <MaterialIcons
+                  name="content-copy"
+                  size={25}
+                  color={"#208BC9"}
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -135,23 +149,23 @@ const Setup2FAScreen: React.FC<Props> = ({ showBack, title }) => {
 const styles = StyleSheet.create({
   container: {
     justifyContent: "center",
-    paddingHorizontal: 10,
+    paddingHorizontal: 10
   },
   icon: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "center"
   },
   bgBx: {
     backgroundColor: Colors.dark.primaryDark2,
     paddingHorizontal: 10,
     paddingVertical: 15,
-    borderRadius: 6,
+    borderRadius: 6
   },
   customContent: {
     paddingHorizontal: 10,
     paddingVertical: 10,
-    borderRadius: 6,
+    borderRadius: 6
   },
   qrContainer: {
     padding: 30,
@@ -160,8 +174,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "#208BC9",
-    alignItems: "center",
-  },
+    alignItems: "center"
+  }
 });
 
 export default Setup2FAScreen;

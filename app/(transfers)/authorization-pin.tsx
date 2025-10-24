@@ -13,7 +13,7 @@ import { Colors } from "@/constants/Colors";
 import { ThemedText } from "@/components/ThemedText";
 import Toast from "react-native-toast-message";
 import { useLoader } from "@/contexts/LoaderContext";
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import Navigator from "@/components/Navigator";
 import { useTransactionDispatcher } from "@/hooks/useTransactionDispatcher";
 
@@ -29,17 +29,10 @@ const AuthorizationPin: React.FC = () => {
 
   const [pin, setPin] = useState<string>("");
   const maxPinLength: number = 4;
-  const { showLoader, hideLoader } = useLoader();
   const navigation = useNavigation();
+  const router = useRouter();
 
-  const { account_number, currency, amount, description, account_password } =
-    useLocalSearchParams<{
-      account_number: string;
-      currency: string;
-      amount: string;
-      description?: string;
-      account_password: string;
-    }>();
+  const { showLoader, hideLoader } = useLoader();
 
   const handleNumberPress = (number: string): void => {
     if (pin.length < maxPinLength) {
@@ -78,13 +71,12 @@ const AuthorizationPin: React.FC = () => {
     </TouchableOpacity>
   );
 
-  console.log("Current PIN:", pin);
-
   const { transactionType, payload } = useLocalSearchParams<{
     transactionType: string;
-    payload: any;
+    payload: string;
   }>();
 
+  const parsedPayload = JSON.parse(payload);
   const { executeTransaction } = useTransactionDispatcher();
 
   const handleTransfer = async (finalPin: string) => {
@@ -92,16 +84,13 @@ const AuthorizationPin: React.FC = () => {
     try {
       const success = await executeTransaction(
         transactionType,
-        payload,
+        parsedPayload,
         finalPin
       );
+
       if (success) {
         setPin("");
-        Toast.show({
-          type: "success",
-          text1: "Transaction completed successfully"
-        });
-        navigation.goBack();
+        router.push("/transaction-success");
       }
     } catch (error) {
       setPin("");

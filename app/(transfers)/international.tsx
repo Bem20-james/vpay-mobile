@@ -18,16 +18,22 @@ import { Feather } from "@expo/vector-icons";
 import { countries } from "@/assets/data";
 import SendInternational from "@/components/Transfers/sendInternational";
 import { Colors } from "@/constants/Colors";
+import { useFetchCountries } from "@/hooks/useGeneral";
 
 const International = () => {
   const colorScheme = useColorScheme();
-  const backgroundColor =
-    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
-  const statusBarBg =
-    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const isDark = colorScheme === "dark";
+  const backgroundColor = isDark
+    ? Colors.dark.background
+    : Colors.light.background;
+  const statusBarBg = isDark ? Colors.dark.background : Colors.light.background;
   const [screenVisible, setScreenVisible] = React.useState(false);
   const [query, setQuery] = React.useState("");
   const [selectedCountry, setSelectedCountry] = React.useState("");
+
+  const { countries, loading } = useFetchCountries();
+
+  console.log("Countries:", countries);
 
   const handleCountrySelect = (country: string) => {
     setSelectedCountry(country);
@@ -64,13 +70,13 @@ const International = () => {
                 renderItem={({ item }) => (
                   <TouchableOpacity
                     style={TransferStyles.itemContainer}
-                    onPress={() => handleCountrySelect(item.name)}
+                    onPress={() => handleCountrySelect(item.country_name)}
                     activeOpacity={0.7}
                   >
                     <View style={TransferStyles.itemContent}>
                       <View style={[TransferStyles.iconCircle]}>
                         <CountryFlag
-                          isoCode={item.countryCode}
+                          isoCode={item.country_code}
                           size={15}
                           style={TransferStyles.flagItem}
                         />
@@ -81,7 +87,7 @@ const International = () => {
                           darkColor="#FFFFFF"
                           style={TransferStyles.primaryText}
                         >
-                          {item.name}
+                          {item.country_name}
                         </ThemedText>
                       </View>
                     </View>

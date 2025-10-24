@@ -289,7 +289,7 @@ const ServicesDispatcher = ({
       />
 
       <ReviewBottomSheet
-        type={"data"}
+        type={"cable"}
         isVisible={showReviewSheet}
         onClose={() => setShowReviewSheet(false)}
         onPay={handlePay}
