@@ -59,6 +59,13 @@ const AccountsBottomSheet: React.FC<Props> = ({
   const handleCopy = async () => {
     if (selectedItem && "account_number" in selectedItem) {
       await Clipboard.setStringAsync(selectedItem.account_number);
+      sheetRef.current?.close();
+      Toast.show({ type: "success", text1: "Copied to clipboard" });
+    }
+
+    if (selectedItem && "wallet_address" in selectedItem) {
+      await Clipboard.setStringAsync(selectedItem.wallet_address);
+      sheetRef.current?.close();
       Toast.show({ type: "success", text1: "Copied to clipboard" });
     }
   };
@@ -159,7 +166,7 @@ const AccountsBottomSheet: React.FC<Props> = ({
           </View>
           <CustomButton
             title="Got it"
-            handlePress={() => {}}
+            handlePress={() => sheetRef.current?.close()}
             btnStyles={{
               width: "100%",
               marginVertical: 20

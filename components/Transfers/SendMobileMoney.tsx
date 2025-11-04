@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
   ScrollView,
   TextInput,
-  Dimensions
+  Dimensions,
+  ActivityIndicator
 } from "react-native";
 import React from "react";
 import Navigator from "@/components/Navigator";
@@ -22,7 +23,7 @@ import ProvidersInputField from "../ProvidersInputField";
 import ProvidersBottomSheet from "../BottomSheets/Providers";
 import { TransferStyles } from "@/styles/transfers";
 
-const SendMobileMoney = ({ onBack }: SendScreenProps) => {
+const SendMobileMoney = ({ onBack, selectedCountry }: SendScreenProps) => {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const txtColor = isDark ? Colors.light.accentBg : Colors.dark.background;
@@ -35,7 +36,24 @@ const SendMobileMoney = ({ onBack }: SendScreenProps) => {
   const [selectedProvider, setSelectedProvider] = useState<any>(null);
   const [showSheet, setShowSheet] = useState(false);
 
-  const { loading, operators } = useMobileMoneyOperators();
+  const { loading, operators, refetch } = useMobileMoneyOperators();
+
+    useEffect(() => {
+    if (selectedCountry) {
+      refetch(selectedCountry);
+    }
+  }, [selectedCountry]);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator color="#007BFF" size="large" />
+        <ThemedText style={{ marginTop: 10 }}>Loading mobile money operators...</ThemedText>
+      </View>
+    );
+  }
+
+  console.log("Selected country:", selectedCountry);
 
   return (
     <React.Fragment>
@@ -59,7 +77,7 @@ const SendMobileMoney = ({ onBack }: SendScreenProps) => {
                 title="Phone Number"
                 value={accountNumber}
                 handleChangeText={setAccountNumber}
-                placeholder="123456789"
+                placeholder="00000000000"
               />
             </View>
 
@@ -111,7 +129,7 @@ const SendMobileMoney = ({ onBack }: SendScreenProps) => {
           accountDetails={{
             accountNumber: accountNumber,
             bank: selectedProvider?.name ?? "",
-            accountName: accountName
+            accountName: "accountName" // Placeholder, replace with actual name when mobile money lookup APIs are resolved available
           }}
           onBack={() => setShowSendScreen(false)}
         />

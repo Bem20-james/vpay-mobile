@@ -1,11 +1,21 @@
 export interface CableTvData {
-  fiatToken: string;
+  base_asset: string;
+  target_asset: string;
+  provider: string;
+  number: string;
+  type: string;
+  amount: string;
+  activity_pin: string;
+}
+
+export interface ElectricityBillData {
+  base_asset: string;
+  target_asset: string;
   provider: string;
   number: string;
   code: string;
   amount: string;
-  phone: string;
-  authorization_pin: string;
+  activity_pin: string;
 }
 
 export interface Response {

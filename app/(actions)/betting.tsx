@@ -31,6 +31,7 @@ const BettingScreen = () => {
     ? Colors.dark.background
     : Colors.light.background;
   const txtColor = isDark ? Colors.light.accentBg : Colors.dark.background;
+  const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
 
   const statusBarBg = isDark ? Colors.dark.background : Colors.light.background;
   const [selectedProvider, setSelectedProvider] = useState<any>(null);
@@ -130,7 +131,22 @@ const BettingScreen = () => {
               isLoading={loading}
             />
 
-            <View>
+            <View
+              style={[
+                TransferStyles.inputBox,
+                { backgroundColor: bgColor}
+              ]}
+            >
+              <ThemedText
+                style={{
+                  marginLeft: 6,
+                  fontFamily: "Questrial",
+                  fontSize: 13,
+                  marginBottom: 15
+                }}
+              >
+                Account ID
+              </ThemedText>
               <FormField
                 placeholder={"Account ID"}
                 value={acctId}
@@ -141,74 +157,86 @@ const BettingScreen = () => {
               />
             </View>
 
-            <View style={{ marginTop: 10 }}>
-              <ThemedText
-                style={{
-                  marginLeft: 6,
-                  fontFamily: "Questrial",
-                  fontSize: 13
-                }}
-              >
-                Account Name
-              </ThemedText>
-              <ThemedView
-                style={[
-                  TransferStyles.inputField,
-                  {
-                    borderColor: error
-                      ? "#FF6B6B"
-                      : colorScheme === "dark"
-                      ? "#414141"
-                      : "#d7d7d7",
-                    height: 45,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    paddingHorizontal: 8
-                  }
-                ]}
-              >
-                {isLoading ? (
-                  <ActivityIndicator size="small" color="#208bc9" />
-                ) : (
-                  <TextInput
-                    style={[
-                      formStyles.input,
-                      {
-                        color: customer?.account_name ? txtColor : "#9B9B9B",
-                        fontSize: customer?.account_name ? 15 : 12,
-                        fontFamily: "Questrial",
-                        fontWeight: customer?.account_name ? "700" : "400",
-                        flex: 1
-                      }
-                    ]}
-                    placeholder="Account name will appear here"
-                    placeholderTextColor="#9B9B9B"
-                    value={customer?.account_name ?? ""}
-                    editable={false}
-                  />
-                )}
-              </ThemedView>
-
-              {error ? (
+            <View
+              style={[
+                TransferStyles.inputBox,
+                { backgroundColor: bgColor, marginTop: 10 }
+              ]}
+            >
+              <View style={{ marginTop: 5 }}>
                 <ThemedText
                   style={{
-                    color: "#FF6B6B",
-                    fontSize: 12,
-                    marginTop: 4,
-                    marginLeft: 6
+                    marginLeft: 6,
+                    fontFamily: "Questrial",
+                    fontSize: 13,
+                    marginBottom: 10
                   }}
                 >
-                  {error}
+                  Account Name
                 </ThemedText>
-              ) : null}
+                <ThemedView
+                  lightColor="#14547C"
+                  darkColor="#0A2D4A"
+                  style={[
+                    TransferStyles.inputField,
+                    {
+                      borderRadius: 5,
+                      borderColor: error
+                        ? "#FF6B6B"
+                        : colorScheme === "dark"
+                        ? "#414141"
+                        : "#d7d7d7",
+                      height: 45,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      paddingHorizontal: 8
+                    }
+                  ]}
+                >
+                  {isLoading ? (
+                    <ActivityIndicator size="small" color="#208bc9" />
+                  ) : (
+                    <TextInput
+                      style={[
+                        formStyles.input,
+                        {
+                          color: customer?.account_name ? txtColor : "#9B9B9B",
+                          fontSize: customer?.account_name ? 15 : 12,
+                          fontFamily: "Questrial",
+                          fontWeight: customer?.account_name ? "700" : "400",
+                          flex: 1
+                        }
+                      ]}
+                      placeholder="Account name will appear here"
+                      placeholderTextColor="#9B9B9B"
+                      value={customer?.account_name ?? ""}
+                      editable={false}
+                    />
+                  )}
+                </ThemedView>
+
+                {error ? (
+                  <ThemedText
+                    style={{
+                      color: "#FF6B6B",
+                      fontSize: 12,
+                      marginTop: 4,
+                      marginLeft: 6
+                    }}
+                  >
+                    {error}
+                  </ThemedText>
+                ) : null}
+              </View>
             </View>
+
             <View style={{ position: "relative" }}>
               <View
                 style={{
                   position: "absolute",
-                  bottom: -350,
-                  left: 10,
-                  right: 10
+                  bottom: -240,
+                  left: 0,
+                  right: 0
                 }}
               >
                 <CustomButton

@@ -12,6 +12,7 @@ import { SERVER_IMAGE_URL } from "@/constants/Paths";
 import CountryFlag from "react-native-country-flag";
 import { TransferStyles as styles } from "@/styles/transfers";
 import images from "@/constants/Images";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 interface Currency {
   country_code: string;
@@ -21,13 +22,24 @@ interface Currency {
   type: string;
   balance: number;
 }
+
+interface ConversionBody {
+  base_currency: string;
+  converted_amount: string;
+  converted_fee: string;
+  target_currency: string;
+  total_converted: string;
+  transaction_type?: string;
+  warning?: string;
+}
+
 interface Props {
   isVisible: boolean;
   onClose: () => void;
   onPay: () => void;
   amount: string;
-  rate: string;
   selectedAsset: Currency;
+  conversion: ConversionBody;
   snapPoints?: string[];
   title?: string;
   username?: string;
@@ -42,19 +54,19 @@ interface Props {
   provider?: string;
 
   // Mode
-  type: "transfer" | "airtime" | "data" | "vpay";
+  type: "transfer" | "bills" | "data" | "airtime" | "vpay";
 }
 
 const ReviewBottomSheet = ({
   isVisible,
   onClose,
   onPay,
-  rate,
   amount,
   bank,
   accountNumber,
   name,
   selectedAsset,
+  conversion,
   phoneNumber,
   provider,
   snapPoints = ["50", "60%"],
@@ -93,7 +105,9 @@ const ReviewBottomSheet = ({
           },
           {
             label: "Transaction fee",
-            value: getSymbolFromCurrency(selectedAsset.currency_code) + rate
+            value:
+              getSymbolFromCurrency(selectedAsset.currency_code) +
+              conversion?.converted_fee
           }
         ]
       : type === "vpay"
@@ -106,11 +120,51 @@ const ReviewBottomSheet = ({
           },
           {
             label: "Transaction fee",
-            value: getSymbolFromCurrency(selectedAsset.currency_code) + rate
+            value:
+              getSymbolFromCurrency(conversion?.target_currency) +
+              conversion?.converted_fee
+          },
+          {
+            label: "Total amount",
+            value: (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <ThemedText>
+                  {getSymbolFromCurrency(selectedAsset.currency_code)}
+                  {amount}
+                </ThemedText>
+                <MaterialCommunityIcons
+                  name="approximately-equal"
+                  size={18}
+                  color="#999"
+                  style={{ marginHorizontal: 6 }}
+                />
+                <ThemedText>
+                  {getSymbolFromCurrency(conversion?.target_currency)}
+                  {conversion?.total_converted}
+                </ThemedText>
+              </View>
+            )
+          }
+        ]
+      : type === "bills"
+      ? [
+          { label: "Smartcard/IUC Number", value: phoneNumber },
+          { label: "Provider", value: provider },
+
+          { label: "Account Name", value: name, transform: "uppercase" },
+          {
+            label: "Amount",
+            value: getSymbolFromCurrency(selectedAsset.currency_code) + amount
+          },
+          {
+            label: "Transaction fee",
+            value:
+              getSymbolFromCurrency(selectedAsset.currency_code) +
+              conversion?.converted_fee
           }
         ]
       : [
-          { label: "Phone Number", value: phoneNumber },
+          { label: "Phone number", value: phoneNumber },
           { label: "Provider", value: provider },
           {
             label: "Amount",
@@ -118,7 +172,15 @@ const ReviewBottomSheet = ({
           },
           {
             label: "Transaction fee",
-            value: getSymbolFromCurrency(selectedAsset.currency_code) + rate
+            value:
+              getSymbolFromCurrency(selectedAsset.currency_code) +
+              conversion?.converted_fee
+          },
+          {
+            label: "Total amount",
+            value:
+              getSymbolFromCurrency(selectedAsset.currency_code) +
+              conversion?.converted_fee
           }
         ];
 

@@ -16,6 +16,7 @@ import { useLoader } from "@/contexts/LoaderContext";
 import ReviewBottomSheet from "@/components/BottomSheets/Review";
 import ProviderInput from "@/components/PhoneInputField";
 import { useUser } from "@/contexts/UserContexts";
+import { ConversionBody } from "@/components/AmountInputField";
 
 const AirtimeScreen = () => {
   const colorScheme = useColorScheme();
@@ -33,13 +34,12 @@ const AirtimeScreen = () => {
   const [showReviewSheet, setShowReviewSheet] = useState(false);
 
   const [amount, setAmount] = useState("");
-  const [amountError, setAmountError] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<any>(null);
   const { providers, loading } = useFetchAirtimeProviders();
   const { showLoader, hideLoader } = useLoader();
   const { user } = useUser();
-
   const countryCode = user?.country?.code;
+  const [currentRate, setCurrentRate] = useState<ConversionBody | any>(null);
 
   //Contacts fetcher
   const fetchContacts = async () => {
@@ -81,17 +81,21 @@ const AirtimeScreen = () => {
     });
   };
 
-  const isContinueDisabled = !selectedProvider || !phoneNumber || !amount;
+  const isContinueDisabled =
+    !selectedProvider ||
+    !phoneNumber ||
+    !amount ||
+    !currentRate?.converted_amount;
 
   return (
     <SafeAreaView
       style={[styles.safeArea, { backgroundColor: boxBackgroundColor }]}
-    >
+    > 
+      <Navigator title="Buy Airtime" />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Navigator title="Buy Airtime" />
         <ThemedText
           lightColor="#9B9B9B"
           darkColor="#EEF3FB"
@@ -117,9 +121,9 @@ const AirtimeScreen = () => {
             <AmountInputField
               onAmountChange={(val, hasError) => {
                 setAmount(val);
-                setAmountError(hasError);
               }}
               onCurrencyChange={setSelectedCurrency}
+              onRateChange={setCurrentRate}
             />
           </View>
 
@@ -127,7 +131,7 @@ const AirtimeScreen = () => {
           <CustomButton
             title="Continue"
             handlePress={() => setShowReviewSheet(true)}
-            btnStyles={{ marginTop: 30 }}
+            btnStyles={{ marginTop: 20 }}
             variant="primary"
             size="medium"
             disabled={isContinueDisabled}
@@ -153,8 +157,8 @@ const AirtimeScreen = () => {
         amount={amount}
         phoneNumber={phoneNumber}
         provider={selectedProvider?.provider_name}
-        rate="10"
         selectedAsset={selectedCurrency}
+        conversion={currentRate}
       />
     </SafeAreaView>
   );

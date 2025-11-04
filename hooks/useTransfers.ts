@@ -9,7 +9,8 @@ import {
   SendFiatData,
   LookUpResponse,
   LookUpResult,
-  FiatResponse
+  TransactionResponse,
+  CryptoData,
 } from "@/types/transfers";
 
 function useResolveVpayTag() {
@@ -116,48 +117,41 @@ const useSendLocal = () => {
   const [error, setError] = useState<string | null>(null);
   const { config } = useUser();
 
-  const sendFunds = async (data: SendFiatData): Promise<FiatResponse> => {
+  const sendFunds = async (
+    data: SendFiatData
+  ): Promise<TransactionResponse> => {
     setIsLoading(true);
     setError(null);
 
     try {
       const { activity_pin, ...rest } = data;
-
-      const response = await axios.post<FiatResponse>(
+      const response = await axios.post(
         `${SERVER_BASE_URL}/user/fiat/send/local`,
         rest,
         {
           ...config,
-          headers: {
-            ...config.headers,
-            activity_pin: activity_pin
-          }
+          headers: { ...config.headers, activity_pin }
         }
       );
 
       const result = response.data;
-      console.log(result);
-      if (!result.success) {
-        return false
+      console.log("send local response:", result);
+
+      if (!result.success && result.code !== 0) {
+        return {
+          success: false,
+          message: result.message || "Transaction failed"
+        };
       }
 
-      if (result.success && result.code === 0) {
-        return true
-      }
-
-      return result;
+      return { success: true, data: result, message: result.message };
     } catch (err) {
       const errorMessage =
         (err as AxiosError<{ message?: string }>)?.response?.data?.message ||
         (err as Error).message ||
         "Network or server error";
-      console.error("Error Response:", errorMessage);
-      setError(errorMessage);
-      Toast.show({
-        type: "error",
-        text1: errorMessage
-      });
 
+      setError(errorMessage);
       return { success: false, message: errorMessage };
     } finally {
       setIsLoading(false);
@@ -167,6 +161,53 @@ const useSendLocal = () => {
   return { sendFunds, isLoading, error };
 };
 
+const useSendCrypto = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { config } = useUser();
 
+  const sendCrypto = async (
+    data: CryptoData
+  ): Promise<TransactionResponse> => {
+    setIsLoading(true);
+    setError(null);
 
-export { useSendLocal, useLookUpUser, useResolveVpayTag };
+    try {
+      const { activity_pin, ...rest } = data;
+      const response = await axios.post(
+        `${SERVER_BASE_URL}/web3/send-tokens`,
+        rest,
+        {
+          ...config,
+          headers: { ...config.headers, activity_pin }
+        }
+      );
+
+      const result = response.data;
+      console.log("send tokens res:", result);
+
+      if (!result.success && result.code !== 0) {
+        return {
+          success: false,
+          message: result.message || "Transaction failed"
+        };
+      }
+
+      return { success: true, data: result, message: result.message };
+    } catch (err) {
+      const errorMessage =
+        (err as AxiosError<{ message?: string }>)?.response?.data?.message ||
+        (err as Error).message ||
+        "Network or server error";
+
+      setError(errorMessage);
+      return { success: false, message: errorMessage };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { sendCrypto, isLoading, error };
+};
+
+export { useSendLocal, useLookUpUser, useResolveVpayTag, useSendCrypto };

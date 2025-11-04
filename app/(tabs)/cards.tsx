@@ -49,7 +49,7 @@ const Cards = () => {
 
           <CustomButton
             title="Create card"
-            handlePress={() => router.push("/")}
+            handlePress={() => router.push("/(cards)/create")}
             btnStyles={{ width: "100%" }}
             variant={colorScheme === "dark" ? "primary" : "secondary"}
             size="medium"

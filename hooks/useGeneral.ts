@@ -97,11 +97,12 @@ function useFetchNgnBanks() {
 }
 
 function useRateConversion(initialData?: RateConversionRequest) {
-  const [rate, setRate] = useState<Rates | null>(null);
+  const [rate, setRate] = useState<Rates | any>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [data, setData] = useState<RateConversionRequest | undefined>(
     initialData
   );
+  const { config } = useUser();
 
   const fetchData = async (bodyData?: RateConversionRequest) => {
     setLoading(true);
@@ -112,7 +113,8 @@ function useRateConversion(initialData?: RateConversionRequest) {
 
       const response = await axios.post<RatesRes<Rates>>(
         `${SERVER_BASE_URL}/rate-conversion`,
-        payload
+        payload,
+        config
       );
 
       const result = response.data;
@@ -124,7 +126,7 @@ function useRateConversion(initialData?: RateConversionRequest) {
     } catch (error: unknown) {
       const axiosError = error as AxiosError<{ message?: string }>;
       const errorMessage =
-        axiosError.response?.data?.message ||
+        axiosError.response?.data ||
         "An error occurred while converting rates.";
 
       console.error("Error fetching data:", errorMessage);
@@ -144,7 +146,7 @@ function useRateConversion(initialData?: RateConversionRequest) {
 function useFetchMobileMoneyCountries() {
   const [MmCountries, setMmCountries] = useState<Country[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const {config} = useUser()
+  const { config } = useUser();
 
   const fetchData = async () => {
     setLoading(true);

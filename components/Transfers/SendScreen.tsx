@@ -11,7 +11,7 @@ import Navigator from "@/components/Navigator";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { ThemedText } from "@/components/ThemedText";
 import CustomButton from "@/components/CustomButton";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { TransferStyles as styles } from "@/styles/transfers";
 import AssetsBottomSheet from "../BottomSheets/Assets";
 import ReviewBottomSheet from "../BottomSheets/Review";
@@ -86,7 +86,9 @@ const SendScreen = ({
         await refetch({
           base_currency: selectedCurrency.currency_code || "",
           target_currency: "NGN", // modify this later to be dynamic
-          amount: Number(amount)
+          amount: Number(amount),
+          transaction_type: "transfer",
+          direction: "base_to_target"
         });
       }
     };
@@ -105,7 +107,7 @@ const SendScreen = ({
     router.push({
       pathname: "/(transfers)/authorization-pin",
       params: {
-        transactionType: "sendLocal",
+        transactionType: "transfer",
         payload: JSON.stringify({
           account_number: accountDetails.accountNumber,
           debit_asset: selectedCurrency?.currency_code,
@@ -255,7 +257,25 @@ const SendScreen = ({
                   fontFamily: "Questrial"
                 }}
               >
-                ≈ {rate.converted_amount.toFixed(2)} {rate.target_currency}
+                {Number(amount)} {rate?.base_currency}{" "}
+                <MaterialCommunityIcons
+                  name="approximately-equal"
+                  size={20}
+                  style={{ paddingTop: 5 }}
+                />
+                {Number(rate?.converted_amount ?? 0).toFixed(2)}{" "}
+                {rate?.target_currency}
+              </ThemedText>
+
+              <ThemedText
+                style={{
+                  color: "red",
+                  marginTop: 3,
+                  fontFamily: "Questrial",
+                  fontSize: 12
+                }}
+              >
+                {rate?.warning}
               </ThemedText>
             </View>
           ) : null}
@@ -300,19 +320,19 @@ const SendScreen = ({
         bank={accountDetails.bank}
         accountNumber={accountDetails.accountNumber || ""}
         name={accountDetails.accountName}
-        rate="5"
         selectedAsset={selectedCurrency}
+        conversion={rate}
       />
 
       <View style={{ position: "relative" }}>
         <View
-          style={{ position: "absolute", bottom: -300, left: 10, right: 10 }}
+          style={{ position: "absolute", bottom: -260, left: 10, right: 10 }}
         >
           <CustomButton
             title="Continue"
             handlePress={() => setDetailsShowSheet(true)}
             btnStyles={{ width: "100%" }}
-            disabled={!amount}
+            disabled={!amount || rateLoading || rate?.warning !== null}
           />
         </View>
       </View>

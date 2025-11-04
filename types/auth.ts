@@ -32,7 +32,7 @@ export type UserData = {
 };
 
 export interface AuthResponse {
-  code: boolean | number;
+  code: string | number;
   message: string;
   success: string;
   result?: UserData;

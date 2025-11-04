@@ -61,7 +61,7 @@ const ProvidersBottomSheet: React.FC<ProvidersBottomSheetProps> = ({
       ) : (
         <BottomSheetFlatList
           data={data}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item?.id.toString()}
           contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
           renderItem={({ item }) => (
             <TouchableOpacity

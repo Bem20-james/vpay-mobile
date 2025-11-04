@@ -131,12 +131,12 @@ const LocalBank = () => {
                 title="Account Number"
                 value={accountNumber}
                 handleChangeText={setAccountNumber}
-                placeholder="1234567890"
+                placeholder="0000000000"
                 keyboardType="phone-pad"
                 maxLength={10}
               />
             </View>
-            {/* Account Name */}
+
             <View
               style={[
                 TransferStyles.inputBox,

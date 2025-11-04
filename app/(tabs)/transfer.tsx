@@ -20,9 +20,9 @@ const TransferScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <Navigator title="Send Money" showBackIcon={false} />
+      <Navigator title="Send Money" showBackIcon={false} />
 
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View>
           <View style={{ flex: 1 }}>
             <QuickActionsSection

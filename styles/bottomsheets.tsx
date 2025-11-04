@@ -24,8 +24,8 @@ export const btmSheetStyles = StyleSheet.create({
     fontFamily: "Questrial"
   },
   value: {
-    fontSize: 14,
-    fontFamily: "Inter-Medium"
+    fontSize: 15,
+    fontFamily: "Inter-SemiBold"
   },
   paymentMethod: {
     marginTop: 20,

@@ -12,8 +12,10 @@ import {
   Response,
   BettingProvider,
   BettingResult,
-  BettingLookUpRes
+  BettingLookUpRes,
+  ElectricityBillData
 } from "@/types/services";
+import { TransactionResponse } from "@/types/transfers";
 
 function useFetchCableTvProviders() {
   const [tvProviders, setTvProviders] = useState<CableTvProvider[]>([]);
@@ -30,7 +32,6 @@ function useFetchCableTvProviders() {
       );
 
       const result = response.data;
-      console.log("Response data:", result);
 
       if (result.code === 0) {
         setTvProviders(result.result);
@@ -107,7 +108,6 @@ function useFetchBettingProviders() {
       );
 
       const result = response.data;
-      console.log("Response data:", result);
 
       if (result.code === 0) {
         setBetProvider(result.result);
@@ -152,7 +152,6 @@ function useLookUpBetCustomer() {
         config
       );
 
-      console.log("lookup response:", response);
       const result = response.data;
 
       if (result.code === 0) {
@@ -299,7 +298,6 @@ function useFetchCableTvOptions(provider?: string) {
       );
 
       const result = response.data;
-      console.log("Result from data options API:", result);
 
       if (result.code === 0) {
         setOptions(result.result);
@@ -344,7 +342,6 @@ function useFetchElectricityOptions(provider?: string) {
       );
 
       const result = response.data;
-      console.log("Result from data options API:", result);
 
       if (result.code === 0) {
         setOptions(result.result);
@@ -378,19 +375,88 @@ const usePayCableTv = () => {
   const [error, setError] = useState<string | null>(null);
   const { config } = useUser();
 
-  const payCableTv = async (data: CableTvData): Promise<Response> => {
+  const payCableTv = async (
+    data: CableTvData
+  ): Promise<TransactionResponse> => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await axios.post<Response>(
+      const { activity_pin, ...rest } = data;
+
+      const response = await axios.post(
         `${SERVER_BASE_URL}/user/cabletv/request`,
-        data,
-        config
+        rest,
+        {
+          ...config,
+          headers: {
+            ...config.headers,
+            activity_pin
+          }
+        }
       );
 
       const result = response.data;
-      console.log(result);
+      console.log("Cable TV Payment Response:", result);
+
+      if (!result.success) {
+        return { success: false, message: result.message || "Payment failed" };
+      }
+
+      return {
+        success: true,
+        data: result.data,
+        message: result.message || "Payment successful"
+      };
+    } catch (err) {
+      const errorMessage =
+        (err as AxiosError<{ message?: string }>)?.response?.data?.message ||
+        (err as Error).message ||
+        "Network or server error";
+
+      console.error("Cable TV Error:", errorMessage);
+      setError(errorMessage);
+
+      return { success: false, message: errorMessage };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { payCableTv, isLoading, error };
+};
+
+const usePayElectricity = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { config } = useUser();
+
+  const payElectricity = async (
+    data: ElectricityBillData
+  ): Promise<Response> => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const { activity_pin, ...rest } = data;
+
+      console.log("Sending with data:", data);
+
+      const response = await axios.post(
+        `${SERVER_BASE_URL}/user/electricity/request`,
+        rest,
+        {
+          ...config,
+          headers: {
+            ...config.headers,
+            activity_pin: activity_pin
+          }
+        }
+      );
+
+      const result = response.data;
+      console.log("Cable TV Payment Response:", result);
+
       if (!result.success) {
         throw new Error(result.message || "Payment failed");
       }
@@ -421,7 +487,7 @@ const usePayCableTv = () => {
     }
   };
 
-  return { payCableTv, isLoading, error };
+  return { payElectricity, isLoading, error };
 };
 
 export {
@@ -433,5 +499,6 @@ export {
   useFetchCableTvOptions,
   useFetchElectricityOptions,
   useFetchBettingProviders,
-  useLookUpBetCustomer
+  useLookUpBetCustomer,
+  usePayElectricity
 };

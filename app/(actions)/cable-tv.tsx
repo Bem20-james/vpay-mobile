@@ -46,6 +46,8 @@ const CableTVScreen = () => {
   const [showSendScreen, setShowSendScreen] = useState(false);
   const navigation = useNavigation();
 
+  console.log("Selected TV provider:", tvProviders);
+
   const prevLookupParams = useRef({ userNumber: "", provider: "" });
   const stableLookup = useCallback(lookup, []);
 
@@ -130,7 +132,7 @@ const CableTVScreen = () => {
               <View
                 style={[
                   styles.textBox,
-                  { backgroundColor: bgColor, marginTop: 20 }
+                  { backgroundColor: bgColor, marginTop: 10 }
                 ]}
               >
                 <ThemedText style={styles.title}>
@@ -148,94 +150,118 @@ const CableTVScreen = () => {
                 />
               </View>
 
-              <View style={{ marginTop: 20 }}>
-                <ThemedText
-                  style={{
-                    marginLeft: 6,
-                    fontFamily: "Questrial",
-                    fontSize: 13
-                  }}
-                >
-                  Customer Name
-                </ThemedText>
-                <ThemedView
-                  style={[
-                    TransferStyles.inputField,
-                    {
-                      borderColor: error
-                        ? "#FF6B6B"
-                        : colorScheme === "dark"
-                        ? "#414141"
-                        : "#d7d7d7",
-                      height: 45,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      paddingHorizontal: 8
-                    }
-                  ]}
-                >
-                  {isLoading ? (
-                    <ActivityIndicator size="small" color="#208bc9" />
-                  ) : (
-                    <TextInput
-                      style={[
-                        formStyles.input,
-                        {
-                          color: subscriber?.customerName
-                            ? txtColor
-                            : "#9B9B9B",
-                          fontSize: subscriber?.customerName ? 15 : 12,
-                          fontFamily: "Questrial",
-                          fontWeight: subscriber?.customerName ? "700" : "400",
-                          flex: 1
-                        }
-                      ]}
-                      placeholder="Subscriber's name will appear here"
-                      placeholderTextColor="#9B9B9B"
-                      value={subscriber?.customerName ?? ""}
-                      editable={false}
-                    />
-                  )}
-                </ThemedView>
-
-                {error ? (
+              <View
+                style={[
+                  TransferStyles.inputBox,
+                  { backgroundColor: bgColor, marginTop: 10 }
+                ]}
+              >
+                <View style={{ marginTop: 5 }}>
                   <ThemedText
                     style={{
-                      color: "#FF6B6B",
-                      fontSize: 12,
-                      marginTop: 4,
-                      marginLeft: 6
+                      marginLeft: 6,
+                      fontFamily: "Questrial",
+                      fontSize: 13,
+                      marginBottom: 10
                     }}
                   >
-                    {error}
+                    Customer Name
                   </ThemedText>
-                ) : null}
+                  <ThemedView
+                    lightColor="#14547C"
+                    darkColor="#0A2D4A"
+                    style={[
+                      TransferStyles.inputField,
+                      {
+                        borderRadius: 5,
+                        borderColor: error
+                          ? "#FF6B6B"
+                          : colorScheme === "dark"
+                          ? "#414141"
+                          : "#d7d7d7",
+                        height: 45,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        paddingHorizontal: 8
+                      }
+                    ]}
+                  >
+                    {isLoading ? (
+                      <ActivityIndicator size="small" color="#208bc9" />
+                    ) : (
+                      <TextInput
+                        style={[
+                          formStyles.input,
+                          {
+                            color: subscriber?.customerName
+                              ? txtColor
+                              : "#9B9B9B",
+                            fontSize: subscriber?.customerName ? 15 : 12,
+                            fontFamily: "Questrial",
+                            fontWeight: subscriber?.customerName
+                              ? "700"
+                              : "400",
+                            flex: 1
+                          }
+                        ]}
+                        placeholder="Subscriber's name will appear here"
+                        placeholderTextColor="#9B9B9B"
+                        value={subscriber?.customerName ?? ""}
+                        editable={false}
+                      />
+                    )}
+                  </ThemedView>
+
+                  {error ? (
+                    <ThemedText
+                      style={{
+                        color: "#FF6B6B",
+                        fontSize: 12,
+                        marginTop: 4,
+                        marginLeft: 6
+                      }}
+                    >
+                      {error}
+                    </ThemedText>
+                  ) : null}
+                </View>
               </View>
             </View>
 
-            <CustomButton
-              title={"Continue"}
-              handlePress={handleContinue}
-              btnStyles={{
-                marginTop: 30,
-                opacity:
-                  userNumber.length === 10 &&
-                  selectedProvider &&
-                  subscriber?.customerName
-                    ? 1
-                    : 0.6
-              }}
-              disabled={
-                !(
-                  !isLoading &&
-                  userNumber.length === 10 &&
-                  selectedProvider &&
-                  subscriber?.customerName
-                )
-              }
-              variant="primary"
-              size="medium"
-            />
+            <View style={{ position: "relative" }}>
+              <View
+                style={{
+                  position: "absolute",
+                  bottom: -340,
+                  left: 0,
+                  right: 0
+                }}
+              >
+                <CustomButton
+                  title={"Continue"}
+                  handlePress={handleContinue}
+                  btnStyles={{
+                    marginTop: 30,
+                    opacity:
+                      userNumber.length === 10 &&
+                      selectedProvider &&
+                      subscriber?.customerName
+                        ? 1
+                        : 0.6
+                  }}
+                  disabled={
+                    !(
+                      !isLoading &&
+                      userNumber.length === 10 &&
+                      selectedProvider &&
+                      subscriber?.customerName
+                    )
+                  }
+                  variant="primary"
+                  size="medium"
+                />
+              </View>
+            </View>
           </View>
         ) : (
           <ServicesDispatcher

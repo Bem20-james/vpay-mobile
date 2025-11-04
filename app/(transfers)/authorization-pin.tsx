@@ -16,11 +16,7 @@ import { useLoader } from "@/contexts/LoaderContext";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import Navigator from "@/components/Navigator";
 import { useTransactionDispatcher } from "@/hooks/useTransactionDispatcher";
-
-interface NumberButtonProps {
-  number: string;
-  onPress: (number: string) => void;
-}
+import { buildSuccessParams } from "@/utils/buildSuccessParams";
 
 const AuthorizationPin: React.FC = () => {
   const colorScheme = useColorScheme();
@@ -31,45 +27,7 @@ const AuthorizationPin: React.FC = () => {
   const maxPinLength: number = 4;
   const navigation = useNavigation();
   const router = useRouter();
-
   const { showLoader, hideLoader } = useLoader();
-
-  const handleNumberPress = (number: string): void => {
-    if (pin.length < maxPinLength) {
-      const newPin = pin + number;
-      setPin(newPin);
-
-      if (newPin.length === maxPinLength) {
-        handleTransfer(newPin);
-      }
-    }
-  };
-
-  const handleDelete = (): void => {
-    setPin(pin.slice(0, -1));
-  };
-
-  const renderPinDots = (): JSX.Element[] => {
-    return Array.from({ length: maxPinLength }, (_, index) => (
-      <View
-        key={index}
-        style={[
-          styles.pinDot,
-          { backgroundColor: index < pin.length ? "#3B82F6" : "#BFDBFE" }
-        ]}
-      />
-    ));
-  };
-
-  const NumberButton: React.FC<NumberButtonProps> = ({ number, onPress }) => (
-    <TouchableOpacity
-      style={styles.numberButton}
-      onPress={() => onPress(number)}
-      activeOpacity={0.7}
-    >
-      <ThemedText style={styles.numberText}>{number}</ThemedText>
-    </TouchableOpacity>
-  );
 
   const { transactionType, payload } = useLocalSearchParams<{
     transactionType: string;
@@ -82,15 +40,31 @@ const AuthorizationPin: React.FC = () => {
   const handleTransfer = async (finalPin: string) => {
     showLoader();
     try {
-      const success = await executeTransaction(
+      const result = await executeTransaction(
         transactionType,
         parsedPayload,
         finalPin
       );
 
-      if (success) {
-        setPin("");
-        router.push("/transaction-success");
+      console.log("TransactionType:", transactionType);
+      console.log("TransactionResult:", result);
+
+      if (result?.success && result?.data?.result) {
+        const successParams = buildSuccessParams(
+          transactionType,
+          result.data.result
+        );
+        console.log("Success Params:", successParams);
+
+        router.push({
+          pathname: "/transaction-success",
+          params: successParams
+        });
+      } else {
+        Toast.show({
+          type: "error",
+          text1: result?.message || "Transaction failed. Please try again."
+        });
       }
     } catch (error) {
       setPin("");
@@ -106,6 +80,27 @@ const AuthorizationPin: React.FC = () => {
     }
   };
 
+  const handleNumberPress = (number: string): void => {
+    if (pin.length < maxPinLength) {
+      const newPin = pin + number;
+      setPin(newPin);
+      if (newPin.length === maxPinLength) handleTransfer(newPin);
+    }
+  };
+
+  const handleDelete = (): void => setPin(pin.slice(0, -1));
+
+  const renderPinDots = () =>
+    Array.from({ length: maxPinLength }, (_, index) => (
+      <View
+        key={index}
+        style={[
+          styles.pinDot,
+          { backgroundColor: index < pin.length ? "#3B82F6" : "#BFDBFE" }
+        ]}
+      />
+    ));
+
   return (
     <SafeAreaView style={{ backgroundColor: bgColor, height: "100%" }}>
       <ScrollView
@@ -113,7 +108,6 @@ const AuthorizationPin: React.FC = () => {
         showsVerticalScrollIndicator={false}
       >
         <Navigator onBack={navigation.goBack} />
-
         <View style={styles.container}>
           <View style={styles.content}>
             <ThemedText
@@ -126,24 +120,17 @@ const AuthorizationPin: React.FC = () => {
             <ThemedText style={styles.subtitle}>
               To complete this transaction, enter your 4-digit PIN
             </ThemedText>
-
             <View style={styles.pinDotsContainer}>{renderPinDots()}</View>
 
             {/* Keypad */}
             <View style={styles.keypad}>
-              {/* Row 1 */}
-              <NumberButton number="1" onPress={handleNumberPress} />
-              <NumberButton number="2" onPress={handleNumberPress} />
-              <NumberButton number="3" onPress={handleNumberPress} />
-              {/* Row 2 */}
-              <NumberButton number="4" onPress={handleNumberPress} />
-              <NumberButton number="5" onPress={handleNumberPress} />
-              <NumberButton number="6" onPress={handleNumberPress} />
-              {/* Row 3 */}
-              <NumberButton number="7" onPress={handleNumberPress} />
-              <NumberButton number="8" onPress={handleNumberPress} />
-              <NumberButton number="9" onPress={handleNumberPress} />
-              {/* Row 4 */}
+              {[..."123456789"].map((num) => (
+                <NumberButton
+                  key={num}
+                  number={num}
+                  onPress={handleNumberPress}
+                />
+              ))}
               <View style={styles.dumNumberButton} />
               <NumberButton number="0" onPress={handleNumberPress} />
               <TouchableOpacity
@@ -153,7 +140,6 @@ const AuthorizationPin: React.FC = () => {
                 ]}
                 onPress={handleDelete}
                 disabled={pin.length === 0}
-                activeOpacity={0.7}
               >
                 <Ionicons name="backspace" size={24} color="#FFFFFF" />
               </TouchableOpacity>
@@ -166,35 +152,31 @@ const AuthorizationPin: React.FC = () => {
   );
 };
 
+// Reuse number button component
+const NumberButton = ({
+  number,
+  onPress
+}: {
+  number: string;
+  onPress: (n: string) => void;
+}) => (
+  <TouchableOpacity style={styles.numberButton} onPress={() => onPress(number)}>
+    <ThemedText style={styles.numberText}>{number}</ThemedText>
+  </TouchableOpacity>
+);
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 20
-  },
-  content: {
-    alignItems: "center",
-    marginTop: 20
-  },
-  title: {
-    fontSize: 15,
-    fontFamily: "Questrial"
-  },
-  subtitle: {
-    fontSize: 14,
-    fontFamily: "Questrial",
-    marginBottom: 50
-  },
+  container: { flex: 1, paddingHorizontal: 20 },
+  content: { alignItems: "center", marginTop: 20 },
+  title: { fontSize: 15, fontFamily: "Questrial" },
+  subtitle: { fontSize: 14, fontFamily: "Questrial", marginBottom: 50 },
   pinDotsContainer: {
     flexDirection: "row",
     justifyContent: "center",
     gap: 16,
     marginBottom: 64
   },
-  pinDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6
-  },
+  pinDot: { width: 12, height: 12, borderRadius: 6 },
   keypad: {
     marginTop: 50,
     width: "100%",
@@ -213,17 +195,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
-  dumNumberButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  numberText: {
-    fontSize: 24,
-    fontWeight: "500"
-  },
+  dumNumberButton: { width: 80, height: 80, borderRadius: 40 },
+  numberText: { fontSize: 24, fontWeight: "500" },
   deleteButton: {
     width: 80,
     height: 80,

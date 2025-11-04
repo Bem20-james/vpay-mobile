@@ -5,6 +5,9 @@ import { TransferItem } from "@/components/Recents/RecentTransfers";
 import { Beneficiaries } from "@/components/Recents/RecentTransfers";
 import images from "@/constants/Images";
 import { ContactItem } from "@/components/Recents/AirtimeDataTrnx";
+import { Dimensions } from "react-native";
+import { Entypo, MaterialIcons } from "@expo/vector-icons";
+import { Colors } from "@/constants/Colors";
 
 export const quickActions: ActionItem[] = [
   {
@@ -429,44 +432,103 @@ export const airtimeDataRecents: ContactItem[] = [
   {
     label: "GLO GH",
     identifier: "022788951",
-    image: images.logolight,
+    image: images.logolight
   },
   {
     label: "9MOBILE NG",
     identifier: "09033788951",
-    image: images.logolight,
+    image: images.logolight
   },
   {
     label: "MTN NG",
     identifier: "09122879851",
-    image: images.logolight,
+    image: images.logolight
   },
   {
     label: "AIRTEL NG",
     identifier: "07044517951",
-    image: images.logolight,
-  },
+    image: images.logolight
+  }
 ];
 
 export const airtimDataBeneficiaries: ContactItem[] = [
   {
     label: "MTN NG",
     identifier: "0917943851",
-    image: images.logolight,
+    image: images.logolight
   },
   {
     label: "AIRTEL NG",
     identifier: "09122879851",
-    image: images.logolight,
+    image: images.logolight
   },
   {
     label: "GLO GH",
     identifier: "122879851",
-    image: images.logolight,
+    image: images.logolight
   },
   {
     label: "9MOBILE NG",
     identifier: "0903879851",
-    image: images.logolight,
+    image: images.logolight
+  }
+];
+
+export const { width: SCREEN_WIDTH } = Dimensions.get("window");
+export const CARD_WIDTH = SCREEN_WIDTH - 40;
+export const CARD_SPACING = 20;
+
+export const cards = [
+  {
+    id: "ngn",
+    name: "NGN card",
+    cardColor: Colors.light.primaryDark1,
+    accentColor: "#208BC9",
+    subtitle: "Built for Your Digital Life",
+    currency: "NGN",
+    features: [
+      {
+        icon: <Entypo name="globe" size={20} color="#208bc9" />,
+        title: "Shop Globally",
+        description:
+          "Use your Vpay Card for online purchases anywhere Visa cards are accepted"
+      },
+      {
+        icon: <MaterialIcons name="security" size={20} color="#208bc9" />,
+        title: "Verified & Secure",
+        description:
+          "Your Vpay Card comes with advanced security features to protect your transactions and personal information."
+      }
+    ],
+    fees: [
+      "NGN 1000 non-refundable card creation fee",
+      "NGN 50 non-refundable quarterly card maintenance fee"
+    ]
   },
+  {
+    id: "usd",
+    name: "USD card",
+    cardColor: Colors.light.primaryDark1,
+    accentColor: "#208BC9",
+    subtitle: "Built for Your Digital Life",
+    currency: "USD",
+    features: [
+      {
+        icon: <Entypo name="globe" size={20} color="#208bc9" />,
+        title: "Shop Globally",
+        description:
+          "Use your Vpay Card for online purchases anywhere Visa cards are accepted"
+      },
+      {
+        icon: <MaterialIcons name="security" size={20} color="#208bc9" />,
+        title: "Verified & Secure",
+        description:
+          "Your Vpay Card comes with advanced security features to protect your transactions and personal information."
+      }
+    ],
+    fees: [
+      "USD 2 non-refundable card creation fee",
+      "USD 1 non-refundable quarterly card maintenance fee"
+    ]
+  }
 ];

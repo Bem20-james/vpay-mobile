@@ -29,13 +29,18 @@ export type RateConversionRequest = {
   base_currency: string;
   target_currency: string;
   amount: number;
+  transaction_type: string;
+  direction?: string;
 };
 
 export type Rates = {
-  rate: number;
-  converted_amount: number;
   base_currency: string;
+  converted_amount: string;
+  converted_fee: string;
   target_currency: string;
+  total_converted: string;
+  transaction_type?: string;
+  warning?: string;
 };
 
 export type RatesRes<T> = {

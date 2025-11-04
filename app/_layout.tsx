@@ -78,6 +78,10 @@ export default function RootLayout() {
                     name="(transfers)"
                     options={{ headerShown: false }}
                   />
+                  <Stack.Screen
+                    name="(cards)"
+                    options={{ headerShown: false }}
+                  />
 
                   <Stack.Screen
                     name="notifications"

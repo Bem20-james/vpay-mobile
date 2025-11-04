@@ -38,6 +38,14 @@ export interface SendFiatData {
   activity_pin: string;
 }
 
+export interface CryptoData {
+  reciever: string;
+  amount: string;
+  token: string;
+  network?: string;
+  activity_pin: string;
+}
+
 export interface FiatResponse {
   success: boolean;
   message?: string;
@@ -56,3 +64,10 @@ export interface LookUpResponse {
   message?: string;
   result: LookUpResult;
 }
+
+export type TransactionResponse = {
+  success: boolean;
+  data?: any;
+  message?: string;
+};
+

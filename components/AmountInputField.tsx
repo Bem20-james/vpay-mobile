@@ -29,6 +29,16 @@ type Currency = {
   balance: number;
 };
 
+export interface ConversionBody {
+  base_currency: string;
+  converted_amount: string;
+  converted_fee: string;
+  target_currency: string;
+  total_converted: string;
+  transaction_type?: string;
+  warning?: string;
+}
+
 type InputProps = {
   quickAmounts?: number[];
   title?: string;
@@ -36,6 +46,7 @@ type InputProps = {
   onBack?: () => void;
   onCurrencyChange?: (currency: Currency) => void;
   onAmountChange?: (amount: string, hasError: boolean) => void;
+  onRateChange?: (rate: ConversionBody) => void;
 };
 
 const AmountInputField = ({
@@ -43,7 +54,8 @@ const AmountInputField = ({
   title = "Airtime amount",
   methodtitle = "Payment method",
   onAmountChange,
-  onCurrencyChange
+  onCurrencyChange,
+  onRateChange
 }: InputProps) => {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
@@ -58,10 +70,8 @@ const AmountInputField = ({
   const [selectedCurrency, setSelectedCurrency] = useState<Currency | null>(
     null
   );
-  const [error, setError] = useState<string>("");
   const { assets, loading } = useFetchUserAssets();
-  const { user } = useUser();
-
+  const { user } = useUser()
   const currencySymbol = user?.country?.currency;
 
   const fiatAssets = assets?.fiat || [];
@@ -87,6 +97,13 @@ const AmountInputField = ({
   const { rate, loading: rateLoading, refetch } = useRateConversion();
 
   useEffect(() => {
+  if (rate) {
+    onRateChange?.(rate);
+  }
+}, [rate]);
+
+
+  useEffect(() => {
     if (loading) {
       showLoader();
     } else {
@@ -100,7 +117,8 @@ const AmountInputField = ({
         await refetch({
           base_currency: selectedCurrency.currency_code || "",
           target_currency: "NGN", // modify this later to be dynamic
-          amount: Number(amount)
+          amount: Number(amount),
+          transaction_type: "airtime"
         });
       }
     };
@@ -112,11 +130,9 @@ const AmountInputField = ({
 
   const validateBalance = (val: number, currency: Currency | null) => {
     if (currency && val > currency?.balance) {
-      setError("Insufficient balance. Please select another wallet.");
       onAmountChange?.(val.toString(), true);
       return false;
     }
-    setError("");
     onAmountChange?.(val.toString(), false);
     return true;
   };
@@ -306,20 +322,18 @@ const AmountInputField = ({
             >
               ≈ {rate.converted_amount.toFixed(2)} {rate.target_currency}
             </ThemedText>
-          </View>
-        ) : null}
 
-        {error ? (
-          <ThemedText
-            style={{
-              color: "red",
-              marginTop: 3,
-              fontFamily: "Questrial",
-              fontSize: 12
-            }}
-          >
-            {error}
-          </ThemedText>
+            <ThemedText
+              style={{
+                color: "red",
+                marginTop: 3,
+                fontFamily: "Questrial",
+                fontSize: 12
+              }}
+            >
+              {rate?.warning}
+            </ThemedText>
+          </View>
         ) : null}
       </View>
 

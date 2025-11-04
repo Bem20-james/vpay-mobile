@@ -3,6 +3,7 @@ import { useState, useEffect, Provider } from "react";
 import Toast from "react-native-toast-message";
 import { SERVER_BASE_URL } from "../constants/Paths";
 import { useUser } from "@/contexts/UserContexts";
+import { TransactionResponse } from "@/types/transfers";
 
 interface MobileData {
   fiatToken: string;
@@ -10,12 +11,7 @@ interface MobileData {
   code: string;
   amount: string;
   phone: string;
-  authorization_pin: string;
-}
-
-interface Response {
-  success: boolean;
-  message?: string;
+  activity_pin: string;
 }
 
 function useFetchDataProviders() {
@@ -26,17 +22,25 @@ function useFetchDataProviders() {
   const fetchProviders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${SERVER_BASE_URL}/user/mobiledata/providers`, config);
+      const response = await axios.get(
+        `${SERVER_BASE_URL}/user/mobiledata/providers`,
+        config
+      );
       const result = response.data;
-      console.log("results:", result)
+      console.log("results:", result);
 
       if (result.success && result.code === 0) {
         setProviders(result.result);
       } else {
-        Toast.show({ type: "error", text1: result.message || "Failed to fetch providers." });
+        Toast.show({
+          type: "error",
+          text1: result.message || "Failed to fetch providers."
+        });
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || "An error occurred while fetching providers.";
+      const errorMessage =
+        error.response?.data?.message ||
+        "An error occurred while fetching providers.";
       Toast.show({ type: "error", text1: errorMessage });
     } finally {
       setLoading(false);
@@ -101,43 +105,47 @@ const usePurchaseData = () => {
   const [error, setError] = useState<string | null>(null);
   const { config } = useUser();
 
-  const purchaseData = async (data: MobileData): Promise<Response> => {
+  const purchaseData = async (
+    data: MobileData
+  ): Promise<TransactionResponse> => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await axios.post<Response>(
+      const { activity_pin, ...rest } = data;
+
+      const response = await axios.post(
         `${SERVER_BASE_URL}/user/mobiledata/request`,
-        data,
-        config
+        rest,
+        {
+          ...config,
+          headers: {
+            ...config.headers,
+            activity_pin
+          }
+        }
       );
 
       const result = response.data;
-      console.log(result)
+      console.log("Mobile Data Purchase Response:", result);
+
       if (!result.success) {
-        throw new Error(result.message || "Payment failed");
+        return { success: false, message: result.message || "Payment failed" };
       }
 
-      if (response.status === 200) {
-        Toast.show({
-          type: "success",
-          text1: result.message || "Payment Successful!",
-        });
-      }
-
-      return result;
+      return {
+        success: true,
+        data: result.data,
+        message: result.message || "Data purchase successful"
+      };
     } catch (err) {
       const errorMessage =
         (err as AxiosError<{ message?: string }>)?.response?.data?.message ||
         (err as Error).message ||
         "Network or server error";
-        console.error("Error Response:", errorMessage)
+
+      console.error("Mobile Data Error:", errorMessage);
       setError(errorMessage);
-      Toast.show({
-        type: "error",
-        text1: errorMessage,
-      });
-      
 
       return { success: false, message: errorMessage };
     } finally {
@@ -148,8 +156,4 @@ const usePurchaseData = () => {
   return { purchaseData, isLoading, error };
 };
 
-export {
-  usePurchaseData,
-  useFetchDataProviders,
-  useFetchDataOptions
-};
+export { usePurchaseData, useFetchDataProviders, useFetchDataOptions };

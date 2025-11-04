@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Pressable, Image, ActivityIndicator } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Pressable,
+  Image,
+  ActivityIndicator
+} from "react-native";
 import { useRouter } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import CustomButton from "@/components/CustomButton";
@@ -61,8 +67,7 @@ const ServicesDispatcher = ({
     provider
   );
   const { assets, loading } = useFetchUserAssets();
-
-  const [selectedAmount, setSelectedAmount] = useState<any>(null);
+  const [selectedOption, setSelectedOption] = useState<any>(null);
   const [selectedCurrency, setSelectedCurrency] = useState<any>(null);
   const [showReviewSheet, setShowReviewSheet] = useState(false);
   const [showCurrencySheet, setShowCurrencySheet] = useState(false);
@@ -90,11 +95,11 @@ const ServicesDispatcher = ({
 
   useEffect(() => {
     const fetchConversion = async () => {
-      if (selectedAmount && selectedCurrency) {
+      if (selectedOption?.amount && selectedCurrency) {
         await refetch({
           base_currency: selectedCurrency.currency_code || "",
           target_currency: "NGN", // modify this later to be dynamic
-          amount: Number(selectedAmount)
+          amount: Number(selectedOption?.amount)
         });
       }
     };
@@ -102,15 +107,21 @@ const ServicesDispatcher = ({
     const delayDebounce = setTimeout(fetchConversion, 600); // debounce input
 
     return () => clearTimeout(delayDebounce);
-  }, [selectedAmount, selectedCurrency]);
+  }, [selectedOption?.amount, selectedCurrency]);
 
   const handlePay = () => {
     setShowReviewSheet(false);
+
     router.push({
       pathname: "/(transfers)/authorization-pin",
       params: {
-        transactionType: type, // ✅ dynamic transaction type
-        payload: [number, selectedCurrency, selectedAmount, provider]
+        transactionType: "cableTV",
+        payload: JSON.stringify({
+          number,
+          base_asset: selectedCurrency?.currency_code,
+          amount: selectedOption?.amount,
+          provider
+        })
       }
     });
   };
@@ -143,7 +154,7 @@ const ServicesDispatcher = ({
           type={type}
           title={title}
           data={options}
-          onSelect={(option) => setSelectedAmount(option?.amount)}
+          onSelect={(option) => setSelectedOption(option)}
         />
 
         <View
@@ -271,7 +282,7 @@ const ServicesDispatcher = ({
           btnStyles={{ marginTop: 60 }}
           variant="primary"
           size="medium"
-          disabled={!selectedAmount}
+          disabled={!selectedOption?.amount}
         />
       </View>
 
@@ -289,13 +300,14 @@ const ServicesDispatcher = ({
       />
 
       <ReviewBottomSheet
-        type={"cable"}
+        type={"bills"}
         isVisible={showReviewSheet}
         onClose={() => setShowReviewSheet(false)}
         onPay={handlePay}
-        amount={selectedAmount}
+        amount={selectedOption?.amount}
         phoneNumber={number}
         provider={provider}
+        name={name}
         rate="10"
         selectedAsset={selectedCurrency}
       />

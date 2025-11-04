@@ -19,6 +19,60 @@ import CountryFlag from "react-native-country-flag";
 import { Colors } from "@/constants/Colors";
 import SendMobileMoney from "@/components/Transfers/SendMobileMoney";
 import { useFetchMobileMoneyCountries } from "@/hooks/useGeneral";
+import { MotiView } from "moti";
+
+const SkeletonLoader = () => {
+  // Simple shimmer skeleton with moti animation
+  return (
+    <View style={{ marginTop: 20 }}>
+      {Array.from({ length: 6 }).map((_, index) => (
+        <MotiView
+          key={index}
+          from={{ opacity: 0.3 }}
+          animate={{ opacity: 1 }}
+          transition={{ loop: true, type: "timing", duration: 1000 }}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: "#1E1E1E",
+            borderRadius: 12,
+            padding: 15,
+            marginBottom: 10
+          }}
+        >
+          <View
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: 15,
+              backgroundColor: "#2E2E2E",
+              marginRight: 12
+            }}
+          />
+          <View style={{ flex: 1 }}>
+            <View
+              style={{
+                width: "70%",
+                height: 10,
+                backgroundColor: "#2E2E2E",
+                borderRadius: 6,
+                marginBottom: 6
+              }}
+            />
+            <View
+              style={{
+                width: "40%",
+                height: 10,
+                backgroundColor: "#2E2E2E",
+                borderRadius: 6
+              }}
+            />
+          </View>
+        </MotiView>
+      ))}
+    </View>
+  );
+};
 
 const MobileMoney = () => {
   const colorScheme = useColorScheme();
@@ -26,16 +80,26 @@ const MobileMoney = () => {
     colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
   const statusBarBg =
     colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+
   const [query, setQuery] = useState("");
   const [screenVisible, setScreenVisible] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState<any | null>(null);
+
   const { MmCountries, loading } = useFetchMobileMoneyCountries();
+
+  // Filter countries based on search query
+  const filteredCountries = MmCountries?.filter((country) =>
+    country.country_name.toLowerCase().includes(query.toLowerCase())
+  );
 
   return (
     <SafeAreaView style={[KycStyles.safeArea, { backgroundColor }]}>
       {!screenVisible ? (
         <ScrollView showsVerticalScrollIndicator={false}>
           <Navigator title="Mobile Money" />
+
           <View style={TransferStyles.container}>
+            {/* Search Input */}
             <View style={TransferStyles.searchContainer}>
               <Feather
                 name="search"
@@ -51,16 +115,23 @@ const MobileMoney = () => {
                 onChangeText={setQuery}
               />
             </View>
-            <View>
+
+            {/* 🟣 Skeleton while loading */}
+            {loading ? (
+              <SkeletonLoader />
+            ) : (
               <FlatList
-                data={MmCountries}
+                data={filteredCountries}
                 keyExtractor={(item, index) => `${item.id}-${index}`}
-                nestedScrollEnabled={true}
+                nestedScrollEnabled
                 scrollEnabled={false}
                 renderItem={({ item }) => (
                   <TouchableOpacity
                     style={TransferStyles.itemContainer}
-                    onPress={() => setScreenVisible(true)}
+                    onPress={() => {
+                      setSelectedCountry(item);
+                      setScreenVisible(true);
+                    }}
                     activeOpacity={0.7}
                   >
                     <View style={TransferStyles.itemContent}>
@@ -85,12 +156,16 @@ const MobileMoney = () => {
                 )}
                 showsVerticalScrollIndicator={false}
               />
-            </View>
+            )}
           </View>
         </ScrollView>
       ) : (
-        <SendMobileMoney selectedCountry={item.country_code} onBack={() => setScreenVisible(false)} />
+        <SendMobileMoney
+          selectedCountry={selectedCountry?.country_code}
+          onBack={() => setScreenVisible(false)}
+        />
       )}
+
       <StatusBar style="dark" backgroundColor={statusBarBg} />
     </SafeAreaView>
   );

@@ -34,6 +34,7 @@ interface Props {
   selectedCurrency: any;
   title?: string;
   isLoading?: boolean;
+  assetType?: "all" | "crypto" | "fiat";
 }
 
 const AssetsBottomSheet = ({
@@ -44,7 +45,8 @@ const AssetsBottomSheet = ({
   selectedCurrency,
   snapPoints = ["40%"],
   title = "Select Wallet",
-  isLoading = false
+  isLoading = false,
+  assetType = "all"
 }: Props) => {
   const colorScheme = useColorScheme();
   const sheetRef = useRef<BottomSheet>(null);
@@ -57,34 +59,38 @@ const AssetsBottomSheet = ({
 
   if (!isVisible) return null;
 
+  // map fiat items and attach raw
   const fiatItems =
     assets?.fiat?.map((item) => ({
       name: item.fiat_currency_name,
       country_code: item.country_code,
       currency_code: item.currency_code,
       balance: item.balance,
-      type: "fiat"
+      type: "fiat",
+      raw: item // <-- attach original fiat object
     })) || [];
 
+  // map crypto items and attach raw
   const cryptoItems =
     assets?.crypto?.map((item) => ({
       name: item.token_name,
       country_code: item.token_symbol,
       image: item.token_image,
       balance: item.balance,
-      type: "crypto"
+      type: "crypto",
+      raw: item // <-- attach original crypto object
     })) || [];
 
-  const combinedData = [...fiatItems, ...cryptoItems];
+  //Filter based on the prop
+  const combinedData =
+    assetType === "crypto"
+      ? cryptoItems
+      : assetType === "fiat"
+      ? fiatItems
+      : [...fiatItems, ...cryptoItems];
 
   const renderSkeleton = () => (
-    <View
-      style={{
-        height: 40,
-        borderRadius: 6,
-        backgroundColor: "#e0e0e0"
-      }}
-    />
+    <View style={{ height: 40, borderRadius: 6, backgroundColor: "#e0e0e0" }} />
   );
 
   return (
@@ -108,7 +114,6 @@ const AssetsBottomSheet = ({
         </View>
 
         {isLoading ? (
-          // show 5 skeleton placeholders
           <View style={{ padding: 16 }}>
             {Array.from({ length: 5 }).map((_, idx) => (
               <View key={idx} style={{ marginBottom: 16 }}>
@@ -123,13 +128,17 @@ const AssetsBottomSheet = ({
             contentContainerStyle={{ paddingBottom: 24 }}
             renderItem={({ item }: { item: any }) => {
               const isSelected =
-                item.country_code === selectedCurrency.country_code;
+                selectedCurrency &&
+                (item.raw?.token_symbol === selectedCurrency.token_symbol ||
+                  item.raw?.currency_code === selectedCurrency.currency_code ||
+                  item.country_code === selectedCurrency.country_code);
 
               return (
                 <TouchableOpacity
                   style={styles.item}
                   onPress={() => {
-                    onSelectCurrency(item);
+                    const payload = item.raw ?? item;
+                    onSelectCurrency(payload);
                     sheetRef.current?.close();
                   }}
                 >
@@ -178,14 +187,8 @@ const AssetsBottomSheet = ({
 };
 
 const styles = StyleSheet.create({
-  header: {
-    padding: 12,
-    alignItems: "center"
-  },
-  title: {
-    fontFamily: "Inter-Bold",
-    fontSize: 16
-  },
+  header: { padding: 12, alignItems: "center" },
+  title: { fontFamily: "Inter-Bold", fontSize: 16 },
   item: {
     paddingVertical: 14,
     paddingHorizontal: 20,
@@ -195,34 +198,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.7,
     borderBottomColor: "#000000"
   },
-  label: {
-    fontSize: 15,
-    fontFamily: "Inter-Medium"
-  },
-  amount: {
-    fontSize: 14,
-    color: "#9B9B9B",
-    fontFamily: "Questrial"
-  },
-  amountWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6
-  },
-  flagWrapper: {
-    padding: 5,
-    borderRadius: 50,
-    marginRight: 12
-  },
-  flag: {
-    width: 30,
-    height: 30,
-    resizeMode: "contain",
-    borderRadius: 20
-  },
-  labelWrapper: {
-    flex: 1
-  }
+  label: { fontSize: 15, fontFamily: "Inter-Medium" },
+  amount: { fontSize: 14, color: "#9B9B9B", fontFamily: "Questrial" },
+  amountWrapper: { flexDirection: "row", alignItems: "center", gap: 6 },
+  flagWrapper: { padding: 5, borderRadius: 50, marginRight: 12 },
+  flag: { width: 30, height: 30, resizeMode: "contain", borderRadius: 20 },
+  labelWrapper: { flex: 1 }
 });
 
 export default AssetsBottomSheet;
