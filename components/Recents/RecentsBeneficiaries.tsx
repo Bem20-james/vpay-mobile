@@ -14,7 +14,7 @@ import { Feather } from "@expo/vector-icons";
 import { ThemedText } from "../ThemedText";
 import { RecentTransferstyles as styles } from "./RecentTransfers";
 import { StoredContact } from "@/utils/encryptedStore";
-import SkeletonRow from "../Skeleton";
+import SkeletonRow from "../SkeletonRow";
 
 interface Props {
   title?: string;

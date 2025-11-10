@@ -38,6 +38,8 @@ const DataScreen = () => {
   const [showDataBundles, setShowDataBundles] = useState(false);
   const { user } = useUser();
   const countryCode = user?.country?.code;
+    const [targetCurrency, setTargetCurrency] = useState<any>(null);
+
 
   useEffect(() => {
     if (loading) showLoader();
@@ -83,16 +85,13 @@ const DataScreen = () => {
     <SafeAreaView
       style={[styles.safeArea, { backgroundColor: boxBackgroundColor }]}
     >
+      <Navigator
+        title="Buy Data"
+        onBack={
+          showDataBundles ? () => setShowDataBundles(false) : navigation.goBack
+        }
+      />
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Navigator
-          title="Buy Data"
-          onBack={
-            showDataBundles
-              ? () => setShowDataBundles(false)
-              : navigation.goBack
-          }
-        />
-
         <ThemedText
           lightColor="#9B9B9B"
           darkColor="#EEF3FB"
@@ -112,6 +111,7 @@ const DataScreen = () => {
               onProviderSelect={(provider) => {
                 setSelectedProvider(provider.provider_name);
                 setSelectedProviderLogo(provider.image);
+                setTargetCurrency(provider.currency_code);
               }}
               onContactPress={fetchContacts}
             />
@@ -138,6 +138,7 @@ const DataScreen = () => {
             logo={selectedProviderLogo}
             number={phoneNumber}
             provider={selectedProvider}
+            targetCurrency={targetCurrency}
           />
         )}
       </ScrollView>

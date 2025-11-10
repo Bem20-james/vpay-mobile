@@ -27,10 +27,12 @@ interface ConversionBody {
   base_currency: string;
   converted_amount: string;
   converted_fee: string;
+  fee: string;
   target_currency: string;
   total_converted: string;
   transaction_type?: string;
   warning?: string;
+  total?: string;
 }
 
 interface Props {
@@ -54,7 +56,15 @@ interface Props {
   provider?: string;
 
   // Mode
-  type: "transfer" | "bills" | "data" | "airtime" | "vpay";
+  type?:
+    | "transfer"
+    | "electricity"
+    | "cable"
+    | "data"
+    | "airtime"
+    | "vpay"
+    | "betting"
+    | any;
 }
 
 const ReviewBottomSheet = ({
@@ -69,7 +79,7 @@ const ReviewBottomSheet = ({
   conversion,
   phoneNumber,
   provider,
-  snapPoints = ["50", "60%"],
+  snapPoints = ["50", "65%"],
   title = "Review Details",
   type,
   username
@@ -78,8 +88,6 @@ const ReviewBottomSheet = ({
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const border = isDark ? "#414141" : "#d7d7d7";
-
-  console.log("💰 Selected Asset in ReviewBottomSheet:", selectedAsset);
 
   useEffect(() => {
     if (isVisible) sheetRef.current?.expand();
@@ -92,7 +100,6 @@ const ReviewBottomSheet = ({
     onPay();
   };
 
-  // Dynamically build the list
   const details =
     type === "transfer"
       ? [
@@ -107,22 +114,7 @@ const ReviewBottomSheet = ({
             label: "Transaction fee",
             value:
               getSymbolFromCurrency(selectedAsset.currency_code) +
-              conversion?.converted_fee
-          }
-        ]
-      : type === "vpay"
-      ? [
-          { label: "username", value: username },
-          { label: "Name", value: name, transform: "uppercase" },
-          {
-            label: "Amount",
-            value: getSymbolFromCurrency(selectedAsset.currency_code) + amount
-          },
-          {
-            label: "Transaction fee",
-            value:
-              getSymbolFromCurrency(conversion?.target_currency) +
-              conversion?.converted_fee
+              conversion?.fee
           },
           {
             label: "Total amount",
@@ -130,7 +122,7 @@ const ReviewBottomSheet = ({
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <ThemedText>
                   {getSymbolFromCurrency(selectedAsset.currency_code)}
-                  {amount}
+                  {conversion?.total}
                 </ThemedText>
                 <MaterialCommunityIcons
                   name="approximately-equal"
@@ -146,21 +138,120 @@ const ReviewBottomSheet = ({
             )
           }
         ]
-      : type === "bills"
+      : type === "vpay"
       ? [
-          { label: "Smartcard/IUC Number", value: phoneNumber },
+          { label: "username", value: username },
+          { label: "Name", value: name, transform: "uppercase" },
+          {
+            label: "Amount",
+            value: getSymbolFromCurrency(conversion?.target_currency) + amount
+          },
+          {
+            label: "Transaction fee",
+            value:
+              getSymbolFromCurrency(selectedAsset?.currency_code) +
+              conversion?.converted_fee
+          },
+          {
+            label: "Total amount",
+            value: (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <ThemedText>
+                  {getSymbolFromCurrency(conversion.target_currency)}
+                  {conversion?.total}
+                </ThemedText>
+                <MaterialCommunityIcons
+                  name="approximately-equal"
+                  size={18}
+                  color="#999"
+                  style={{ marginHorizontal: 6 }}
+                />
+                <ThemedText>
+                  {getSymbolFromCurrency(conversion?.target_currency)}
+                  {conversion?.total_converted}
+                </ThemedText>
+              </View>
+            )
+          }
+        ]
+      : type === "cable" || type === "electricity"
+      ? [
+          type === "cable"
+            ? { label: "Smartcard/IUC Number", value: phoneNumber }
+            : type === "electricity"
+            ? { label: "Meter Number", value: phoneNumber }
+            : null,
           { label: "Provider", value: provider },
 
           { label: "Account Name", value: name, transform: "uppercase" },
           {
             label: "Amount",
-            value: getSymbolFromCurrency(selectedAsset.currency_code) + amount
+            value: getSymbolFromCurrency(conversion?.target_currency) + amount
           },
           {
             label: "Transaction fee",
             value:
-              getSymbolFromCurrency(selectedAsset.currency_code) +
-              conversion?.converted_fee
+              getSymbolFromCurrency(conversion?.target_currency) +
+              conversion?.fee
+          },
+          {
+            label: "Total amount",
+            value: (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <ThemedText>
+                  {getSymbolFromCurrency(conversion?.target_currency)}
+                  {conversion?.total}
+                </ThemedText>
+                <MaterialCommunityIcons
+                  name="approximately-equal"
+                  size={18}
+                  color="#999"
+                  style={{ marginHorizontal: 6 }}
+                />
+                <ThemedText>
+                  {getSymbolFromCurrency(conversion?.base_currency)}
+                  {conversion?.total_converted}
+                </ThemedText>
+              </View>
+            )
+          }
+        ]
+      : type === "betting"
+      ? [
+          { label: "Account ID", value: accountNumber },
+          { label: "Provider", value: bank },
+
+          { label: "Account Name", value: name, transform: "uppercase" },
+          {
+            label: "Amount",
+            value: getSymbolFromCurrency(selectedAsset?.currency_code) + amount
+          },
+          {
+            label: "Transaction fee",
+            value:
+              getSymbolFromCurrency(selectedAsset?.currency_code) +
+              conversion?.fee
+          },
+          {
+            label: "Total amount",
+            value: (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <ThemedText>
+                  {getSymbolFromCurrency(selectedAsset?.currency_code)}
+                  {conversion?.total}
+                </ThemedText>
+                <MaterialCommunityIcons
+                  name="approximately-equal"
+                  size={18}
+                  color="#999"
+                  style={{ marginHorizontal: 5 }}
+                />
+                <ThemedText>
+                  {getSymbolFromCurrency(conversion?.target_currency)}
+                  {conversion?.total_converted}
+                </ThemedText>
+              </View>
+            )
           }
         ]
       : [
@@ -168,19 +259,34 @@ const ReviewBottomSheet = ({
           { label: "Provider", value: provider },
           {
             label: "Amount",
-            value: getSymbolFromCurrency(selectedAsset.currency_code) + amount
+            value: getSymbolFromCurrency(conversion?.target_currency) + amount
           },
           {
             label: "Transaction fee",
             value:
-              getSymbolFromCurrency(selectedAsset.currency_code) +
-              conversion?.converted_fee
+              getSymbolFromCurrency(conversion?.target_currency) +
+              conversion?.fee
           },
           {
             label: "Total amount",
-            value:
-              getSymbolFromCurrency(selectedAsset.currency_code) +
-              conversion?.converted_fee
+            value: (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <ThemedText>
+                  {getSymbolFromCurrency(conversion?.target_currency)}
+                  {conversion?.total}
+                </ThemedText>
+                <MaterialCommunityIcons
+                  name="approximately-equal"
+                  size={18}
+                  color="#999"
+                  style={{ marginHorizontal: 6 }}
+                />
+                <ThemedText>
+                  {getSymbolFromCurrency(conversion?.base_currency)}
+                  {conversion?.total_converted}
+                </ThemedText>
+              </View>
+            )
           }
         ];
 
@@ -218,17 +324,17 @@ const ReviewBottomSheet = ({
                 key={index}
               >
                 <ThemedText style={btmSheetStyles.label}>
-                  {item.label}
+                  {item?.label}
                 </ThemedText>
                 <ThemedText
                   style={[
                     btmSheetStyles.value,
-                    item.transform === "uppercase" && {
+                    item?.transform === "uppercase" && {
                       textTransform: "uppercase"
                     }
                   ]}
                 >
-                  {item.value}
+                  {item?.value}
                 </ThemedText>
               </View>
             ))}
@@ -303,7 +409,7 @@ const ReviewBottomSheet = ({
               <View
                 style={{
                   position: "absolute",
-                  bottom: -80,
+                  bottom: -70,
                   left: 1,
                   right: 1
                 }}

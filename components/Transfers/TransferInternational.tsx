@@ -7,14 +7,12 @@ import {
   ActivityIndicator
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import Navigator from "@/components/Navigator";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { ThemedText } from "@/components/ThemedText";
 import CustomButton from "@/components/CustomButton";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { TransferStyles as styles } from "@/styles/transfers";
 import AssetsBottomSheet from "../BottomSheets/Assets";
-import ReviewBottomSheet from "../BottomSheets/Review";
 import { Colors } from "@/constants/Colors";
 import { router } from "expo-router";
 import { useFetchUserAssets } from "@/hooks/useUser";
@@ -22,15 +20,13 @@ import CountryFlag from "react-native-country-flag";
 import { SERVER_IMAGE_URL } from "@/constants/Paths";
 import { useLoader } from "@/contexts/LoaderContext";
 import { useRateConversion } from "@/hooks/useGeneral";
+import InternationalReview from "./InternationalReviewScreen";
 
 type AccountDetails = {
   bank: string;
   accountNumber: string;
-  accountName: string;
-  username?: string;
-  avatar?: string;
-  betId?: string;
-  targetCurrency?: string;
+  swiftCode?: string;
+  country?: string;
 };
 
 type SendScreenProps = {
@@ -41,13 +37,7 @@ type SendScreenProps = {
   accountDetails: AccountDetails;
 };
 
-const SendScreen = ({
-  onBack,
-  title = "Send to local",
-  type,
-  accountDetails,
-  navig = true
-}: SendScreenProps) => {
+const TransferInternational = ({ accountDetails }: SendScreenProps) => {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
@@ -60,12 +50,14 @@ const SendScreen = ({
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [selectedCurrency, setSelectedCurrency] = useState<any>(null);
+
   const { showLoader, hideLoader } = useLoader();
   const { rate, loading: rateLoading, refetch } = useRateConversion();
 
   const fiatAssets = assets?.fiat || [];
   const cryptoAssets = assets?.crypto || [];
   const allAssets = [...fiatAssets, ...cryptoAssets];
+  console.log("SELECTED CURRENCY:", selectedCurrency);
 
   // set default only after assets load
   useEffect(() => {
@@ -106,78 +98,60 @@ const SendScreen = ({
   const handlePay = () => {
     setDetailsShowSheet(false);
 
-    const payloadObj: any = {
-      amount
-    };
-
-    // inject key field depending on transaction type
-    if (type === "betting") {
-      payloadObj.account = accountDetails.accountNumber;
-      payloadObj.target_asset = accountDetails.targetCurrency;
-      payloadObj.base_asset = selectedCurrency.currency_code;
-      payloadObj.provider = accountDetails.bank;
-    } else {
-      payloadObj.debit_asset = selectedCurrency.currency_code;
-      payloadObj.account_number = accountDetails.accountNumber;
-      payloadObj.description = note;
-      payloadObj.bank = accountDetails.bank;
-    }
-
     router.push({
       pathname: "/(transfers)/authorization-pin",
       params: {
-        transactionType: accountDetails.betId ? "betting" : "transfer",
-        payload: JSON.stringify(payloadObj)
+        transactionType: "transfer",
+        account_number: accountDetails.accountNumber,
+        base_asset: selectedCurrency.currency_code,
+        amount
       }
     });
   };
 
   return (
     <ScrollView>
-      {navig && <Navigator title={title} onBack={onBack} />}
       <View style={styles.container}>
         <View style={[styles.recipient, { backgroundColor: bgColor }]}>
-          {accountDetails.avatar ? (
-            <Image
-              source={{ uri: `${SERVER_IMAGE_URL}/${accountDetails.avatar}` }}
-              style={styles.logo}
-            />
-          ) : (
-            <View
+          <View
+            style={{
+              width: 50,
+              height: 50,
+              borderRadius: 25,
+              backgroundColor: Colors.light.tint, // pick a brand color
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <ThemedText
               style={{
-                width: 50,
-                height: 50,
-                borderRadius: 25,
-                backgroundColor: Colors.light.tint, // pick a brand color
-                justifyContent: "center",
-                alignItems: "center"
+                color: "#fff",
+                fontSize: 22,
+                fontFamily: "Inter-Bold",
+                textTransform: "uppercase"
               }}
             >
-              <ThemedText
-                style={{
-                  color: "#fff",
-                  fontSize: 22,
-                  fontFamily: "Inter-Bold",
-                  textTransform: "uppercase"
-                }}
-              >
-                {accountDetails?.accountName?.charAt(0) || "?"}
-              </ThemedText>
-            </View>
-          )}
+              {accountDetails?.swiftCode?.charAt(0) || "?"}
+            </ThemedText>
+          </View>
 
           <View style={{ marginLeft: 10 }}>
             <ThemedText style={styles.recipientName}>
-              {accountDetails.accountName}
+              {accountDetails.accountNumber}
             </ThemedText>
             <View style={{ flexDirection: "row", gap: 5 }}>
-              <ThemedText style={styles.recipientDetails}>
-                {type === "vpaytag"
-                  ? accountDetails.username
-                  : accountDetails.accountNumber}
+              <ThemedText
+                style={{
+                  fontSize: 12,
+                  fontWeight: "700",
+                  fontFamily: "Questrial",
+                  color: "#9B9B9B"
+                }}
+              >
+                {accountDetails.swiftCode?.toUpperCase()}
               </ThemedText>
               <ThemedText style={styles.recipientDetails}>
-                {type !== "vpaytag" && accountDetails.bank}
+                {accountDetails.bank}
               </ThemedText>
             </View>
           </View>
@@ -262,36 +236,23 @@ const SendScreen = ({
                 marginTop: 15
               }}
             >
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <ThemedText
-                  style={{
-                    marginTop: 5,
-                    color: "#80D1FF",
-                    fontSize: 14,
-                    fontFamily: "Questrial"
-                  }}
-                >
-                  {Number(amount)} {rate?.base_currency}{" "}
-                </ThemedText>
-
+              <ThemedText
+                style={{
+                  marginTop: 5,
+                  color: "#80D1FF",
+                  fontSize: 14,
+                  fontFamily: "Questrial"
+                }}
+              >
+                {Number(amount)} {rate?.base_currency}{" "}
                 <MaterialCommunityIcons
                   name="approximately-equal"
                   size={20}
-                  color={"#208BC9"}
                   style={{ paddingTop: 5 }}
                 />
-                <ThemedText
-                  style={{
-                    marginTop: 5,
-                    color: "#80D1FF",
-                    fontSize: 14,
-                    fontFamily: "Questrial"
-                  }}
-                >
-                  {Number(rate?.converted_amount ?? 0).toFixed(2)}{" "}
-                  {rate?.target_currency}
-                </ThemedText>
-              </View>
+                {Number(rate?.converted_amount ?? 0).toFixed(2)}{" "}
+                {rate?.target_currency}
+              </ThemedText>
 
               <ThemedText
                 style={{
@@ -309,7 +270,7 @@ const SendScreen = ({
 
         {/* Note Section */}
         <View
-          style={[styles.inputBox, { backgroundColor: bgColor, marginTop: 20 }]}
+          style={[styles.inputBox, { backgroundColor: bgColor, marginTop: 10 }]}
         >
           <ThemedText style={styles.label}>Description</ThemedText>
           <TextInput
@@ -334,31 +295,18 @@ const SendScreen = ({
         isLoading={loading}
       />
 
-      {/* Review Sheet */}
-      <ReviewBottomSheet
-        type={
-          accountDetails.username
-            ? "vpay"
-            : accountDetails.betId
-            ? "betting"
-            : "transfer"
-        }
-        isVisible={showDetailsSheet}
-        onClose={() => setDetailsShowSheet(false)}
-        onPay={handlePay}
+      <InternationalReview
         amount={amount}
-        username={accountDetails.username || ""}
-        bank={accountDetails.bank}
-        accountNumber={accountDetails.accountNumber || ""}
-        name={accountDetails.accountName}
-        selectedAsset={selectedCurrency}
+        accountNumber={accountDetails.accountNumber}
         conversion={rate}
+        bank={accountDetails.bank}
+        selectedAsset={selectedCurrency}
+        description={note}
+        onPay={handlePay}
       />
 
       <View style={{ position: "relative" }}>
-        <View
-          style={{ position: "absolute", bottom: -260, left: 10, right: 10 }}
-        >
+        <View style={{ position: "absolute", bottom: -300, left: 0, right: 0 }}>
           <CustomButton
             title="Continue"
             handlePress={() => setDetailsShowSheet(true)}
@@ -371,4 +319,4 @@ const SendScreen = ({
   );
 };
 
-export default SendScreen;
+export default TransferInternational;

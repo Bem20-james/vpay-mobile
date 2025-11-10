@@ -41,8 +41,9 @@ const CustomChip: React.FC<CustomChipProps> = ({
   isLoading = false
 }) => {
   const colorScheme = useColorScheme();
-  const BgColor =
-    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+  const isDark = colorScheme === "dark";
+  const BgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
+  const txtColor = isDark ? Colors.light.accentBg : Colors.dark.background;
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
@@ -79,9 +80,10 @@ const CustomChip: React.FC<CustomChipProps> = ({
         )}
 
         <ThemedText
-          lightColor="#252525"
-          darkColor="#F8F8F8"
-          style={styles.text}
+          style={[
+            styles.text,
+            { color: isSelected ? Colors.light.background : txtColor }
+          ]}
         >
           {item.provider_name}
         </ThemedText>

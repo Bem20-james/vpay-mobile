@@ -173,6 +173,15 @@ export const trnxHistory2: HistoryItem[] = [
     iconColor: "#9c27b0",
     amount: "9500",
     timestamp: "May 20th, 08:03:38"
+  },
+    {
+    id: "10",
+    label: "Outgoing Transfer",
+    icon: "arrow-bottom-right",
+    backgroundColor: "#ede1ff",
+    iconColor: "#9c27b0",
+    amount: "4000",
+    timestamp: "May 20th, 08:03:38"
   }
 ];
 

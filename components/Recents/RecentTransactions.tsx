@@ -58,7 +58,12 @@ const RecentTransaction: React.FC<Props> = ({
           >
             see more
           </ThemedText>
-          <Entypo name="chevron-small-right" size={20} color={"#218DC9"} style={{marginTop:3}} />
+          <Entypo
+            name="chevron-small-right"
+            size={20}
+            color={"#218DC9"}
+            style={{ marginTop: 3 }}
+          />
         </Pressable>
       </View>
       <FlatList

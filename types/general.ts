@@ -13,16 +13,17 @@ export interface GenericResponse<T> {
   result: any[];
 }
 
-export interface Banks {
+export interface Bank {
+  id: number;
   name: string;
   code: string;
 }
 
-export interface BanksRes {
-  error: number;             
-  message: string;
+export interface BanksResponse {
   success: boolean;
-  result: any[];
+  error?: number;
+  message?: string;
+  result: Bank[];
 }
 
 export type RateConversionRequest = {
@@ -49,3 +50,19 @@ export type RatesRes<T> = {
   message: string;
   result: T;
 };
+
+export interface History {
+  id: string;
+  currency: string;
+  amount: number;
+  date: string;
+  status: string;
+  transaction_type: string;
+  created_at: string;
+}
+
+export interface HistoryResponse {
+  success: boolean;
+  message?: string;
+  result?: History[];
+}

@@ -14,7 +14,7 @@ import { useLoader } from "@/contexts/LoaderContext";
 import ReviewBottomSheet from "@/components/BottomSheets/Review";
 import ServiceOptionsField from "@/components/ServiceOptionsField";
 import { ThemedText } from "./ThemedText";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import CountryFlag from "react-native-country-flag";
 import { TransferStyles as styles } from "@/styles/transfers";
 import { SERVER_IMAGE_URL } from "@/constants/Paths";
@@ -37,6 +37,8 @@ type ServicesDispatcherProps = {
   title?: string;
   number: string;
   provider: string;
+  targetCurrency: string;
+  meterType?: string;
   logo?: any;
   name?: string;
   onCurrencyChange?: (currency: Currency) => void;
@@ -49,7 +51,9 @@ const ServicesDispatcher = ({
   provider,
   logo,
   name,
-  onCurrencyChange
+  onCurrencyChange,
+  targetCurrency,
+  meterType
 }: ServicesDispatcherProps) => {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
@@ -77,6 +81,9 @@ const ServicesDispatcher = ({
   const allAssets = [...fiatAssets, ...cryptoAssets];
   const { rate, loading: rateLoading, refetch } = useRateConversion();
 
+  console.log("selected option:", selectedOption);
+  console.log("TARGET CURRENCY:", targetCurrency);
+
   useEffect(() => {
     if (allAssets?.length > 0 && !selectedCurrency) {
       const firstAsset = allAssets[0];
@@ -98,8 +105,9 @@ const ServicesDispatcher = ({
       if (selectedOption?.amount && selectedCurrency) {
         await refetch({
           base_currency: selectedCurrency.currency_code || "",
-          target_currency: "NGN", // modify this later to be dynamic
-          amount: Number(selectedOption?.amount)
+          target_currency: targetCurrency, // modified from hardcoded "NGN" to be dynamic with currency_code from providers
+          amount: Number(selectedOption?.amount),
+          transaction_type: "airtime"
         });
       }
     };
@@ -112,16 +120,32 @@ const ServicesDispatcher = ({
   const handlePay = () => {
     setShowReviewSheet(false);
 
+    const payloadObj: any = {
+      base_asset: selectedCurrency.currency_code,
+      target_asset: targetCurrency,
+      amount: selectedOption?.amount,
+      provider
+    };
+
+    console.log("PAYLOAD OBJECT:", JSON.stringify(payloadObj));
+
+    // inject key field depending on transaction type
+    if (type === "data") {
+      payloadObj.phone = number;
+      payloadObj.code = selectedOption?.code;
+    } else if (type === "electricity") {
+      payloadObj.number = number;
+      payloadObj.type = meterType;
+    } else {
+      payloadObj.number = number;
+      payloadObj.code = selectedOption?.code;
+    }
+
     router.push({
       pathname: "/(transfers)/authorization-pin",
       params: {
-        transactionType: "cableTV",
-        payload: JSON.stringify({
-          number,
-          base_asset: selectedCurrency?.currency_code,
-          amount: selectedOption?.amount,
-          provider
-        })
+        transactionType: type,
+        payload: JSON.stringify(payloadObj)
       }
     });
   };
@@ -262,16 +286,36 @@ const ServicesDispatcher = ({
                 marginTop: 15
               }}
             >
-              <ThemedText
-                style={{
-                  marginTop: 5,
-                  color: "#80D1FF",
-                  fontSize: 14,
-                  fontFamily: "Questrial"
-                }}
-              >
-                ≈ {rate.converted_amount.toFixed(2)} {rate.target_currency}
-              </ThemedText>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <ThemedText
+                  style={{
+                    marginTop: 5,
+                    color: "#80D1FF",
+                    fontSize: 14,
+                    fontFamily: "Questrial"
+                  }}
+                >
+                  {Number(selectedOption?.amount)} {rate?.base_currency}{" "}
+                </ThemedText>
+
+                <MaterialCommunityIcons
+                  name="approximately-equal"
+                  size={20}
+                  color={"#208BC9"}
+                  style={{ paddingTop: 5 }}
+                />
+                <ThemedText
+                  style={{
+                    marginTop: 5,
+                    color: "#80D1FF",
+                    fontSize: 14,
+                    fontFamily: "Questrial"
+                  }}
+                >
+                  {Number(rate?.converted_amount ?? 0).toFixed(2)}{" "}
+                  {rate?.target_currency}
+                </ThemedText>
+              </View>
             </View>
           ) : null}
         </View>
@@ -279,10 +323,10 @@ const ServicesDispatcher = ({
         <CustomButton
           title={"Continue"}
           handlePress={() => setShowReviewSheet(true)}
-          btnStyles={{ marginTop: 60 }}
+          btnStyles={{ marginTop: 40 }}
           variant="primary"
           size="medium"
-          disabled={!selectedOption?.amount}
+          disabled={!selectedOption?.amount || rateLoading}
         />
       </View>
 
@@ -300,7 +344,7 @@ const ServicesDispatcher = ({
       />
 
       <ReviewBottomSheet
-        type={"bills"}
+        type={type}
         isVisible={showReviewSheet}
         onClose={() => setShowReviewSheet(false)}
         onPay={handlePay}
@@ -308,7 +352,7 @@ const ServicesDispatcher = ({
         phoneNumber={number}
         provider={provider}
         name={name}
-        rate="10"
+        conversion={rate}
         selectedAsset={selectedCurrency}
       />
     </>

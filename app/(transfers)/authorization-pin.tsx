@@ -61,6 +61,7 @@ const AuthorizationPin: React.FC = () => {
           params: successParams
         });
       } else {
+        setPin("");
         Toast.show({
           type: "error",
           text1: result?.message || "Transaction failed. Please try again."

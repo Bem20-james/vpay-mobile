@@ -4,14 +4,17 @@ import { useEffect, useState } from "react";
 import Toast from "react-native-toast-message";
 import { useUser } from "@/contexts/UserContexts";
 import {
-  BanksRes,
+  BanksResponse,
   Country,
   GenericResponse,
   Rates,
   RatesRes,
-  Banks,
-  RateConversionRequest
+  Bank,
+  RateConversionRequest,
+  History,
+  HistoryResponse
 } from "@/types/general";
+import { useQuery } from "@tanstack/react-query";
 
 function useFetchCountries() {
   const [countries, setCountries] = useState<Country[]>([]);
@@ -49,51 +52,55 @@ function useFetchCountries() {
   return { countries, loading, refetch: fetchData };
 }
 
-function useFetchNgnBanks() {
-  const [banks, setBanks] = useState<Banks[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+const fetchBanks = async (
+  countryCode: string,
+  config: any
+): Promise<Bank[]> => {
+  const url = `${SERVER_BASE_URL}/app/banks/${encodeURIComponent(countryCode)}`;
+  const response = await axios.get<BanksResponse>(url, config);
+
+  if (response.data.success && !response.data.error) {
+    return response.data.result;
+  } else {
+    const message = response.data.message || "Failed to fetch banks.";
+    throw new Error(message);
+  }
+};
+
+function useFetchBanks(countryCode: string) {
   const { config } = useUser();
 
-  const fetchData = async () => {
-    setLoading(true);
-
-    try {
-      const response = await axios.get<BanksRes>(
-        `${SERVER_BASE_URL}/app/banks/ng`,
-        config
-      );
-
-      const result = response.data;
-      console.log("banks response:", result);
-
-      if (result.success) {
-        setBanks(result.result);
-      } else {
-        if (response.data.error) {
-          Toast.show({
-            type: "error",
-            text1: response.data.message || "Failed to fetch banks."
-          });
-        }
-      }
-    } catch (error: unknown) {
-      const axiosError = error as AxiosError<{ message?: string }>;
-      const errorMessage =
-        axiosError.response?.data?.message ||
-        "An error occurred while fetching banks.";
-
-      console.error("Error fetching data:", errorMessage);
-      Toast.show({ type: "error", text1: errorMessage });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    data: banks = [],
+    isLoading,
+    isFetching,
+    error,
+    refetch
+  } = useQuery<Bank[], AxiosError>({
+    queryKey: ["banks", countryCode],
+    queryFn: () => fetchBanks(countryCode, config),
+    enabled: !!countryCode,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: 2
+  });
 
   useEffect(() => {
-    fetchData();
-  }, [config]);
+    if (!error) return;
+    Toast.show({
+      type: "error",
+      text1:
+        (error.response?.data as any)?.message ||
+        error.message ||
+        "Failed to fetch banks"
+    });
+  }, [error]);
 
-  return { banks, loading, refetch: fetchData };
+  return {
+    banks,
+    loading: isLoading || isFetching,
+    error,
+    refetch
+  };
 }
 
 function useRateConversion(initialData?: RateConversionRequest) {
@@ -183,7 +190,7 @@ function useFetchMobileMoneyCountries() {
 }
 
 function useMobileMoneyOperators() {
-  const [operators, setOperators] = useState<Banks[]>([]);
+  const [operators, setOperators] = useState<Bank[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const { config } = useUser();
 
@@ -196,7 +203,7 @@ function useMobileMoneyOperators() {
     }
 
     try {
-      const response = await axios.get<BanksRes>(
+      const response = await axios.get<BanksResponse>(
         `${SERVER_BASE_URL}/mobile-money-providers/${countryCode}`,
         config
       );
@@ -234,10 +241,66 @@ function useMobileMoneyOperators() {
   return { operators, loading, refetch: fetchData };
 }
 
+const fetchTrnxHistory = async (config: any): Promise<History[]> => {
+  try {
+    const url = `${SERVER_BASE_URL}/user/recent-transactions`;
+    const response = await axios.get<HistoryResponse>(url, config);
+    const result = response.data
+
+    console.log("TRNX HISTORY:", result)
+
+    if (result?.success && response.data?.result) {
+      return response.data.result;
+    }
+
+    throw new Error(response.data?.message || "Failed to fetch transaction history");
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || error.message);
+  }
+};
+
+function useFetchTrnxHistory() {
+  const { config } = useUser();
+
+  const {
+    data: trnxHistory = [],
+    isLoading,
+    isFetching,
+    error,
+    refetch,
+  } = useQuery<History[], AxiosError>({
+    queryKey: ["transactionHistory"],
+    queryFn: () => fetchTrnxHistory(config),
+    staleTime: 1000 * 60 * 5,
+    retry: 2,
+  });
+
+  useEffect(() => {
+    if (!error) return;
+    Toast.show({
+      type: "error",
+      text1:
+        (error.response?.data as any)?.message ||
+        error.message ||
+        "Failed to fetch transaction history",
+    });
+    console.error()
+  }, [error]);
+
+  return {
+    trnxHistory,
+    loading: isLoading || isFetching,
+    error,
+    refetch,
+  };
+}
+
+
 export {
   useFetchCountries,
-  useFetchNgnBanks,
+  useFetchBanks,
   useRateConversion,
   useMobileMoneyOperators,
-  useFetchMobileMoneyCountries
+  useFetchMobileMoneyCountries,
+  useFetchTrnxHistory
 };

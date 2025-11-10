@@ -9,7 +9,7 @@ import {
 import React, { useState, useEffect } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { ThemedText } from "@/components/ThemedText";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { TransferStyles as styles } from "@/styles/transfers";
 import { Colors } from "@/constants/Colors";
 import AssetsBottomSheet from "./BottomSheets/Assets";
@@ -71,7 +71,7 @@ const AmountInputField = ({
     null
   );
   const { assets, loading } = useFetchUserAssets();
-  const { user } = useUser()
+  const { user } = useUser();
   const currencySymbol = user?.country?.currency;
 
   const fiatAssets = assets?.fiat || [];
@@ -97,11 +97,10 @@ const AmountInputField = ({
   const { rate, loading: rateLoading, refetch } = useRateConversion();
 
   useEffect(() => {
-  if (rate) {
-    onRateChange?.(rate);
-  }
-}, [rate]);
-
+    if (rate) {
+      onRateChange?.(rate);
+    }
+  }, [rate]);
 
   useEffect(() => {
     if (loading) {
@@ -312,16 +311,36 @@ const AmountInputField = ({
               marginTop: 15
             }}
           >
-            <ThemedText
-              style={{
-                marginTop: 5,
-                color: "#80D1FF",
-                fontSize: 14,
-                fontFamily: "Questrial"
-              }}
-            >
-              ≈ {rate.converted_amount.toFixed(2)} {rate.target_currency}
-            </ThemedText>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <ThemedText
+                style={{
+                  marginTop: 5,
+                  color: "#80D1FF",
+                  fontSize: 14,
+                  fontFamily: "Questrial"
+                }}
+              >
+                {Number(amount)} {rate?.target_currency}{" "}
+              </ThemedText>
+
+              <MaterialCommunityIcons
+                name="approximately-equal"
+                size={20}
+                color={"#208BC9"}
+                style={{ paddingTop: 5 }}
+              />
+              <ThemedText
+                style={{
+                  marginTop: 5,
+                  color: "#80D1FF",
+                  fontSize: 14,
+                  fontFamily: "Questrial"
+                }}
+              >
+                {Number(rate?.converted_amount ?? 0).toFixed(2)}{" "}
+                {rate?.base_currency}
+              </ThemedText>
+            </View>
 
             <ThemedText
               style={{

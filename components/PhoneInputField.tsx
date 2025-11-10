@@ -19,6 +19,7 @@ export type ProviderItem = {
   id: string | number;
   provider_name: string;
   country_code: string;
+  currency_code: string;
   image: any;
 };
 

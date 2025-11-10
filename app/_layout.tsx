@@ -17,6 +17,7 @@ import Toast from "react-native-toast-message";
 import toastConfig from "@/config/toastConfig";
 import UserContextProvider from "@/contexts/UserContexts";
 import { LoaderProvider } from "@/contexts/LoaderContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -43,91 +44,98 @@ export default function RootLayout() {
 
   if (!fontsLoaded) return null;
 
+  const queryClient = new QueryClient();
+
   return (
     <UserContextProvider>
       <GestureHandlerRootView>
-        <LoaderProvider>
-          <BottomSheetModalProvider>
-            <PortalProvider>
-              <ThemeProvider
-                value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-              >
-                <Stack>
-                  <Stack.Screen name="index" options={{ headerShown: false }} />
-                  <Stack.Screen
-                    name="onboarding"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="(tabs)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="(auth)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="(actions)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="(user)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="(transfers)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="(cards)"
-                    options={{ headerShown: false }}
+        <QueryClientProvider client={queryClient}>
+          <LoaderProvider>
+            <BottomSheetModalProvider>
+              <PortalProvider>
+                <ThemeProvider
+                  value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+                >
+                  <Stack>
+                    <Stack.Screen
+                      name="index"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="onboarding"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(tabs)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(auth)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(actions)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(user)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(transfers)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(cards)"
+                      options={{ headerShown: false }}
+                    />
+
+                    <Stack.Screen
+                      name="notifications"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="transactions"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="verification"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="transaction-limit"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen name="+not-found" />
+                    <Stack.Screen
+                      name="transaction-failed"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="transaction-success"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="setup-2FA"
+                      options={{ headerShown: false }}
+                    />
+                  </Stack>
+
+                  <Toast
+                    position="bottom"
+                    bottomOffset={50}
+                    visibilityTime={6000}
+                    autoHide
+                    topOffset={50}
+                    config={toastConfig}
                   />
 
-                  <Stack.Screen
-                    name="notifications"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="transactions"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="verification"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="transaction-limit"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen name="+not-found" />
-                  <Stack.Screen
-                    name="transaction-failed"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="transaction-success"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="setup-2FA"
-                    options={{ headerShown: false }}
-                  />
-                </Stack>
-
-                <Toast
-                  position="bottom"
-                  bottomOffset={50}
-                  visibilityTime={6000}
-                  autoHide
-                  topOffset={50}
-                  config={toastConfig}
-                />
-
-                <StatusBar style="auto" backgroundColor="#fff" />
-              </ThemeProvider>
-            </PortalProvider>
-          </BottomSheetModalProvider>
-        </LoaderProvider>
+                  <StatusBar style="auto" backgroundColor="#fff" />
+                </ThemeProvider>
+              </PortalProvider>
+            </BottomSheetModalProvider>
+          </LoaderProvider>
+        </QueryClientProvider>
       </GestureHandlerRootView>
     </UserContextProvider>
   );

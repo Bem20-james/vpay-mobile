@@ -12,6 +12,7 @@ interface AirtimeData {
   bank_code: string;
   description: string;
   currency: string;
+  activity_pin: string;
 }
 
 function useFetchAirtimeProviders() {
@@ -65,12 +66,18 @@ const usePurchaseAirtime = () => {
     setError(null);
 
     try {
+      const { activity_pin, ...rest } = data;
       const response = await axios.post(
         `${SERVER_BASE_URL}/user/airtime/request`,
-        data,
-        config
+        rest,
+        {
+          ...config,
+          headers: { ...config.headers, activity_pin }
+        }
       );
+
       const result = response.data;
+      console.log("airtime RESPONSE:", result);
 
       if (!result.success) {
         return {
@@ -79,7 +86,7 @@ const usePurchaseAirtime = () => {
         };
       }
 
-      return { success: true, data: result.data, message: result.message };
+      return { success: true, data: result, message: result.message };
     } catch (err) {
       const errorMessage =
         (err as AxiosError<{ message?: string }>)?.response?.data?.message ||
@@ -95,7 +102,5 @@ const usePurchaseAirtime = () => {
 
   return { purchaseAirtime, isLoading, error };
 };
-
-export default usePurchaseAirtime;
 
 export { usePurchaseAirtime, useFetchAirtimeProviders };

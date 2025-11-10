@@ -13,6 +13,8 @@ import { styles } from "@/styles/trnxstatus";
 import * as Print from "expo-print";
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
+import getSymbolFromCurrency from "currency-symbol-map";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export type TransactionType =
   | "transfer"
@@ -42,28 +44,27 @@ const TransactionSuccess = () => {
   const {
     transactionType,
     amount,
-    currency = "₦",
+    currency,
     recipient,
     recipientAccount,
     reference,
     date,
     fee,
+    totalFee,
     description,
-    recieved,
-    sent,
     bank,
     currency_sent,
     currency_recieved,
     status,
+    total,
     totalDebited
   } = params;
 
-  // ✅ Dynamic titles
   const titles: Record<string, string> = {
     transfer: "Transfer Successful",
     airtime: "Airtime Purchase Successful",
     data: "Data Purchase Successful",
-    bill_payment: "Bill Payment Successful",
+    betting: "Bet Wallet Funded Successful",
     purchase: "Purchase Successful",
     payment: "Payment Successful",
     withdrawal: "Withdrawal Successful",
@@ -184,9 +185,26 @@ const TransactionSuccess = () => {
           </ThemedText>
 
           <ThemedText style={[styles.amount, { color: textPrimary }]}>
-            {currency}
+            {getSymbolFromCurrency(currency_recieved)}
+
             {totalDebited || "0.00"}
           </ThemedText>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <ThemedText>
+              {getSymbolFromCurrency(currency_recieved)}
+              {amount}
+            </ThemedText>
+            <MaterialCommunityIcons
+              name="approximately-equal"
+              size={18}
+              color="#999"
+              style={{ marginHorizontal: 6 }}
+            />
+            <ThemedText>
+              {getSymbolFromCurrency(currency_sent)}
+              {totalDebited}
+            </ThemedText>
+          </View>
 
           {description ? (
             <ThemedText style={[styles.description, { color: textSecondary }]}>
@@ -207,19 +225,21 @@ const TransactionSuccess = () => {
 
             <DetailRow label="Recipient" value={recipient} />
             <DetailRow label="Account Number" value={recipientAccount} />
-            <DetailRow label="Bank" value={bank} />
+            <DetailRow
+              label={transactionType === "Transfer" ? "Bank" : "Provider"}
+              value={bank}
+            />
             <DetailRow label="Transaction ID" value={reference} />
             <DetailRow label="Date & Time" value={date} />
             <DetailRow label="Currency Sent" value={currency_sent} />
             <DetailRow label="Currency Received" value={currency_recieved} />
             <DetailRow
               label="Transaction Fee"
-              value={fee ? `${currency}${fee}` : ""}
+              value={fee ? `${getSymbolFromCurrency(currency_sent)}${fee}` : ""}
             />
             <DetailRow label="Status" value={status} />
           </View>
 
-          {/* ✅ Actions */}
           <View style={styles.actionButtons}>
             <Pressable
               style={[

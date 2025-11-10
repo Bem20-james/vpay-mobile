@@ -103,7 +103,6 @@ const FormField = ({
             marginBottom: 5,
             fontFamily: "Questrial",
             fontSize: 12,
-            color: "#F5F5F5"
           }}
         >
           {title}

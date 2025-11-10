@@ -95,70 +95,70 @@ const MobileMoney = () => {
   return (
     <SafeAreaView style={[KycStyles.safeArea, { backgroundColor }]}>
       {!screenVisible ? (
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <>
           <Navigator title="Mobile Money" />
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={TransferStyles.container}>
+              {/* Search Input */}
+              <View style={TransferStyles.searchContainer}>
+                <Feather
+                  name="search"
+                  size={20}
+                  color="#9B9B9B"
+                  style={TransferStyles.searchIcon}
+                />
+                <TextInput
+                  style={TransferStyles.searchInput}
+                  placeholder="Type a country"
+                  placeholderTextColor="#9B9B9B"
+                  value={query}
+                  onChangeText={setQuery}
+                />
+              </View>
 
-          <View style={TransferStyles.container}>
-            {/* Search Input */}
-            <View style={TransferStyles.searchContainer}>
-              <Feather
-                name="search"
-                size={20}
-                color="#9B9B9B"
-                style={TransferStyles.searchIcon}
-              />
-              <TextInput
-                style={TransferStyles.searchInput}
-                placeholder="Type a country"
-                placeholderTextColor="#9B9B9B"
-                value={query}
-                onChangeText={setQuery}
-              />
+              {loading ? (
+                <SkeletonLoader />
+              ) : (
+                <FlatList
+                  data={filteredCountries}
+                  keyExtractor={(item, index) => `${item.id}-${index}`}
+                  nestedScrollEnabled
+                  scrollEnabled={false}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={TransferStyles.itemContainer}
+                      onPress={() => {
+                        setSelectedCountry(item);
+                        setScreenVisible(true);
+                      }}
+                      activeOpacity={0.7}
+                    >
+                      <View style={TransferStyles.itemContent}>
+                        <View style={[TransferStyles.iconCircle]}>
+                          <CountryFlag
+                            isoCode={item.country_code}
+                            size={15}
+                            style={TransferStyles.flagItem}
+                          />
+                        </View>
+                        <View style={TransferStyles.txtBorder}>
+                          <ThemedText
+                            lightColor="#252525"
+                            darkColor="#FFFFFF"
+                            style={TransferStyles.primaryText}
+                          >
+                            {item.country_name}
+                          </ThemedText>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                  showsVerticalScrollIndicator={false}
+                />
+              )}
             </View>
-
-            {/* 🟣 Skeleton while loading */}
-            {loading ? (
-              <SkeletonLoader />
-            ) : (
-              <FlatList
-                data={filteredCountries}
-                keyExtractor={(item, index) => `${item.id}-${index}`}
-                nestedScrollEnabled
-                scrollEnabled={false}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={TransferStyles.itemContainer}
-                    onPress={() => {
-                      setSelectedCountry(item);
-                      setScreenVisible(true);
-                    }}
-                    activeOpacity={0.7}
-                  >
-                    <View style={TransferStyles.itemContent}>
-                      <View style={[TransferStyles.iconCircle]}>
-                        <CountryFlag
-                          isoCode={item.country_code}
-                          size={15}
-                          style={TransferStyles.flagItem}
-                        />
-                      </View>
-                      <View style={TransferStyles.txtBorder}>
-                        <ThemedText
-                          lightColor="#252525"
-                          darkColor="#FFFFFF"
-                          style={TransferStyles.primaryText}
-                        >
-                          {item.country_name}
-                        </ThemedText>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                )}
-                showsVerticalScrollIndicator={false}
-              />
-            )}
-          </View>
-        </ScrollView>
+          </ScrollView>
+        </>
       ) : (
         <SendMobileMoney
           selectedCountry={selectedCountry?.country_code}

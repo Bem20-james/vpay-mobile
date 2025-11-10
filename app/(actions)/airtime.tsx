@@ -41,6 +41,9 @@ const AirtimeScreen = () => {
   const countryCode = user?.country?.code;
   const [currentRate, setCurrentRate] = useState<ConversionBody | any>(null);
 
+  console.log("selected provider:", selectedProvider);
+  console.log("selected currecy:", selectedCurrency);
+
   //Contacts fetcher
   const fetchContacts = async () => {
     try {
@@ -72,10 +75,11 @@ const AirtimeScreen = () => {
       params: {
         transactionType: "airtime",
         payload: JSON.stringify({
-          phoneNumber,
-          selectedCurrency,
+          phone: phoneNumber,
           amount,
-          provider: selectedProvider?.provider_name
+          provider: selectedProvider?.provider_name,
+          base_asset: selectedProvider?.currency_code,
+          target_asset: selectedCurrency?.currency_code
         })
       }
     });
@@ -90,7 +94,7 @@ const AirtimeScreen = () => {
   return (
     <SafeAreaView
       style={[styles.safeArea, { backgroundColor: boxBackgroundColor }]}
-    > 
+    >
       <Navigator title="Buy Airtime" />
       <ScrollView
         contentContainerStyle={styles.scrollContent}

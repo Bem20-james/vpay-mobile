@@ -10,9 +10,6 @@ import {
   LookUpResult,
   CableTvData,
   Response,
-  BettingProvider,
-  BettingResult,
-  BettingLookUpRes,
   ElectricityBillData
 } from "@/types/services";
 import { TransactionResponse } from "@/types/transfers";
@@ -91,94 +88,6 @@ function useFetchElectricityProviders() {
   }, []);
 
   return { powerProviders, loading, refetch: fetchData };
-}
-
-function useFetchBettingProviders() {
-  const [betProvider, setBetProvider] = useState<BettingProvider[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const { config } = useUser();
-
-  const fetchData = async () => {
-    setLoading(true);
-
-    try {
-      const response = await axios.get<ProviderRes<BettingProvider[]>>(
-        `${SERVER_BASE_URL}/user/bet/providers`,
-        config
-      );
-
-      const result = response.data;
-
-      if (result.code === 0) {
-        setBetProvider(result.result);
-      }
-    } catch (error: unknown) {
-      const axiosError = error as AxiosError<{ message?: string }>;
-      const errorMessage =
-        axiosError.response?.data ||
-        "An error occurred while fetching betting providers.";
-
-      console.error("Error fetching data:", errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  return { betProvider, loading, refetch: fetchData };
-}
-
-function useLookUpBetCustomer() {
-  const [customer, setCustomer] = useState<BettingResult | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const { config } = useUser();
-
-  const fetchData = async (data: {
-    provider: string;
-    account: string;
-  }): Promise<boolean> => {
-    setLoading(true);
-
-    try {
-      const response = await axios.post<BettingLookUpRes>(
-        `${SERVER_BASE_URL}/user/bet/verify-wallet`,
-        {
-          provider: data.provider,
-          account: data.account
-        },
-        config
-      );
-
-      const result = response.data;
-
-      if (result.code === 0) {
-        setCustomer(result.result);
-        return true;
-      } else {
-        Toast.show({
-          type: "error",
-          text1: response.data.message || "Failed to look up subscriber."
-        });
-        return false;
-      }
-    } catch (error: unknown) {
-      const axiosError = error as AxiosError<{ message?: string }>;
-      const errorMessage =
-        axiosError.response?.data?.message ||
-        "An error occurred while looking up subscriber.";
-
-      console.error("Error fetching data:", errorMessage);
-      Toast.show({ type: "error", text1: errorMessage });
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { customer, loading, lookup: fetchData };
 }
 
 function useLookUpTvSubscriber() {
@@ -433,7 +342,7 @@ const usePayElectricity = () => {
 
   const payElectricity = async (
     data: ElectricityBillData
-  ): Promise<Response> => {
+  ): Promise<TransactionResponse> => {
     setIsLoading(true);
     setError(null);
 
@@ -490,6 +399,7 @@ const usePayElectricity = () => {
   return { payElectricity, isLoading, error };
 };
 
+
 export {
   useFetchCableTvProviders,
   usePayCableTv,
@@ -498,7 +408,5 @@ export {
   useLookUpElectricityUser,
   useFetchCableTvOptions,
   useFetchElectricityOptions,
-  useFetchBettingProviders,
-  useLookUpBetCustomer,
   usePayElectricity
 };

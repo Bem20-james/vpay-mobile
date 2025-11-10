@@ -118,17 +118,19 @@ const ElectricityScreen = () => {
     setShowSendScreen(true);
   };
 
+  console.log("METER TYPE:", activeTab);
+
   return (
     <SafeAreaView
       style={[styles.safeArea, { backgroundColor: boxBackgroundColor }]}
     >
+      <Navigator
+        title="Electricity"
+        onBack={
+          showSendScreen ? () => setShowSendScreen(false) : navigation.goBack
+        }
+      />
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Navigator
-          title="Electricity"
-          onBack={
-            showSendScreen ? () => setShowSendScreen(false) : navigation.goBack
-          }
-        />
         <ThemedText
           lightColor="#9B9B9B"
           darkColor="#EEF3FB"
@@ -254,7 +256,7 @@ const ElectricityScreen = () => {
               <View
                 style={{
                   position: "absolute",
-                  bottom: -300,
+                  bottom: -280,
                   left: 0,
                   right: 0
                 }}
@@ -295,6 +297,8 @@ const ElectricityScreen = () => {
             number={meterNumber}
             provider={selectedProvider?.provider_name}
             logo={selectedProvider?.image}
+            targetCurrency={selectedProvider?.currency_code}
+            meterType={activeTab.toUpperCase()}
           />
         )}
       </ScrollView>

@@ -13,7 +13,7 @@ import CountryFlag from "react-native-country-flag";
 import CustomButton from "./CustomButton";
 import { StoredContact } from "@/utils/encryptedStore";
 import { useVpayContacts } from "@/hooks/useContacts";
-import SkeletonRow from "./Skeleton"
+import SkeletonRow from "./SkeletonRow";
 
 interface ContactSectionProps {
   title?: string;

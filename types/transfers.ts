@@ -1,6 +1,6 @@
 export type SendScreenProps = {
   onBack: () => void;
-  selectedCountry?: string;
+  selectedCountry?: any;
 };
 
 export interface ResolveTag {

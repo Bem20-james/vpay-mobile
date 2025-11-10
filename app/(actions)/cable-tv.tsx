@@ -32,7 +32,7 @@ const CableTVScreen = () => {
     ? Colors.dark.background
     : Colors.light.background;
   const statusBarBg = isDark ? Colors.dark.background : Colors.light.background;
-  const txtColor = isDark ? Colors.light.accentBg : Colors.dark.background;
+  const txtColor = isDark ? Colors.light.accentBg : Colors.light.background;
   const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
 
   const [userNumber, setUserNumber] = useState("");
@@ -46,10 +46,10 @@ const CableTVScreen = () => {
   const [showSendScreen, setShowSendScreen] = useState(false);
   const navigation = useNavigation();
 
-  console.log("Selected TV provider:", tvProviders);
-
   const prevLookupParams = useRef({ userNumber: "", provider: "" });
   const stableLookup = useCallback(lookup, []);
+
+  console.log("SELECTED PROVIDER:", selectedProvider);
 
   useEffect(() => {
     let isMounted = true;
@@ -106,13 +106,13 @@ const CableTVScreen = () => {
     <SafeAreaView
       style={[styles.safeArea, { backgroundColor: boxBackgroundColor }]}
     >
+      <Navigator
+        title="Cable TV"
+        onBack={
+          showSendScreen ? () => setShowSendScreen(false) : navigation.goBack
+        }
+      />
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Navigator
-          title="Cable TV"
-          onBack={
-            showSendScreen ? () => setShowSendScreen(false) : navigation.goBack
-          }
-        />
         <ThemedText
           lightColor="#9B9B9B"
           darkColor="#EEF3FB"
@@ -271,6 +271,7 @@ const CableTVScreen = () => {
             number={userNumber}
             provider={selectedProvider?.provider_name}
             logo={selectedProvider?.image}
+            targetCurrency={selectedProvider?.currency_code}
           />
         )}
       </ScrollView>

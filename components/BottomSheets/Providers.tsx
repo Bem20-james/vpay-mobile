@@ -24,7 +24,6 @@ const ProvidersBottomSheet: React.FC<ProvidersBottomSheetProps> = ({
 }) => {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
-  const border = isDark ? "#414141" : "#d7d7d7";
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["30%", "40%"], []);
 
@@ -61,32 +60,49 @@ const ProvidersBottomSheet: React.FC<ProvidersBottomSheetProps> = ({
       ) : (
         <BottomSheetFlatList
           data={data}
-          keyExtractor={(item) => item?.id.toString()}
+          keyExtractor={(item, index) =>
+            item?.id?.toString() ||
+            item?.code?.toString() ||
+            item?.slug ||
+            `provider-${index}`
+          }
           contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.item}
-              onPress={() => {
-                onSelect(item);
-                onClose();
-              }}
-            >
-              {item.image && (
-                <Image
-                  source={{ uri: `${SERVER_IMAGE_URL}/${item.image}` }}
-                  style={styles.image}
-                  resizeMode="contain"
-                />
-              )}
-              <ThemedText
-                style={styles.name}
-                lightColor="#252525"
-                darkColor="#f1f1f1"
+          renderItem={({ item }) => {
+            const name = item?.provider_name || "Unknown Provider";
+            const imageUri = item?.image
+              ? `${SERVER_IMAGE_URL}/${item.image}`
+              : null;
+
+            return (
+              <TouchableOpacity
+                style={styles.item}
+                onPress={() => {
+                  onSelect(item);
+                  onClose();
+                }}
               >
-                {item.provider_name}
-              </ThemedText>
-            </TouchableOpacity>
-          )}
+                {imageUri ? (
+                  <Image
+                    source={{ uri: imageUri }}
+                    style={styles.image}
+                    resizeMode="contain"
+                  />
+                ) : (
+                  <View style={styles.placeholderIcon} />
+                )}
+
+                <View style={{ flex: 1 }}>
+                  <ThemedText
+                    style={styles.name}
+                    lightColor="#252525"
+                    darkColor="#f1f1f1"
+                  >
+                    {name}
+                  </ThemedText>
+                </View>
+              </TouchableOpacity>
+            );
+          }}
         />
       )}
     </BottomSheet>
@@ -106,7 +122,6 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 5,
     flexDirection: "row",
-    gap: 5,
     alignItems: "center",
     borderBottomWidth: 0.7,
     borderBottomColor: "#000000"
@@ -117,9 +132,21 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginRight: 12
   },
+  placeholderIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 50,
+    marginRight: 12,
+    backgroundColor: "#d9d9d9"
+  },
   name: {
     fontSize: 14,
     fontFamily: "Inter-Medium"
+  },
+  subtitle: {
+    fontSize: 12,
+    marginTop: 3,
+    fontFamily: "Inter-Regular"
   }
 });
 

@@ -10,7 +10,7 @@ import {
   LookUpResponse,
   LookUpResult,
   TransactionResponse,
-  CryptoData,
+  CryptoData
 } from "@/types/transfers";
 
 function useResolveVpayTag() {
@@ -112,6 +112,59 @@ function useLookUpUser() {
   return { acctInfo, loading, lookup: fetchData };
 }
 
+function useLookUpMobileMoneyUser() {
+  const [acctInfo, setAcctInfo] = useState<LookUpResult | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const { config } = useUser();
+
+  const fetchData = async (data: {
+    provider_code: string;
+    phone: string;
+    currency: string;
+  }): Promise<boolean> => {
+    setLoading(true);
+
+    try {
+      const response = await axios.post<LookUpResponse>(
+        `${SERVER_BASE_URL}/mobile-money/recipient/verify`,
+        {
+          provider_code: data.provider_code,
+          phone: data.phone,
+          currency: data.currency
+        },
+        config
+      );
+      const result = response.data;
+      console.log("lookup response:", result);
+      console.log("acctInfo:", acctInfo);
+
+      if (result.success && result.code === 0) {
+        setAcctInfo(result.result);
+        return true;
+      } else {
+        Toast.show({
+          type: "error",
+          text1: response.data.message || "Failed to look up user."
+        });
+        return false;
+      }
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      const errorMessage =
+        axiosError.response?.data?.message ||
+        "An error occurred while looking up user.";
+
+      console.error("Error fetching data:", errorMessage);
+      Toast.show({ type: "error", text1: errorMessage });
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { acctInfo, loading, lookup: fetchData };
+}
+
 const useSendLocal = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -166,9 +219,7 @@ const useSendCrypto = () => {
   const [error, setError] = useState<string | null>(null);
   const { config } = useUser();
 
-  const sendCrypto = async (
-    data: CryptoData
-  ): Promise<TransactionResponse> => {
+  const sendCrypto = async (data: CryptoData): Promise<TransactionResponse> => {
     setIsLoading(true);
     setError(null);
 
@@ -210,4 +261,60 @@ const useSendCrypto = () => {
   return { sendCrypto, isLoading, error };
 };
 
-export { useSendLocal, useLookUpUser, useResolveVpayTag, useSendCrypto };
+const useSendInternational = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { config } = useUser();
+
+  const sendFunds = async (
+    data: SendFiatData
+  ): Promise<TransactionResponse> => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const { activity_pin, ...rest } = data;
+      const response = await axios.post(
+        `${SERVER_BASE_URL}/user/fiat/send/international`,
+        rest,
+        {
+          ...config,
+          headers: { ...config.headers, activity_pin }
+        }
+      );
+
+      const result = response.data;
+      console.log("International RES:", result);
+
+      if (!result.success && result.code !== 0) {
+        return {
+          success: false,
+          message: result.message || "Transaction failed"
+        };
+      }
+
+      return { success: true, data: result, message: result.message };
+    } catch (err) {
+      const errorMessage =
+        (err as AxiosError<{ message?: string }>)?.response?.data?.message ||
+        (err as Error).message ||
+        "Network or server error";
+
+      setError(errorMessage);
+      return { success: false, message: errorMessage };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { sendFunds, isLoading, error };
+};
+
+export {
+  useSendLocal,
+  useLookUpUser,
+  useResolveVpayTag,
+  useSendCrypto,
+  useLookUpMobileMoneyUser,
+  useSendInternational
+};

@@ -124,8 +124,8 @@ export const TransferStyles = StyleSheet.create({
     color: "#9B9B9B"
   },
   inputBox: {
-    paddingVertical: 13,
-    paddingHorizontal: 15,
+    paddingVertical: 7,
+    paddingHorizontal: 10,
     borderRadius: 10
   },
   label: {
@@ -198,7 +198,8 @@ export const TransferStyles = StyleSheet.create({
   noteInput: {
     fontSize: 14,
     fontFamily: "Inter-Regular",
-    marginTop: 4
+    marginTop: 4,
+    marginVertical: 15
   },
   itemContainer: {
     marginTop: 5,
@@ -227,7 +228,7 @@ export const TransferStyles = StyleSheet.create({
   },
   primaryText: {
     fontFamily: "Inter-Regular",
-    fontSize: 16
+    fontSize: 15
   },
   lastUsed: {
     fontSize: 10,

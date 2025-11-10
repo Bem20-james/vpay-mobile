@@ -120,7 +120,7 @@ const ServiceOptionsField = ({
             >
               <ThemedText
                 style={{
-                  color: txtColor,
+                  color: isSelected ? Colors.light.background : txtColor,
                   fontSize: 13,
                   fontFamily: "Questrial",
                   textAlign: "center"

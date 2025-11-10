@@ -16,13 +16,15 @@ import FormField from "@/components/FormFields";
 import CustomButton from "@/components/CustomButton";
 import CustomChip from "@/components/CustomChips";
 import { Colors } from "@/constants/Colors";
-import { useFetchBettingProviders } from "@/hooks/useBillPayments";
 import { ThemedView } from "@/components/ThemedView";
-import { useLookUpBetCustomer } from "@/hooks/useBillPayments";
 import { TransferStyles } from "@/styles/transfers";
 import { styles as formStyles } from "@/styles/formfield";
 import Toast from "react-native-toast-message";
 import SendScreen from "@/components/Transfers/SendScreen";
+import {
+  useFetchBettingProviders,
+  useLookUpBetCustomer
+} from "@/hooks/useBetting";
 
 const BettingScreen = () => {
   const colorScheme = useColorScheme();
@@ -46,6 +48,8 @@ const BettingScreen = () => {
   const prevLookupParams = useRef({ acctId: "", provider: "" });
   const stableLookup = useCallback(lookup, []);
   const navigation = useNavigation();
+
+  console.log("SELECTED AS:", selectedProvider)
 
   useEffect(() => {
     let isMounted = true;
@@ -107,13 +111,13 @@ const BettingScreen = () => {
     <SafeAreaView
       style={[styles.safeArea, { backgroundColor: boxBackgroundColor }]}
     >
+      <Navigator
+        title="Betting"
+        onBack={() =>
+          showSendScreen ? setShowSendScreen(false) : navigation.goBack()
+        }
+      />
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Navigator
-          title="Betting"
-          onBack={() =>
-            showSendScreen ? setShowSendScreen(false) : navigation.goBack()
-          }
-        />
         <ThemedText
           lightColor="#9B9B9B"
           darkColor="#EEF3FB"
@@ -132,10 +136,7 @@ const BettingScreen = () => {
             />
 
             <View
-              style={[
-                TransferStyles.inputBox,
-                { backgroundColor: bgColor}
-              ]}
+              style={[TransferStyles.inputBox, { backgroundColor: bgColor }]}
             >
               <ThemedText
                 style={{
@@ -268,10 +269,13 @@ const BettingScreen = () => {
         ) : (
           <SendScreen
             onBack={() => setShowSendScreen(false)}
+            type="betting"
             accountDetails={{
               accountNumber: acctId,
               bank: selectedProvider?.provider_name ?? "",
-              accountName: customer?.account_name ?? ""
+              accountName: customer?.account_name ?? "",
+              betId: acctId,
+              targetCurrency: selectedProvider?.currency_code ?? "",
             }}
             navig={false}
           />
