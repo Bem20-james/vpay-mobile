@@ -7,11 +7,15 @@ import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { ThemedText } from "@/components/ThemedText";
 import images from "@/constants/Images";
 import CustomButton from "@/components/CustomButton";
+import { Colors } from "@/constants/Colors";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const Cards = () => {
-  const colorScheme = useColorScheme();
-  const boxBackgroundColor = colorScheme === "dark" ? "#000000" : "#EEF3FB";
-  const statusBarBg = colorScheme === "dark" ? "#000000" : "#EEF3FB";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const boxBackgroundColor = isDark
+    ? Colors.dark.background
+    : Colors.light.background;
   const router = useRouter();
 
   return (
@@ -51,7 +55,7 @@ const Cards = () => {
             title="Create card"
             handlePress={() => router.push("/(cards)/create")}
             btnStyles={{ width: "100%" }}
-            variant={colorScheme === "dark" ? "primary" : "secondary"}
+            variant={"primary"}
             size="medium"
           />
         </View>

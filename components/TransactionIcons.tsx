@@ -19,7 +19,7 @@ export const TransactionIcon: React.FC<TransactionIconProps> = ({ type }) => {
     airtime: { name: "phone", color: "#ff3d9b", bg: "#fff1eb" },
     bet_funding: { name: "minus-circle", color: "#ff7043", bg: "#fff1eb" },
     debit: { name: "arrow-up-bold", color: "#BF281C", bg: "#fff1eb" },
-    transfer: { name: "bank-transfer", color: "#208BC9", bg: "#e6f2ff" },
+    transfer: { name: "arrow-bottom-left", color: "#208BC9", bg: "#e6f2ff" },
     default: { name: "swap-horizontal", color: "#9B9B9B", bg: "#f5f5f5" }
   };
 

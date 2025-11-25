@@ -8,7 +8,6 @@ import {
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { ThemedText } from "@/components/ThemedText";
 import CustomButton from "@/components/CustomButton";
 import OTPInputField from "../../components/OtpInputField";
@@ -27,7 +26,8 @@ import {
 } from "@/hooks/useAuthentication";
 import Toast from "react-native-toast-message";
 import { Colors } from "@/constants/Colors";
-import { useLoader } from "@/contexts/LoaderContext"; 
+import { useLoader } from "@/contexts/LoaderContext";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 interface OtpVerificationProps {
   email?: string;
@@ -54,10 +54,10 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
   secret,
   newPassword
 }) => {
-  const colorScheme = useColorScheme();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const router = useRouter();
-  const bgColor =
-    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+  const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
   const [otp, setOtp] = useState("");
   const [isResending, setIsResending] = useState(false);
   const [countdown, setCountdown] = useState(0);
@@ -72,8 +72,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
   const { enable2FA } = useEnable2FA();
   const { changePwd, loading: verifyingOTP } = useChangePwd();
   const { resendChangePwdOTP } = useResendChangePwdOTP();
-    const { showLoader, hideLoader } = useLoader();
-
+  const { showLoader, hideLoader } = useLoader();
 
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | undefined;
@@ -157,7 +156,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
             ? (error as { message: string }).message
             : "OTP Verification Failed"
       });
-    }finally{
+    } finally {
       hideLoader();
     }
   };
@@ -209,8 +208,9 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
 
   return (
     <SafeAreaView style={{ backgroundColor: bgColor, height: "100%" }}>
+      <Navigator title={""} onBack={onBack} />
+
       <ScrollView>
-        <Navigator title={""} onBack={onBack} />
         <View style={styles.container}>
           <View>
             <ThemedText
@@ -236,7 +236,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
                 {mode === "forgot-password"
                   ? "Enter the OTP sent to reset your password."
                   : "We have sent a code to your email."}
-                  {mode === "setup-2fa" && "enter the code from your at"}
+                {mode === "setup-2fa" && "enter the code from your at"}
               </ThemedText>
               <ThemedText
                 style={{
@@ -288,11 +288,7 @@ const OtpVerification: React.FC<OtpVerificationProps> = ({
                   style={{
                     fontFamily: "Inter-Bold",
                     color:
-                      countdown > 0
-                        ? "gray"
-                        : colorScheme === "dark"
-                        ? "#218DC9"
-                        : "#218DC9"
+                      countdown > 0 ? "gray" : isDark ? "#218DC9" : "#218DC9"
                   }}
                 >
                   {countdown > 0 ? `Resend in ${countdown}s` : "Resend"}

@@ -1,20 +1,17 @@
 import React from "react";
 import { StatusBar } from "expo-status-bar";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider
-} from "@react-navigation/native";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { Stack } from "expo-router";
 import Toast from "react-native-toast-message";
 import toastConfig from "@/config/toastConfig";
+import { ThemeProvider, useTheme } from "@/contexts/ThemeContexts";
+import { Colors } from "@/constants/Colors";
 
 const AuthLayout = () => {
-  const colorScheme = useColorScheme();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+    <ThemeProvider>
       <Stack>
         <Stack.Screen name="register" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
@@ -39,8 +36,8 @@ const AuthLayout = () => {
       />
 
       <StatusBar
-        style={colorScheme === "dark" ? "light" : "dark"}
-        backgroundColor={colorScheme === "dark" ? "#161622" : "#ffffff"}
+        style={isDark ? "light" : "dark"}
+        backgroundColor={isDark ? Colors.dark.background : Colors.light.background}
       />
     </ThemeProvider>
   );

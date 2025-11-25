@@ -22,7 +22,7 @@ function useFetchBettingProviders() {
 
     try {
       const response = await axios.get<ProviderRes<BettingProvider[]>>(
-        `${SERVER_BASE_URL}/user/bet/providers`,
+        `${SERVER_BASE_URL}/bet/providers`,
         config
       );
 
@@ -63,7 +63,7 @@ function useLookUpBetCustomer() {
 
     try {
       const response = await axios.post<BettingLookUpRes>(
-        `${SERVER_BASE_URL}/user/bet/verify-wallet`,
+        `${SERVER_BASE_URL}/bet/verify-wallet`,
         {
           provider: data.provider,
           account: data.account
@@ -115,7 +115,7 @@ const useFundBetWallet = () => {
       const { activity_pin, ...rest } = data;
 
       const response = await axios.post(
-        `${SERVER_BASE_URL}/user/bet/fund-wallet`,
+        `${SERVER_BASE_URL}/bet/fund-wallet`,
         rest,
         {
           ...config,

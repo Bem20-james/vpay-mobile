@@ -4,19 +4,16 @@ import {
   View,
   TouchableOpacity,
   StyleSheet,
-  ActivityIndicator
 } from "react-native";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { ThemedText } from "./ThemedText";
 import { Colors } from "@/constants/Colors";
-import { AntDesign } from "@expo/vector-icons";
+import { Fontisto } from "@expo/vector-icons";
 import { useLoader } from "@/contexts/LoaderContext";
+import { useTheme } from "@/contexts/ThemeContexts";
 
-// ---- shared canonical type ----
 export const OTP_METHODS = ["email", "sms", "authenticator"] as const;
 export type OtpMethod = (typeof OTP_METHODS)[number];
 
-// Make methods generic so onSubmit is narrowed to the subset
 type OtpMethodModalProps<T extends readonly OtpMethod[] = typeof OTP_METHODS> =
   {
     visible: boolean;
@@ -35,12 +32,10 @@ function OtpMediumModal<T extends readonly OtpMethod[] = typeof OTP_METHODS>({
   methods,
   autoSubmitIfSingle = true
 }: OtpMethodModalProps<T>) {
-  // If none provided or empty, fall back to all
   const effectiveMethods = useMemo(() => {
-    const list = (methods && methods.length
+    return (methods && methods.length
       ? methods
       : OTP_METHODS) as unknown as readonly T[number][];
-    return list;
   }, [methods]);
 
   const [selectedMethod, setSelectedMethod] = useState<T[number]>(
@@ -51,13 +46,24 @@ function OtpMediumModal<T extends readonly OtpMethod[] = typeof OTP_METHODS>({
     setSelectedMethod(effectiveMethods[0]);
   }, [effectiveMethods]);
 
-  const colorScheme = useColorScheme();
-  const bgColor =
-    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
+
   const { showLoader, hideLoader } = useLoader();
 
-  // Auto-submit if only one method (skip UI)
+  // 🔥 Loader control based on isLoading
+  useEffect(() => {
+    if (isLoading) {
+      showLoader();
+    } else {
+      hideLoader();
+    }
+
+    return () => hideLoader(); // cleanup when unmounting
+  }, [isLoading]);
+
+  // Auto submit if only one method
   useEffect(() => {
     if (autoSubmitIfSingle && visible && effectiveMethods.length === 1) {
       onSubmit(effectiveMethods[0]);
@@ -68,6 +74,7 @@ function OtpMediumModal<T extends readonly OtpMethod[] = typeof OTP_METHODS>({
   const handleSelect = (method: T[number]) => {
     setSelectedMethod(method);
     onClose();
+    showLoader();
     onSubmit(method);
   };
 
@@ -76,11 +83,7 @@ function OtpMediumModal<T extends readonly OtpMethod[] = typeof OTP_METHODS>({
       <View style={styles.backdrop}>
         <View style={[styles.modal, { backgroundColor: bgColor }]}>
           <TouchableOpacity onPress={onClose} style={styles.closeIconContainer}>
-            <AntDesign
-              name="close"
-              size={20}
-              color={isDark ? "#9B9B9B" : "#80D1FF"}
-            />
+            <Fontisto name="close" size={22} color={"#0A2D4A"} />
           </TouchableOpacity>
 
           <ThemedText style={styles.title}>
@@ -105,8 +108,6 @@ function OtpMediumModal<T extends readonly OtpMethod[] = typeof OTP_METHODS>({
               </ThemedText>
             </TouchableOpacity>
           ))}
-
-          {isLoading && <ActivityIndicator style={{ marginTop: 10 }} />}
         </View>
       </View>
     </Modal>
@@ -136,13 +137,11 @@ const styles = StyleSheet.create({
     elevation: 10
   },
   title: {
-    marginVertical: 10,
+    marginTop: 15,
     textAlign: "center",
     fontFamily: "Inter-Bold",
-    fontWeight: "700",
-    fontSize: 18,
-    lineHeight: 25,
-    letterSpacing: 0
+    fontSize: 17,
+    lineHeight: 30
   },
   option: {
     padding: 12,

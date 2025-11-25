@@ -2,7 +2,6 @@ import { Image, View, ScrollView, Text, Pressable } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { ThemedText } from "@/components/ThemedText";
 import images from "@/constants/Images";
 import FormField from "@/components/FormFields";
@@ -16,12 +15,13 @@ import { FontAwesome } from "@expo/vector-icons";
 import CountryBottomSheet from "@/components/BottomSheets/Countries";
 import { CountryItem } from "@/components/FormFields";
 import { Colors } from "@/constants/Colors";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const Register = () => {
-  const colorScheme = useColorScheme();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const router = useRouter();
-  const bgColor =
-    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+  const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
   const [stepTwoVisible, setStepTwoVisible] = useState(false);
   const { loading, countries } = useFetchCountries();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -283,7 +283,7 @@ const Register = () => {
               <FontAwesome name="angle-left" size={25} color={"#9B9B9B"} />
             </Pressable>
           )}
-          {colorScheme === "dark" ? (
+          {isDark ? (
             <Image source={images.logolight} style={styles.logo} />
           ) : (
             <Image source={images.logodark} style={styles.logo} />

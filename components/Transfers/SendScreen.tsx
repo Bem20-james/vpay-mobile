@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import Navigator from "@/components/Navigator";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { ThemedText } from "@/components/ThemedText";
 import CustomButton from "@/components/CustomButton";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -22,6 +21,7 @@ import CountryFlag from "react-native-country-flag";
 import { SERVER_IMAGE_URL } from "@/constants/Paths";
 import { useLoader } from "@/contexts/LoaderContext";
 import { useRateConversion } from "@/hooks/useGeneral";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 type AccountDetails = {
   bank: string;
@@ -48,8 +48,8 @@ const SendScreen = ({
   accountDetails,
   navig = true
 }: SendScreenProps) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
   const txtColor = isDark ? Colors.light.accentBg : Colors.dark.background;
   const inputBgColor = isDark

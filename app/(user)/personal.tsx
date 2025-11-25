@@ -6,45 +6,60 @@ import {
   StyleSheet,
   ScrollView
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, AntDesign } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { ThemedText } from "@/components/ThemedText";
-import CustomButton from "@/components/CustomButton";
 import Navigator from "@/components/Navigator";
 import { Colors } from "@/constants/Colors";
 import images from "@/constants/Images";
+import { useTheme } from "@/contexts/ThemeContexts";
+import { styles as userStyx } from "@/styles/users";
+import { useFetchAuthUser } from "@/hooks/useUser";
 
 type userInfoProps = {
   label: string;
   name: string;
+  hasChevron?: boolean;
+  canCopy?: boolean;
 };
 
 const PersonalInfo: React.FC = () => {
-  const colorScheme = useColorScheme();
-  const boxBackgroundColor = colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const boxBackgroundColor = isDark
+    ? Colors.dark.background
+    : Colors.light.background;
+  const boxBg = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
+  const { userData } = useFetchAuthUser();
 
-  const UserInfoItem = ({ label, name }: userInfoProps) => {
+  const UserInfoItem = ({
+    label,
+    name,
+    hasChevron,
+    canCopy
+  }: userInfoProps) => {
     return (
-      <View
-        style={[
-          styles.userItem,
-          {
-            backgroundColor:
-              colorScheme === "dark"
-                ? Colors.dark.accentBg
-                : Colors.light.accentBg
-          }
-        ]}
-      >
-        <View style={styles.content}>
-          <View style={{ flex: 1 }}>
-            <ThemedText style={styles.label}>{label}</ThemedText>
-            <ThemedText darkColor="#FEFEFE" style={styles.name}>
-              {name}
-            </ThemedText>
-          </View>
+      <View style={[styles.userItem, { backgroundColor: boxBg }]}>
+        <View>
+          <ThemedText
+            lightColor="#9B9B9B"
+            darkColor="#FFFFFF"
+            style={userStyx.title}
+          >
+            {label}
+          </ThemedText>
+          <ThemedText
+            lightColor="#252525"
+            darkColor="#EEF3FB"
+            style={userStyx.label}
+          >
+            {name}
+          </ThemedText>
         </View>
+        {hasChevron && (
+          <Ionicons name="chevron-forward" size={20} color="#208bc9" />
+        )}
+        {canCopy && <Ionicons name="copy" size={20} color="#208bc9" />}
       </View>
     );
   };
@@ -53,33 +68,48 @@ const PersonalInfo: React.FC = () => {
     <SafeAreaView
       style={[styles.safeArea, { backgroundColor: boxBackgroundColor }]}
     >
+      <Navigator title="Personal Information" showBackIcon={true} />
+
       <ScrollView>
         <View style={styles.container}>
-          <Navigator title="Personal Information" showBackIcon={true} />
-          <View style={styles.imgcontainer}>
-            <TouchableOpacity
-              style={styles.avatarWrapper}
-              activeOpacity={0.7}
-              onPress={() => { }}
-            >
-              <Image
-                source={images.avatar}
-                style={styles.avatar}
+          <View style={userStyx.avatarBox}>
+            <View style={userStyx.avatarCon}>
+              <AntDesign
+                name="user"
+                size={80}
+                color="#161622"
+                style={userStyx.icon}
               />
               <View style={styles.cameraIconContainer}>
-                <Ionicons name="camera" size={20} color="#fff" />
+                <Ionicons name="camera" size={15} color="#fff" />
               </View>
-            </TouchableOpacity>
+            </View>
           </View>
 
-          <UserInfoItem label="Full Name" name="James Bem Aondoakura" />
-          <UserInfoItem label="Email" name="be*gmail.com" />
+          <UserInfoItem
+            label="Username"
+            name={userData?.username || "johndoe123"}
+            canCopy={true}
+          />
+          <UserInfoItem
+            label="Fullname"
+            name={userData?.firstname + " " + userData?.lastname || "John Doe"}
+          />
+          <UserInfoItem label="Email" name={userData?.email || "John Doe"} />
+          <UserInfoItem label="Account Tier" name={"Basic"} hasChevron={true} />
+          <UserInfoItem
+            label="Vpay Account Number"
+            name={"217 0000 0001"}
+            canCopy={true}
+          />
           <UserInfoItem label="Gender" name="Male" />
-
-          <UserInfoItem label="Mobile Number" name="+0123456789" />
-          <UserInfoItem label="Username" name="Jimie" />
-          <UserInfoItem label="Date of birth" name="James Bem Aondoakura" />
-          <UserInfoItem label="Address" name="James Bem Aondoakura" />
+          <UserInfoItem label="Mobile Number" name="+2349011567891" />
+          <UserInfoItem label="Date of Birth" name="30th July 1989" />
+          <UserInfoItem
+            label="Address"
+            name="Abuja, Nigeria"
+            hasChevron={true}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -94,28 +124,12 @@ const styles = StyleSheet.create({
   },
   container: {
     marginHorizontal: 10,
-    marginTop: 5
-  },
-  imgcontainer: {
-    alignItems: "center",
-    paddingVertical: 10,
-    marginBottom: 10
-  },
-  avatarWrapper: {
-    position: "relative"
-  },
-  avatar: {
-    width: 80,
-    height: 80,
-    objectFit: "cover",
-    borderRadius: 50,
-    borderColor: "#444",
-    borderWidth: 2
+    marginBottom: 20
   },
   cameraIconContainer: {
     position: "absolute",
     bottom: 0,
-    right: 0,
+    right: 10,
     backgroundColor: "#000",
     borderRadius: 20,
     padding: 5
@@ -123,24 +137,22 @@ const styles = StyleSheet.create({
   userItem: {
     padding: 7,
     borderRadius: 10,
-    marginBottom: 10,
+    marginBottom: 7,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
-    elevation: 2
+    elevation: 2,
+
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    marginHorizontal: 5,
+    paddingVertical: 10
   },
   content: {
     flexDirection: "row",
     alignItems: "flex-start"
-  },
-  name: {
-    fontSize: 15,
-    fontFamily: "Inter-Medium"
-  },
-  label: {
-    fontSize: 13,
-    fontFamily: "Questrial",
-    marginTop: 4
   }
 });

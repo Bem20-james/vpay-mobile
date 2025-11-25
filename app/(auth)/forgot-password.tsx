@@ -13,6 +13,7 @@ import { useForgotPwd } from "@/hooks/useAuthentication";
 import Toast from "react-native-toast-message";
 import { useRouter } from "expo-router";
 import { Colors } from "@/constants/Colors";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const isValidEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -20,9 +21,9 @@ const isValidEmail = (email: string): boolean => {
 };
 
 const ForgotPassword = () => {
-  const colorScheme = useColorScheme();
-  const bgColor =
-    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
   const { forgotPwd, error } = useForgotPwd();
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -99,10 +100,11 @@ const ForgotPassword = () => {
 
   return (
     <SafeAreaView style={{ backgroundColor: bgColor, height: "100%" }}>
+      <Navigator />
+
       <ScrollView>
-        <Navigator />
         <View style={styles.container}>
-          {colorScheme === "dark" ? (
+          {isDark ? (
             <Image source={images.logolight} style={styles.logo} />
           ) : (
             <Image source={images.logodark} style={styles.logo} />

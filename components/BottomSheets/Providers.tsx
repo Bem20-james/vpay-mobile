@@ -3,9 +3,9 @@ import { View, TouchableOpacity, Image, StyleSheet } from "react-native";
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { btmSheetStyles } from "@/styles/bottomsheets";
 import { SERVER_IMAGE_URL } from "@/constants/Paths";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 interface ProvidersBottomSheetProps {
   isVisible: boolean;
@@ -22,8 +22,8 @@ const ProvidersBottomSheet: React.FC<ProvidersBottomSheetProps> = ({
   onSelect,
   loading = false
 }) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["30%", "40%"], []);
 

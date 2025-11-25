@@ -3,7 +3,6 @@ import { View, TouchableOpacity, Image } from "react-native";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { Portal } from "@gorhom/portal";
 import { ThemedText } from "../ThemedText";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import CustomButton from "../CustomButton";
 import { Colors } from "@/constants/Colors";
 import getSymbolFromCurrency from "currency-symbol-map";
@@ -13,6 +12,7 @@ import CountryFlag from "react-native-country-flag";
 import { TransferStyles as styles } from "@/styles/transfers";
 import images from "@/constants/Images";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 interface Currency {
   country_code: string;
@@ -79,14 +79,14 @@ const ReviewBottomSheet = ({
   conversion,
   phoneNumber,
   provider,
-  snapPoints = ["50", "65%"],
+  snapPoints = ["65%"],
   title = "Review Details",
   type,
   username
 }: Props) => {
   const sheetRef = useRef<BottomSheet>(null);
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const border = isDark ? "#414141" : "#d7d7d7";
 
   useEffect(() => {
@@ -120,7 +120,7 @@ const ReviewBottomSheet = ({
             label: "Total amount",
             value: (
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <ThemedText>
+                <ThemedText style={btmSheetStyles.value}>
                   {getSymbolFromCurrency(selectedAsset.currency_code)}
                   {conversion?.total}
                 </ThemedText>
@@ -130,7 +130,7 @@ const ReviewBottomSheet = ({
                   color="#999"
                   style={{ marginHorizontal: 6 }}
                 />
-                <ThemedText>
+                <ThemedText style={btmSheetStyles.value}>
                   {getSymbolFromCurrency(conversion?.target_currency)}
                   {conversion?.total_converted}
                 </ThemedText>
@@ -156,7 +156,7 @@ const ReviewBottomSheet = ({
             label: "Total amount",
             value: (
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <ThemedText>
+                <ThemedText style={btmSheetStyles.value}>
                   {getSymbolFromCurrency(conversion.target_currency)}
                   {conversion?.total}
                 </ThemedText>
@@ -166,7 +166,7 @@ const ReviewBottomSheet = ({
                   color="#999"
                   style={{ marginHorizontal: 6 }}
                 />
-                <ThemedText>
+                <ThemedText style={btmSheetStyles.value}>
                   {getSymbolFromCurrency(conversion?.target_currency)}
                   {conversion?.total_converted}
                 </ThemedText>
@@ -198,7 +198,7 @@ const ReviewBottomSheet = ({
             label: "Total amount",
             value: (
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <ThemedText>
+                <ThemedText style={btmSheetStyles.value}>
                   {getSymbolFromCurrency(conversion?.target_currency)}
                   {conversion?.total}
                 </ThemedText>
@@ -208,7 +208,7 @@ const ReviewBottomSheet = ({
                   color="#999"
                   style={{ marginHorizontal: 6 }}
                 />
-                <ThemedText>
+                <ThemedText style={btmSheetStyles.value}>
                   {getSymbolFromCurrency(conversion?.base_currency)}
                   {conversion?.total_converted}
                 </ThemedText>
@@ -236,7 +236,7 @@ const ReviewBottomSheet = ({
             label: "Total amount",
             value: (
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <ThemedText>
+                <ThemedText style={btmSheetStyles.value}>
                   {getSymbolFromCurrency(selectedAsset?.currency_code)}
                   {conversion?.total}
                 </ThemedText>
@@ -246,7 +246,7 @@ const ReviewBottomSheet = ({
                   color="#999"
                   style={{ marginHorizontal: 5 }}
                 />
-                <ThemedText>
+                <ThemedText style={btmSheetStyles.value}>
                   {getSymbolFromCurrency(conversion?.target_currency)}
                   {conversion?.total_converted}
                 </ThemedText>
@@ -271,7 +271,7 @@ const ReviewBottomSheet = ({
             label: "Total amount",
             value: (
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <ThemedText>
+                <ThemedText style={btmSheetStyles.value}>
                   {getSymbolFromCurrency(conversion?.target_currency)}
                   {conversion?.total}
                 </ThemedText>
@@ -281,7 +281,7 @@ const ReviewBottomSheet = ({
                   color="#999"
                   style={{ marginHorizontal: 6 }}
                 />
-                <ThemedText>
+                <ThemedText style={btmSheetStyles.value}>
                   {getSymbolFromCurrency(conversion?.base_currency)}
                   {conversion?.total_converted}
                 </ThemedText>

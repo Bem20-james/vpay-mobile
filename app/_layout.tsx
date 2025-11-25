@@ -1,15 +1,9 @@
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider
-} from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { PortalProvider } from "@gorhom/portal";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -18,12 +12,12 @@ import toastConfig from "@/config/toastConfig";
 import UserContextProvider from "@/contexts/UserContexts";
 import { LoaderProvider } from "@/contexts/LoaderContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "@/contexts/ThemeContexts";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
   const [fontsLoaded] = useFonts({
     Questrial: require("../assets/fonts/Questrial-Regular.ttf"),
     "Inter-Black": require("../assets/fonts/Inter-Black.ttf"),
@@ -48,14 +42,12 @@ export default function RootLayout() {
 
   return (
     <UserContextProvider>
-      <GestureHandlerRootView>
-        <QueryClientProvider client={queryClient}>
-          <LoaderProvider>
-            <BottomSheetModalProvider>
-              <PortalProvider>
-                <ThemeProvider
-                  value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-                >
+      <ThemeProvider>
+        <GestureHandlerRootView>
+          <QueryClientProvider client={queryClient}>
+            <LoaderProvider>
+              <BottomSheetModalProvider>
+                <PortalProvider>
                   <Stack>
                     <Stack.Screen
                       name="index"
@@ -131,12 +123,12 @@ export default function RootLayout() {
                   />
 
                   <StatusBar style="auto" backgroundColor="#fff" />
-                </ThemeProvider>
-              </PortalProvider>
-            </BottomSheetModalProvider>
-          </LoaderProvider>
-        </QueryClientProvider>
-      </GestureHandlerRootView>
+                </PortalProvider>
+              </BottomSheetModalProvider>
+            </LoaderProvider>
+          </QueryClientProvider>
+        </GestureHandlerRootView>
+      </ThemeProvider>
     </UserContextProvider>
   );
 }

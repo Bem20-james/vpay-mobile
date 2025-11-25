@@ -4,12 +4,12 @@ import FormField from "@/components/FormFields";
 import CustomButton from "@/components/CustomButton";
 import { TransferStyles } from "@/styles/transfers";
 import { styles } from "./sendInternational";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { Colors } from "@/constants/Colors";
 import { ThemedView } from "../ThemedView";
 import { ThemedText } from "../ThemedText";
 import { styles as formStyles } from "@/styles/formfield";
 import { useLookUpUser } from "@/hooks/useTransfers";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 interface Props {
   onRedirect: () => void;
@@ -24,8 +24,8 @@ const LocalInternational = ({
   onShowBanks,
   selectedBank
 }: Props) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
   const txtColor = isDark ? Colors.light.accentBg : Colors.dark.background;
 
@@ -125,11 +125,7 @@ const LocalInternational = ({
             styles.inputField,
             {
               borderRadius: 5,
-              borderColor: error
-                ? "#FF6B6B"
-                : colorScheme === "dark"
-                ? "#414141"
-                : "#d7d7d7",
+              borderColor: error ? "#FF6B6B" : isDark ? "#414141" : "#d7d7d7",
               height: 45,
               flexDirection: "row",
               alignItems: "center",

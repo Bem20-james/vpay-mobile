@@ -25,7 +25,7 @@ const toastConfig = {
       {text1 && <Text style={styles.errorText}>{text1}</Text>}
       {text2 && <Text style={styles.secondaryText}>{text2}</Text>}
     </View>
-  ),
+  )
 };
 
 const styles = StyleSheet.create({
@@ -37,32 +37,35 @@ const styles = StyleSheet.create({
     height: 50,
     padding: 10,
     borderRadius: 8,
-    borderWidth: 1,
+    elevation: 10,
+    shadowColor: "#ECFDF3",
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 2 }
   },
   errorContainer: {
-    backgroundColor: "#161622",
-    borderColor: "#D92D20",
+    backgroundColor: "#D92D20"
   },
   successContainer: {
-    backgroundColor: "#ECFDF3",
-    borderColor: "#ABEFC6",
+    backgroundColor: "#067647"
   },
   errorText: {
-    color: "#D92D20",
-    fontSize: 12,
-    fontWeight: "600",
-    fontFamily: "Questrial",
+    color: "#ffffff",
+    fontSize: 13,
+    fontWeight: "700",
+    fontFamily: "Questrial"
   },
   successText: {
-    color: "#067647",
-    fontSize: 12,
-    fontWeight: "600",
+    color: "#ECFDF3",
+    fontSize: 13,
+    fontWeight: "700",
+    fontFamily: "Questrial"
   },
   secondaryText: {
-    color: "#D92D20",
+    color: "#ffffff",
     fontSize: 12,
-    marginLeft: 8,
-  },
+    marginLeft: 8
+  }
 });
 
 export default toastConfig;

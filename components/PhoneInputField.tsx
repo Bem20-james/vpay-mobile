@@ -9,11 +9,11 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { ThemedText } from "./ThemedText";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { styles } from "@/styles/formfield";
 import { TransferStyles } from "@/styles/transfers";
 import { SERVER_IMAGE_URL } from "@/constants/Paths";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 export type ProviderItem = {
   id: string | number;
@@ -44,8 +44,8 @@ const ProviderInput: React.FC<ProviderInputProps> = ({
   onContactPress,
   maxLength
 }) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const {theme} = useTheme();
+  const isDark = theme === "dark";
   const border = isDark ? "#414141" : "#d7d7d7";
   const txtColor = isDark ? Colors.light.accentBg : Colors.dark.background;
   const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;

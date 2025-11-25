@@ -14,6 +14,7 @@ import { btmSheetStyles as styles } from "../../styles/bottomsheets";
 import { Colors } from "@/constants/Colors";
 import { Feather } from "@expo/vector-icons";
 import { MotiView } from "moti";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 export type BankItem = {
   id?: number;
@@ -41,7 +42,8 @@ const BanksBottomSheet = ({
   snapPoints = ["60%", "60%"]
 }: BanksSheetProps) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const colorScheme = useColorScheme();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
@@ -165,7 +167,7 @@ const BanksBottomSheet = ({
       <TouchableOpacity
         style={[
           styles.item,
-          { borderBottomColor: "#252d31ff", borderBottomWidth: 0.3 }
+          { borderBottomColor: isDark ? "#252d31ff" : "#e5e5ecff", borderBottomWidth: 0.5 }
         ]}
         onPress={() => handleItemSelect(item)}
       >
@@ -200,10 +202,9 @@ const BanksBottomSheet = ({
         handleIndicatorStyle={styles.indicatorHandle}
         onClose={onClose}
         backgroundStyle={{
-          backgroundColor:
-            colorScheme === "dark"
-              ? Colors.dark.primaryBgDark
-              : Colors.light.accentBg
+          backgroundColor: isDark
+            ? Colors.dark.primaryBgDark
+            : Colors.light.accentBg
         }}
       >
         <ThemedText style={styles.title}>{title}</ThemedText>

@@ -7,7 +7,6 @@ import {
   Image,
   StyleSheet
 } from "react-native";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { Colors } from "@/constants/Colors";
 import { TransferStyles } from "@/styles/transfers";
 import { Feather } from "@expo/vector-icons";
@@ -15,6 +14,7 @@ import { ThemedText } from "../ThemedText";
 import { RecentTransferstyles as styles } from "./RecentTransfers";
 import { StoredContact } from "@/utils/encryptedStore";
 import SkeletonRow from "../SkeletonRow";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 interface Props {
   title?: string;
@@ -31,8 +31,8 @@ const RecentsBeneficiaries: React.FC<Props> = ({
   loading = false,
   onSelect
 }) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
 
   const [activeTab, setActiveTab] = useState<"Recents" | "Beneficiaries">(
@@ -44,10 +44,9 @@ const RecentsBeneficiaries: React.FC<Props> = ({
     <>
       <ThemedText
         style={{
-          color: "#F5F5F5",
           fontSize: 13,
           fontFamily: "Inter-SemiBold",
-          marginTop: 20,
+          marginTop: 10,
           textTransform: "uppercase"
         }}
       >

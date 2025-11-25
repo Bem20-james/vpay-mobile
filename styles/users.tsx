@@ -5,34 +5,27 @@ export const styles = StyleSheet.create({
     flex: 1
   },
   container: {
-    paddingHorizontal: 5
+    paddingHorizontal: 5,
+    paddingBottom: 10
   },
   avatarBox: {
     alignItems: "center",
-    marginTop: 20,
+    marginTop: 10,
     marginBottom: 10
   },
   avatarCon: {
     backgroundColor: "#BFEFFB",
-    width: 90,
-    height: 90,
+    width: 100,
+    height: 100,
     borderRadius: 100,
     position: "relative",
     justifyContent: "center",
     alignItems: "center"
   },
-  avatar: {
-    width: 90,
-    height: 90,
-    borderRadius: 50
-  },
   icon: {
-    position: "absolute",
-    bottom: 14,
-    right: -5,
     backgroundColor: "#CDEBFA",
     padding: 2,
-    borderRadius: 30,
+    borderRadius: 100,
     elevation: 5,
     shadowColor: "#000",
     shadowOpacity: 0.1,
@@ -43,13 +36,13 @@ export const styles = StyleSheet.create({
     fontFamily: "Inter-Bold",
     fontSize: 20,
     textAlign: "center",
-    marginBottom: 20
+    marginBottom: 10
   },
   heroBox: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
     marginHorizontal: 8,
     paddingVertical: 10,
     borderRadius: 10,
@@ -57,12 +50,13 @@ export const styles = StyleSheet.create({
   },
   title: {
     fontFamily: "Questrial",
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "500"
   },
   label: {
     fontSize: 15,
-    fontFamily: "Inter-Bold"
+    fontFamily: "Inter-Bold",
+    textTransform: "capitalize"
   },
   iconButton: {
     padding: 7,
@@ -79,8 +73,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingVertical: 10,
-    marginBottom: 10,
+    marginBottom: 5,
     borderRadius: 6,
     minHeight: 48
   },
@@ -92,7 +85,7 @@ export const styles = StyleSheet.create({
   optionTitle: {
     fontFamily: "Inter-Bold",
     fontWeight: 600,
-    fontSize: 18,
+    fontSize: 13,
     letterSpacing: 0
   },
   optionLabel: {
@@ -108,6 +101,19 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12
+  },
+  imageCon: {
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12
+  },
+  image: {
+    width: 40,
+    height: 40,
+    resizeMode: "contain"
   },
 
   option: {

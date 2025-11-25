@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { StatusBar } from "expo-status-bar";
 import Navigator from "@/components/Navigator";
 import FormField from "@/components/FormFields";
@@ -25,11 +24,12 @@ import { ThemedView } from "@/components/ThemedView";
 import { styles as formStyles } from "@/styles/formfield";
 import { TransferStyles } from "@/styles/transfers";
 import ServicesDispatcher from "@/components/ServicesDispatcher";
+import { useTheme } from "@/contexts/ThemeContexts";
 import { useNavigation } from "expo-router";
 
 const ElectricityScreen = () => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const boxBackgroundColor = isDark
     ? Colors.dark.background
     : Colors.light.background;
@@ -172,69 +172,81 @@ const ElectricityScreen = () => {
                     iconName="electric-meter"
                   />
                 </View>
-
-                <View style={{ marginTop: 20 }}>
-                  <ThemedText
-                    style={{
-                      marginLeft: 6,
-                      fontFamily: "Questrial",
-                      fontSize: 13
-                    }}
-                  >
-                    Customer Name
-                  </ThemedText>
-                  <ThemedView
-                    style={[
-                      TransferStyles.inputField,
-                      {
-                        borderColor: error
-                          ? "#FF6B6B"
-                          : colorScheme === "dark"
-                          ? "#414141"
-                          : "#d7d7d7",
-                        height: 45,
-                        flexDirection: "row",
-                        alignItems: "center",
-                        paddingHorizontal: 8
-                      }
-                    ]}
-                  >
-                    {isLoading ? (
-                      <ActivityIndicator size="small" color="#208bc9" />
-                    ) : (
-                      <TextInput
-                        style={[
-                          formStyles.input,
-                          {
-                            color: customer?.customerName
-                              ? txtColor
-                              : "#9B9B9B",
-                            fontSize: customer?.customerName ? 15 : 12,
-                            fontFamily: "Questrial",
-                            fontWeight: customer?.customerName ? "700" : "400",
-                            flex: 1
-                          }
-                        ]}
-                        placeholder="customer's name will appear here"
-                        placeholderTextColor="#9B9B9B"
-                        value={customer?.customerName ?? ""}
-                        editable={false}
-                      />
-                    )}
-                  </ThemedView>
-
-                  {error ? (
+                <View
+                  style={[
+                    TransferStyles.inputBox,
+                    { backgroundColor: bgColor, marginTop: 10 }
+                  ]}
+                >
+                  <View style={{ marginTop: 5, marginBottom: 10 }}>
                     <ThemedText
                       style={{
-                        color: "#FF6B6B",
-                        fontSize: 12,
-                        marginTop: 4,
-                        marginLeft: 6
+                        marginLeft: 6,
+                        fontFamily: "Questrial",
+                        fontSize: 13
                       }}
                     >
-                      {error}
+                      Customer Name
                     </ThemedText>
-                  ) : null}
+                    <ThemedView
+                      lightColor="#F2F2F7"
+                      darkColor="#0A2D4A"
+                      style={[
+                        TransferStyles.inputField,
+                        {
+                          elevation: 3,
+                          borderRadius: 5,
+                          borderColor: error
+                            ? "#FF6B6B"
+                            : isDark
+                            ? "#414141"
+                            : "#d7d7d7",
+                          height: 45,
+                          flexDirection: "row",
+                          alignItems: "center",
+                          paddingHorizontal: 8
+                        }
+                      ]}
+                    >
+                      {isLoading ? (
+                        <ActivityIndicator size="small" color="#208bc9" />
+                      ) : (
+                        <TextInput
+                          style={[
+                            formStyles.input,
+                            {
+                              color: customer?.customerName
+                                ? txtColor
+                                : "#9B9B9B",
+                              fontSize: customer?.customerName ? 15 : 12,
+                              fontFamily: "Questrial",
+                              fontWeight: customer?.customerName
+                                ? "700"
+                                : "400",
+                              flex: 1
+                            }
+                          ]}
+                          placeholder="customer's name will appear here"
+                          placeholderTextColor="#9B9B9B"
+                          value={customer?.customerName ?? ""}
+                          editable={false}
+                        />
+                      )}
+                    </ThemedView>
+
+                    {error ? (
+                      <ThemedText
+                        style={{
+                          color: "#FF6B6B",
+                          fontSize: 12,
+                          marginTop: 4,
+                          marginLeft: 6
+                        }}
+                      >
+                        {error}
+                      </ThemedText>
+                    ) : null}
+                  </View>
                 </View>
               </View>
             </TabContent>

@@ -8,6 +8,7 @@ import { ContactItem } from "@/components/Recents/AirtimeDataTrnx";
 import { Dimensions } from "react-native";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
+import { TierData } from "@/app/transaction-limit";
 
 export const quickActions: ActionItem[] = [
   {
@@ -53,138 +54,6 @@ export const quickActions: ActionItem[] = [
   }
 ];
 
-export const trnxHistory: HistoryItem[] = [
-  {
-    id: "1",
-    label: "Purchase Airtime",
-    icon: "phone",
-    backgroundColor: "#ffe6f0",
-    iconColor: "#ff3d9b",
-    amount: "100",
-    timestamp: "May 1st, 10:03:38"
-  },
-  {
-    id: "2",
-    label: "Mobile data",
-    icon: "web",
-    backgroundColor: "#ede1ff",
-    iconColor: "#9c27b0",
-    amount: "9500",
-    timestamp: "May 20th, 08:03:38"
-  },
-  {
-    id: "3",
-    label: "Electric bills",
-    icon: "wallet",
-    backgroundColor: "#e0f7f4",
-    iconColor: "#00bfa5",
-    amount: "5000",
-    timestamp: "Today 9:45am"
-  },
-  {
-    id: "4",
-    label: "Betting",
-    icon: "minus-circle",
-    backgroundColor: "#fff1eb",
-    iconColor: "#ff7043",
-    amount: "200",
-    timestamp: "Yesterday 10:00pm"
-  }
-];
-
-export const trnxHistory2: HistoryItem[] = [
-  {
-    id: "1",
-    label: "Purchase Airtime",
-    icon: "phone",
-    backgroundColor: "#ffe6f0",
-    iconColor: "#ff3d9b",
-    amount: "100",
-    timestamp: "May 1st, 10:03:38"
-  },
-  {
-    id: "2",
-    label: "Mobile data",
-    icon: "web",
-    backgroundColor: "#ede1ff",
-    iconColor: "#9c27b0",
-    amount: "9500",
-    timestamp: "May 20th, 08:03:38"
-  },
-  {
-    id: "3",
-    label: "Purchase Airtime",
-    icon: "phone",
-    backgroundColor: "#ffe6f0",
-    iconColor: "#ff3d9b",
-    amount: "100",
-    timestamp: "May 1st, 10:03:38"
-  },
-  {
-    id: "4",
-    label: "Mobile data",
-    icon: "web",
-    backgroundColor: "#ede1ff",
-    iconColor: "#9c27b0",
-    amount: "9500",
-    timestamp: "May 20th, 08:03:38"
-  },
-  {
-    id: "5",
-    label: "Electric bills",
-    icon: "wallet",
-    backgroundColor: "#e0f7f4",
-    iconColor: "#00bfa5",
-    amount: "5000",
-    timestamp: "Today 9:45am"
-  },
-  {
-    id: "6",
-    label: "Betting",
-    icon: "minus-circle",
-    backgroundColor: "#fff1eb",
-    iconColor: "#ff7043",
-    amount: "200",
-    timestamp: "Yesterday 10:00pm"
-  },
-  {
-    id: "7",
-    label: "Electric bills",
-    icon: "wallet",
-    backgroundColor: "#e0f7f4",
-    iconColor: "#00bfa5",
-    amount: "5000",
-    timestamp: "Today 9:45am"
-  },
-  {
-    id: "8",
-    label: "Betting",
-    icon: "minus-circle",
-    backgroundColor: "#fff1eb",
-    iconColor: "#ff7043",
-    amount: "200",
-    timestamp: "Yesterday 10:00pm"
-  },
-  {
-    id: "9",
-    label: "Incoming Transfer",
-    icon: "arrow-bottom-right",
-    backgroundColor: "#ede1ff",
-    iconColor: "#9c27b0",
-    amount: "9500",
-    timestamp: "May 20th, 08:03:38"
-  },
-    {
-    id: "10",
-    label: "Outgoing Transfer",
-    icon: "arrow-bottom-right",
-    backgroundColor: "#ede1ff",
-    iconColor: "#9c27b0",
-    amount: "4000",
-    timestamp: "May 20th, 08:03:38"
-  }
-];
-
 export const notifications = [
   {
     label: "Debit Alert",
@@ -210,24 +79,6 @@ export const notifications = [
     status: "Read",
     message: "lorem ipsum dolor sit amet, consectetur adipiscing elit",
     timestamp: "August 20th, 10:00pm"
-  }
-];
-
-export const currencies = [
-  {
-    label: "Naira (NGN)",
-    amount: "23,000",
-    flag: "NG"
-  },
-  {
-    label: "US Dollar (USD)",
-    amount: "3,000",
-    flag: "US"
-  },
-  {
-    label: "USDT (USDT)",
-    amount: "1,000",
-    flag: "USDT"
   }
 ];
 
@@ -374,89 +225,31 @@ export const transferOptions: ActionItem[] = [
   }
 ];
 
-export const countries = [
-  {
-    id: 1,
-    name: "USA",
-    countryCode: "US"
-  },
-  {
-    id: 2,
-    name: "UK",
-    countryCode: "UK"
-  },
-  {
-    id: 3,
-    name: "Nigeria",
-    countryCode: "NG"
-  },
-  {
-    id: 4,
-    name: "South Africa",
-    countryCode: "ZA"
-  },
-  {
-    id: 5,
-    name: "Kenya",
-    countryCode: "KE"
-  },
-  {
-    id: 6,
-    name: "Ghana",
-    countryCode: "GH"
-  },
-  {
-    id: 7,
-    name: "Egypt",
-    countryCode: "EG"
-  },
-  {
-    id: 8,
-    name: "Morocco",
-    countryCode: "MA"
-  },
-  {
-    id: 9,
-    name: "Ethiopia",
-    countryCode: "ET"
-  },
-  {
-    id: 10,
-    name: "Uganda",
-    countryCode: "UG"
-  },
-  {
-    id: 11,
-    name: "Tanzania",
-    countryCode: "TZ"
-  },
-  {
-    id: 12,
-    name: "Rwanda",
-    countryCode: "RW"
-  }
-];
-
 export const airtimeDataRecents: ContactItem[] = [
   {
     label: "GLO GH",
     identifier: "022788951",
-    image: images.logolight
+    image: images.logodark
   },
   {
     label: "9MOBILE NG",
     identifier: "09033788951",
-    image: images.logolight
+    image: images.logodark
   },
   {
     label: "MTN NG",
     identifier: "09122879851",
-    image: images.logolight
+    image: images.logodark
   },
   {
     label: "AIRTEL NG",
     identifier: "07044517951",
-    image: images.logolight
+    image: images.logodark
+  },
+  {
+    label: "AIRTEL NG",
+    identifier: "07044517951",
+    image: images.logodark
   }
 ];
 
@@ -464,22 +257,27 @@ export const airtimDataBeneficiaries: ContactItem[] = [
   {
     label: "MTN NG",
     identifier: "0917943851",
-    image: images.logolight
+    image: images.logodark
   },
   {
     label: "AIRTEL NG",
     identifier: "09122879851",
-    image: images.logolight
+    image: images.logodark
   },
   {
     label: "GLO GH",
     identifier: "122879851",
-    image: images.logolight
+    image: images.logodark
+  },
+  {
+    label: "AIRTEL NG",
+    identifier: "07044517951",
+    image: images.logodark
   },
   {
     label: "9MOBILE NG",
     identifier: "0903879851",
-    image: images.logolight
+    image: images.logodark
   }
 ];
 
@@ -539,5 +337,26 @@ export const cards = [
       "USD 2 non-refundable card creation fee",
       "USD 1 non-refundable quarterly card maintenance fee"
     ]
+  }
+];
+
+export const tierData: TierData[] = [
+  {
+    tier: "Tier 1",
+    dailyLimit: "₦50,000",
+    accountBalance: "₦300,000",
+    isCurrent: false
+  },
+  {
+    tier: "Tier 2",
+    dailyLimit: "₦200,000",
+    accountBalance: "₦500,000",
+    isCurrent: false
+  },
+  {
+    tier: "Tier 3",
+    dailyLimit: "₦5,000,000",
+    accountBalance: "Unlimited",
+    isCurrent: true
   }
 ];

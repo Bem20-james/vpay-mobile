@@ -9,7 +9,6 @@ import {
   LookUpResponse,
   LookUpResult,
   CableTvData,
-  Response,
   ElectricityBillData
 } from "@/types/services";
 import { TransactionResponse } from "@/types/transfers";
@@ -24,7 +23,7 @@ function useFetchCableTvProviders() {
 
     try {
       const response = await axios.get<ProviderRes<CableTvProvider[]>>(
-        `${SERVER_BASE_URL}/user/cabletv/providers`,
+        `${SERVER_BASE_URL}/cabletv/providers`,
         config
       );
 
@@ -62,7 +61,7 @@ function useFetchElectricityProviders() {
 
     try {
       const response = await axios.get<ProviderRes<CableTvProvider[]>>(
-        `${SERVER_BASE_URL}/user/electricity/providers`,
+        `${SERVER_BASE_URL}/electricity/providers`,
         config
       );
 
@@ -103,7 +102,7 @@ function useLookUpTvSubscriber() {
 
     try {
       const response = await axios.post<LookUpResponse>(
-        `${SERVER_BASE_URL}/user/cabletv/verify`,
+        `${SERVER_BASE_URL}/cabletv/verify`,
         {
           provider: data.provider,
           number: data.number
@@ -153,7 +152,7 @@ function useLookUpElectricityUser() {
 
     try {
       const response = await axios.post<LookUpResponse>(
-        `${SERVER_BASE_URL}/user/electricity/verify`,
+        `${SERVER_BASE_URL}/electricity/verify`,
         {
           provider: data.provider,
           number: data.number,
@@ -201,7 +200,7 @@ function useFetchCableTvOptions(provider?: string) {
     try {
       console.log("Fetching TV options for provider:", prov);
       const response = await axios.post(
-        `${SERVER_BASE_URL}/user/cabletv/options`,
+        `${SERVER_BASE_URL}/cabletv/options`,
         { provider: prov },
         config
       );
@@ -245,7 +244,7 @@ function useFetchElectricityOptions(provider?: string) {
     setLoading(true);
     try {
       const response = await axios.post(
-        `${SERVER_BASE_URL}/user/electricity/options`,
+        `${SERVER_BASE_URL}/electricity/options`,
         { provider: prov },
         config
       );
@@ -294,7 +293,7 @@ const usePayCableTv = () => {
       const { activity_pin, ...rest } = data;
 
       const response = await axios.post(
-        `${SERVER_BASE_URL}/user/cabletv/request`,
+        `${SERVER_BASE_URL}/cabletv/request`,
         rest,
         {
           ...config,
@@ -352,7 +351,7 @@ const usePayElectricity = () => {
       console.log("Sending with data:", data);
 
       const response = await axios.post(
-        `${SERVER_BASE_URL}/user/electricity/request`,
+        `${SERVER_BASE_URL}/electricity/request`,
         rest,
         {
           ...config,

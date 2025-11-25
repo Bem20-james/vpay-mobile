@@ -3,13 +3,13 @@ import { View, StyleSheet } from "react-native";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { Portal } from "@gorhom/portal";
 import { ThemedText } from "../ThemedText";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import CustomButton from "../CustomButton";
 import { MaterialIcons } from "@expo/vector-icons";
 import QRCode from "react-native-qrcode-svg";
 import Toast from "react-native-toast-message";
 import * as Clipboard from "expo-clipboard";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 interface FiatItem {
   bank: string;
@@ -42,11 +42,12 @@ const AccountsBottomSheet: React.FC<Props> = ({
   onClose,
   selectedItem,
   selectedType,
-  snapPoints = ["50", "60%"],
+  snapPoints = ["65%"],
   title = "",
   label
 }) => {
-  const colorScheme = useColorScheme();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const sheetRef = useRef<BottomSheet>(null);
   useEffect(() => {
     if (isVisible) {
@@ -80,10 +81,9 @@ const AccountsBottomSheet: React.FC<Props> = ({
         handleIndicatorStyle={styles.handleIndicator}
         onClose={onClose}
         backgroundStyle={{
-          backgroundColor:
-            colorScheme === "dark"
-              ? Colors.dark.primaryBgDark
-              : Colors.light.accentBg
+          backgroundColor: isDark
+            ? Colors.dark.primaryBgDark
+            : Colors.light.accentBg
         }}
       >
         <BottomSheetView style={{ marginHorizontal: 15 }}>
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#208BC9",
+    borderColor: Colors.dark.accentBg,
     alignItems: "center"
   },
   handleIndicator: {

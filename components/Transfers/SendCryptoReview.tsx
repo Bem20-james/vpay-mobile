@@ -1,16 +1,11 @@
 import { View, ScrollView } from "react-native";
 import React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { styles as homeStyles } from "@/styles/home";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
-import { Colors } from "@/constants/Colors";
 import { ThemedText } from "@/components/ThemedText";
-import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, router } from "expo-router";
-import Toast from "react-native-toast-message";
 import CustomButton from "@/components/CustomButton";
 import { styles } from "@/styles/trnxstatus";
 import Navigator from "@/components/Navigator";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 interface Asset {
   country_code: string;
@@ -41,8 +36,8 @@ const SendCryptoReview = ({
   selectedAsset,
   title = "Review Details"
 }: Props) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const cardBackground = isDark ? "#1C1C1E" : "#FFFFFF";
   const borderColor = isDark ? "#2C2C2E" : "#E5E5EA";
   const textPrimary = isDark ? "#FFFFFF" : "#000000";
@@ -103,7 +98,10 @@ const SendCryptoReview = ({
 
             <DetailRow label="Wallet Addrss" value={address} />
             <DetailRow label={"Network"} value={network} />
-            <DetailRow label="Token" value={selectedAsset?.token_name.toUpperCase()} />
+            <DetailRow
+              label="Token"
+              value={selectedAsset?.token_name.toUpperCase()}
+            />
             <DetailRow label="Amount" value={amount} />
           </View>
 

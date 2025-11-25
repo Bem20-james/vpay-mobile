@@ -25,10 +25,11 @@ import {
   useFetchBettingProviders,
   useLookUpBetCustomer
 } from "@/hooks/useBetting";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const BettingScreen = () => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const boxBackgroundColor = isDark
     ? Colors.dark.background
     : Colors.light.background;
@@ -49,7 +50,7 @@ const BettingScreen = () => {
   const stableLookup = useCallback(lookup, []);
   const navigation = useNavigation();
 
-  console.log("SELECTED AS:", selectedProvider)
+  console.log("SELECTED AS:", selectedProvider);
 
   useEffect(() => {
     let isMounted = true;
@@ -164,7 +165,7 @@ const BettingScreen = () => {
                 { backgroundColor: bgColor, marginTop: 10 }
               ]}
             >
-              <View style={{ marginTop: 5 }}>
+              <View style={{ marginTop: 5, marginBottom: 10 }}>
                 <ThemedText
                   style={{
                     marginLeft: 6,
@@ -176,15 +177,16 @@ const BettingScreen = () => {
                   Account Name
                 </ThemedText>
                 <ThemedView
-                  lightColor="#14547C"
+                  lightColor="#F2F2F7"
                   darkColor="#0A2D4A"
                   style={[
                     TransferStyles.inputField,
                     {
                       borderRadius: 5,
+                      elevation: 3,
                       borderColor: error
                         ? "#FF6B6B"
-                        : colorScheme === "dark"
+                        : isDark
                         ? "#414141"
                         : "#d7d7d7",
                       height: 45,
@@ -275,7 +277,7 @@ const BettingScreen = () => {
               bank: selectedProvider?.provider_name ?? "",
               accountName: customer?.account_name ?? "",
               betId: acctId,
-              targetCurrency: selectedProvider?.currency_code ?? "",
+              targetCurrency: selectedProvider?.currency_code ?? ""
             }}
             navig={false}
           />

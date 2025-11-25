@@ -8,7 +8,7 @@ export const cardStyles = StyleSheet.create({
   },
 
   scrollContent: {
-    paddingBottom: 100
+    paddingBottom: 20
   },
   carouselContainer: {
     marginTop: 10
@@ -120,7 +120,7 @@ export const cardStyles = StyleSheet.create({
   },
   termsButton: {
     alignSelf: "center",
-    marginVertical: 20
+    marginVertical: 10
   },
   termsText: {
     fontSize: 15,

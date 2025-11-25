@@ -55,10 +55,9 @@ export interface History {
   id: string;
   currency: string;
   amount: number;
-  date: string;
   status: string;
-  transaction_type: string;
-  created_at: string;
+  transactionType: string;
+  date: string;
 }
 
 export interface HistoryResponse {

@@ -64,8 +64,8 @@ export const styles = StyleSheet.create({
   },
   forgotPwdTxt: {
     textDecorationLine: "underline",
-    fontFamily: "Inter-Bold",
-    fontSize: 13
+    fontFamily: "Inter-SemiBold",
+    fontSize: 12
   },
   userField: {
     width: "100%",

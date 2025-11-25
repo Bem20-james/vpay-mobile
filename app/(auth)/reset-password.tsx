@@ -2,7 +2,6 @@ import { Image, View, ScrollView } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { ThemedText } from "@/components/ThemedText";
 import images from "@/constants/Images";
 import FormField from "@/components/FormFields";
@@ -15,11 +14,12 @@ import OtpVerification from "./otp-verification";
 import { Colors } from "@/constants/Colors";
 import toastConfig from "@/config/toastConfig";
 import OtpMediumModal, { OTP_METHODS } from "@/components/OtpMediumModal";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const ResetPassword = () => {
-  const colorScheme = useColorScheme();
-  const bgColor =
-    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
   const { sendResetOTP } = useSendResetPwdOTP();
   const { otp, email: rawEmail } = useLocalSearchParams();
   const email = Array.isArray(rawEmail) ? rawEmail[0] : rawEmail;
@@ -120,10 +120,11 @@ const ResetPassword = () => {
 
   return (
     <SafeAreaView style={{ backgroundColor: bgColor, height: "100%" }}>
+      <Navigator />
+
       <ScrollView>
-        <Navigator />
         <View style={styles.container}>
-          {colorScheme === "dark" ? (
+          {isDark ? (
             <Image source={images.logolight} style={styles.logo} />
           ) : (
             <Image source={images.logodark} style={styles.logo} />

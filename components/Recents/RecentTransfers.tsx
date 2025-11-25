@@ -9,8 +9,8 @@ import {
 import { MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { ThemedText } from "../ThemedText";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 interface TransferItem {
   label: string;
@@ -38,8 +38,8 @@ interface Props {
 
 const RecentTransfers: React.FC<Props> = ({ beneficiaries, recents }) => {
   const router = useRouter();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+   const { theme } = useTheme();
+   const isDark = theme === "dark";
   const [activeTab, setActiveTab] = useState<"Recents" | "Beneficiaries">(
     "Recents"
   );

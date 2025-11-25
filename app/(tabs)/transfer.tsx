@@ -10,10 +10,11 @@ import { beneficiaries, recentActions } from "@/assets/data";
 import { Colors } from "@/constants/Colors";
 import { transferOptions } from "@/assets/data";
 import QuickActionsSection from "@/components/QuickAction";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const TransferScreen: React.FC = () => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const backgroundColor = isDark
     ? Colors.dark.background
     : Colors.light.background;
@@ -50,7 +51,7 @@ const TransferScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    marginHorizontal: 10
+    paddingHorizontal: 10
   }
 });
 

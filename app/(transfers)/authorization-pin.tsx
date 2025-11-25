@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { Colors } from "@/constants/Colors";
 import { ThemedText } from "@/components/ThemedText";
 import Toast from "react-native-toast-message";
@@ -17,11 +16,12 @@ import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import Navigator from "@/components/Navigator";
 import { useTransactionDispatcher } from "@/hooks/useTransactionDispatcher";
 import { buildSuccessParams } from "@/utils/buildSuccessParams";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const AuthorizationPin: React.FC = () => {
-  const colorScheme = useColorScheme();
-  const bgColor =
-    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+  const { theme } = useTheme();
+  const isDark = theme === "dark";  const bgColor =
+    isDark ? Colors.dark.accentBg : Colors.light.accentBg;
 
   const [pin, setPin] = useState<string>("");
   const maxPinLength: number = 4;
@@ -45,9 +45,6 @@ const AuthorizationPin: React.FC = () => {
         parsedPayload,
         finalPin
       );
-
-      console.log("TransactionType:", transactionType);
-      console.log("TransactionResult:", result);
 
       if (result?.success && result?.data?.result) {
         const successParams = buildSuccessParams(

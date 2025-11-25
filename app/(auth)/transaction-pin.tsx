@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { Colors } from "@/constants/Colors";
 import images from "@/constants/Images";
 import { ThemedText } from "@/components/ThemedText";
@@ -17,6 +16,7 @@ import { useSetTransactionPin } from "@/hooks/useAuthentication";
 import Toast from "react-native-toast-message";
 import { useLoader } from "@/contexts/LoaderContext";
 import { useLocalSearchParams } from "expo-router";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 interface NumberButtonProps {
   number: string;
@@ -24,9 +24,9 @@ interface NumberButtonProps {
 }
 
 const TransactionPinScreen: React.FC = () => {
-  const colorScheme = useColorScheme();
-  const bgColor =
-    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
 
   const [pin, setPin] = useState<string>("");
   const [firstPin, setFirstPin] = useState<string | null>(null);
@@ -118,7 +118,7 @@ const TransactionPinScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.container}>
-          {colorScheme === "dark" ? (
+          {isDark ? (
             <Image source={images.logolight} style={styles.logo} />
           ) : (
             <Image source={images.logodark} style={styles.logo} />

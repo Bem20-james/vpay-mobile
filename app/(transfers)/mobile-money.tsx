@@ -20,6 +20,7 @@ import { Colors } from "@/constants/Colors";
 import SendMobileMoney from "@/components/Transfers/SendMobileMoney";
 import { useFetchMobileMoneyCountries } from "@/hooks/useGeneral";
 import { MotiView } from "moti";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const SkeletonLoader = () => {
   // Simple shimmer skeleton with moti animation
@@ -75,11 +76,11 @@ const SkeletonLoader = () => {
 };
 
 const MobileMoney = () => {
-  const colorScheme = useColorScheme();
-  const backgroundColor =
-    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+  const { theme } = useTheme();
+  const isDark = theme === "dark";  const backgroundColor =
+    isDark ? Colors.dark.background : Colors.light.background;
   const statusBarBg =
-    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
+    isDark ? Colors.dark.background : Colors.light.background;
 
   const [query, setQuery] = useState("");
   const [screenVisible, setScreenVisible] = useState(false);

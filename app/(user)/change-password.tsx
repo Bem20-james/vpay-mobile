@@ -1,7 +1,6 @@
 import { Dimensions, View, ScrollView } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { ThemedText } from "@/components/ThemedText";
 import FormField from "@/components/FormFields";
 import CustomButton from "@/components/CustomButton";
@@ -13,11 +12,12 @@ import { useChangePwd } from "@/hooks/useAuthentication";
 import Navigator from "@/components/Navigator";
 import OtpVerification from "../(auth)/otp-verification";
 import { useUser } from "@/contexts/UserContexts";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const ChangePassword = () => {
-  const colorScheme = useColorScheme();
-  const bgColor =
-    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
   const [form, setForm] = useState({ pwd: "", newPwd: "", confirmNewPwd: "" });
   const [errors, setErrors] = useState({
     pwd: "",
@@ -32,8 +32,8 @@ const ChangePassword = () => {
   );
   const { changePwd } = useChangePwd();
   const screenHeight = Dimensions.get("window").height;
-  const { user } = useUser()
-  const userEmail = user?.email
+  const { user } = useUser();
+  const userEmail = user?.email;
 
   const validate = () => {
     let valid = true;
@@ -120,6 +120,8 @@ const ChangePassword = () => {
     <SafeAreaView
       style={{ backgroundColor: bgColor, height: "100%", position: "relative" }}
     >
+      <Navigator title="Change Password" />
+
       <ScrollView>
         <View
           style={{
@@ -129,7 +131,6 @@ const ChangePassword = () => {
             paddingHorizontal: 15
           }}
         >
-          <Navigator title="Change Password" />
           <View style={{ marginTop: 20 }}>
             <ThemedText
               darkColor="#FFFFFF"
@@ -187,7 +188,7 @@ const ChangePassword = () => {
             disabled={!form.pwd || !form.newPwd || !form.confirmNewPwd}
             btnStyles={{
               position: "absolute",
-              top: screenHeight - 120,
+              top: screenHeight - 200,
               left: 10,
               right: 10,
               marginTop: 7

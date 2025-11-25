@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { StatusBar } from "expo-status-bar";
 import Navigator from "@/components/Navigator";
 import FormField from "@/components/FormFields";
@@ -24,10 +23,11 @@ import { TransferStyles } from "@/styles/transfers";
 import Toast from "react-native-toast-message";
 import ServicesDispatcher from "@/components/ServicesDispatcher";
 import { useNavigation } from "expo-router";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const CableTVScreen = () => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const boxBackgroundColor = isDark
     ? Colors.dark.background
     : Colors.light.background;
@@ -156,7 +156,7 @@ const CableTVScreen = () => {
                   { backgroundColor: bgColor, marginTop: 10 }
                 ]}
               >
-                <View style={{ marginTop: 5 }}>
+                <View style={{ marginTop: 5, marginBottom: 10 }}>
                   <ThemedText
                     style={{
                       marginLeft: 6,
@@ -168,15 +168,16 @@ const CableTVScreen = () => {
                     Customer Name
                   </ThemedText>
                   <ThemedView
-                    lightColor="#14547C"
+                    lightColor="#F2F2F7"
                     darkColor="#0A2D4A"
                     style={[
                       TransferStyles.inputField,
                       {
                         borderRadius: 5,
+                        elevation: 3,
                         borderColor: error
                           ? "#FF6B6B"
-                          : colorScheme === "dark"
+                          : isDark
                           ? "#414141"
                           : "#d7d7d7",
                         height: 45,

@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   Pressable,
   FlatList,
-  Image,
+  Image
 } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { Colors } from "@/constants/Colors";
@@ -13,6 +13,7 @@ import { TransferStyles } from "@/styles/transfers";
 import { Feather } from "@expo/vector-icons";
 import { ThemedText } from "../ThemedText";
 import { RecentTransferstyles as styles } from "./RecentTransfers";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 export interface ContactItem {
   label: string;
@@ -41,14 +42,16 @@ const ContactsSection: React.FC<Props> = ({
   beneficiaries = [],
   searchPlaceholder = "Search contact",
   onSelect,
-  searchBy = "identifier",
+  searchBy = "identifier"
 }) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
 
   const [query, setQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<"Recents" | "Beneficiaries">("Recents");
+  const [activeTab, setActiveTab] = useState<"Recents" | "Beneficiaries">(
+    "Recents"
+  );
 
   const currentData = activeTab === "Recents" ? recents : beneficiaries;
 
@@ -59,12 +62,22 @@ const ContactsSection: React.FC<Props> = ({
   });
 
   return (
-    <View style={[TransferStyles.inputBox, { backgroundColor: bgColor, marginTop: 20 }]}>
+    <View
+      style={[
+        TransferStyles.inputBox,
+        { backgroundColor: bgColor, marginTop: 20, marginBottom: 20 }
+      ]}
+    >
       <ThemedText style={TransferStyles.label}>{title}</ThemedText>
 
       {/* Search Input */}
       <View style={[TransferStyles.searchContainer, { marginBottom: 20 }]}>
-        <Feather name="search" size={20} color="#208BC9" style={TransferStyles.searchIcon} />
+        <Feather
+          name="search"
+          size={20}
+          color="#208BC9"
+          style={TransferStyles.searchIcon}
+        />
         <TextInput
           style={TransferStyles.searchInput}
           placeholder={searchPlaceholder}
@@ -107,12 +120,14 @@ const ContactsSection: React.FC<Props> = ({
               marginTop: 7,
               padding: 10,
               borderTopColor: isDark ? "#0b2230ff" : "#9db5c0ff",
-              borderTopWidth: 0.5,
+              borderTopWidth: 0.5
             }}
             onPress={() => onSelect?.(item)}
             activeOpacity={0.7}
           >
-            <View style={{ flexDirection: "row", gap: 20, alignItems: "center" }}>
+            <View
+              style={{ flexDirection: "row", gap: 20, alignItems: "center" }}
+            >
               {item.image && (
                 <Image
                   source={item.image}
@@ -120,7 +135,7 @@ const ContactsSection: React.FC<Props> = ({
                     width: 30,
                     height: 30,
                     borderRadius: 20,
-                    objectFit: "contain",
+                    objectFit: "contain"
                   }}
                 />
               )}

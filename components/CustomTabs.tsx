@@ -1,9 +1,9 @@
 import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import React, { useState } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { ThemedText } from "./ThemedText";
 import { ThemedView } from "./ThemedView";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 interface CustomTabProps {
   tabs: string[];
@@ -11,17 +11,15 @@ interface CustomTabProps {
 }
 const CustomTab = ({ tabs, onTabChange }: CustomTabProps) => {
   const [activeTab, setActiveTab] = useState(tabs[0]);
-  const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   return (
     <ThemedView
       style={[
         styles.tabContainer,
         {
-          backgroundColor: isDarkMode
-            ? Colors.dark.accentBg
-            : Colors.light.accentBg
+          backgroundColor: isDark ? Colors.dark.accentBg : Colors.light.accentBg
         }
       ]}
     >
@@ -33,7 +31,7 @@ const CustomTab = ({ tabs, onTabChange }: CustomTabProps) => {
             {
               backgroundColor:
                 activeTab === tab
-                  ? isDarkMode
+                  ? isDark
                     ? Colors.dark.primaryDark2
                     : Colors.dark.primaryDark1
                   : "transparent"
@@ -48,10 +46,10 @@ const CustomTab = ({ tabs, onTabChange }: CustomTabProps) => {
             style={{
               color:
                 activeTab === tab
-                  ? isDarkMode
+                  ? isDark
                     ? "#ffffff"
                     : "#ffffff"
-                  : isDarkMode
+                  : isDark
                   ? "#ffffff"
                   : "#000000",
               textAlign: "center",

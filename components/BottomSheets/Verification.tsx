@@ -3,20 +3,23 @@ import {
   TouchableOpacity,
   View,
   ActivityIndicator,
-  StyleSheet
+  StyleSheet,
+  Image
 } from "react-native";
-import BottomSheet from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { Portal } from "@gorhom/portal";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { ThemedText } from "../ThemedText";
 import { ThemedView } from "../ThemedView";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import images from "@/constants/Images";
+import { btmSheetStyles } from "@/styles/bottomsheets";
+import { useTheme } from "@/contexts/ThemeContexts";
+import CustomButton from "../CustomButton";
 
 interface VerificationBtmSheetProps {
   isVisible: boolean;
   onClose: () => void;
-  isLoading?: boolean;
   title?: string;
   snapPoints?: string[];
 }
@@ -24,13 +27,13 @@ interface VerificationBtmSheetProps {
 const VerificationBtmSheet = ({
   isVisible,
   onClose,
-  isLoading = false,
-  title = "Select Option",
-  snapPoints = ["30%", "30%"]
+  title = "Verify your account",
+  snapPoints = ["50%"]
 }: VerificationBtmSheetProps) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const colorScheme = useColorScheme();
   const router = useRouter();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   if (!isVisible) return null;
 
@@ -43,52 +46,70 @@ const VerificationBtmSheet = ({
         enablePanDownToClose
         onClose={onClose}
         backgroundStyle={{
-          backgroundColor: colorScheme === "dark" ? "#1A1A1A" : "#FFFFFF"
+          backgroundColor: isDark ? "#1A1A1A" : "#FFFFFF"
         }}
+        handleIndicatorStyle={btmSheetStyles.indicatorHandle}
       >
-        <ThemedView style={styles.sheetHeader}>
+        <BottomSheetView>
           <ThemedText
+            style={btmSheetStyles.title}
             lightColor="#252525"
-            darkColor="#F8F8F8"
-            style={styles.title}
+            darkColor="#9B9B9B"
           >
             {title}
           </ThemedText>
-        </ThemedView>
+          <View style={btmSheetStyles.container}>
+            <View style={styles.imgCon}>
+              <Image source={images.verification} style={styles.image} />
+            </View>
+
+            <View>
+              <ThemedText style={styles.subtitle}>
+                complete your account setup to be able to enjoy more features on
+                the go
+              </ThemedText>
+            </View>
+
+            <CustomButton
+              title="Let's Go"
+              handlePress={() => router.push("/verification")}
+            />
+            <CustomButton
+              title="Not Now"
+              handlePress={onClose}
+              variant="secondary"
+              btnStyles={{ marginTop: 7 }}
+            />
+          </View>
+        </BottomSheetView>
       </BottomSheet>
     </Portal>
   );
 };
 
 const styles = StyleSheet.create({
-  sheetHeader: {
-    padding: 10
-  },
-  title: {
-    textAlign: "center",
-    fontFamily: "Inter-Bold",
-    fontSize: 16
-  },
-  sheetItem: {
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1
-  },
-  sheetCon: {
-    flexDirection: "row",
+  imgCon: {
     alignItems: "center",
-    gap: 5
+    justifyContent: "center",
+    margin: "auto",
+    width: 150,
+    height: 150
   },
-  sheetIcon: {
-    borderRadius: 100,
-    padding: 10
+  image: {
+    width: 250,
+    height: 250,
+    resizeMode: "contain"
   },
-  sheetLabel: {
-    fontSize: 16,
-    fontFamily: "Inter-SemiBold"
+  textCon: {
+    justifyContent: "center",
+    textAlign: "center"
   },
-  bottomSheetContent: {
-    paddingBottom: 24
+  subtitle: {
+    fontFamily: "Questrial",
+    fontSize: 14,
+    textAlign: "center",
+    paddingVertical: 10,
+    color: "#9B9B9B"
   }
 });
 

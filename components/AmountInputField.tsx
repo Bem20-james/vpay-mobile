@@ -20,6 +20,7 @@ import { SERVER_IMAGE_URL } from "@/constants/Paths";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { useUser } from "@/contexts/UserContexts";
 import { useRateConversion } from "@/hooks/useGeneral";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 type Currency = {
   country_code?: string;
@@ -57,8 +58,8 @@ const AmountInputField = ({
   onCurrencyChange,
   onRateChange
 }: InputProps) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const {theme} = useTheme();
+  const isDark = theme === "dark";
   const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
   const txtColor = isDark ? Colors.light.accentBg : Colors.dark.background;
   const inputBgColor = isDark

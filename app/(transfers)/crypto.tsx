@@ -7,7 +7,6 @@ import {
 } from "react-native";
 import React, { useState, useEffect, useMemo } from "react";
 import Navigator from "@/components/Navigator";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
@@ -22,12 +21,13 @@ import { useLoader } from "@/contexts/LoaderContext";
 import { TransferStyles } from "@/styles/transfers";
 import ScanQrCodeModal from "@/components/ScanQrCodeModal";
 import SendCryptoReview from "@/components/Transfers/SendCryptoReview";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const dummyNetworks = ["Mainnet", "Testnet", "Sepolia"];
 
 const SendCrypto = () => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const txtColor = isDark ? Colors.light.accentBg : Colors.dark.background;
   const backgroundColor = isDark
     ? Colors.dark.background
@@ -162,7 +162,7 @@ const SendCrypto = () => {
                     styles.inputField,
                     {
                       borderColor:
-                        colorScheme === "dark" ? "#414141" : "#d7d7d7",
+                        isDark ? "#414141" : "#d7d7d7",
                       height: 45
                     }
                   ]}

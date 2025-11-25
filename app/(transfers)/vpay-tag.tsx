@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Navigator from "@/components/Navigator";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { StatusBar } from "expo-status-bar";
 import { TransferStyles as styles } from "@/styles/transfers";
 import { Colors } from "@/constants/Colors";
@@ -21,10 +20,11 @@ import SendScreen from "@/components/Transfers/SendScreen";
 import { ThemedText } from "@/components/ThemedText";
 import CountryFlag from "react-native-country-flag";
 import { router } from "expo-router";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const VpayTag = () => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const backgroundColor = isDark
     ? Colors.dark.background
     : Colors.light.background;
@@ -119,7 +119,7 @@ const VpayTag = () => {
           <Navigator title="Vpay Tag" onBack={router.back} />
 
           <View style={styles.container}>
-            {/* 🔍 Search input */}
+            {/* Search input */}
             <View style={styles.searchContainer}>
               <TextInput
                 style={styles.searchInput}
@@ -131,7 +131,7 @@ const VpayTag = () => {
               />
             </View>
 
-            {/* 🔍 Searching indicator */}
+            {/* Searching indicator */}
             {(isSearching || apiLoading) && (
               <View style={{ marginTop: 15, alignItems: "center" }}>
                 <ActivityIndicator size="small" color="#999" />
@@ -141,7 +141,6 @@ const VpayTag = () => {
               </View>
             )}
 
-            {/* ❌ Search Error */}
             {searchError && (
               <ThemedText
                 style={{ color: "red", textAlign: "center", marginTop: 10 }}
@@ -150,7 +149,7 @@ const VpayTag = () => {
               </ThemedText>
             )}
 
-            {/* ✅ Backend result */}
+            {/*Backend result */}
             {showAcctInfo && (
               <TouchableOpacity
                 style={{
@@ -189,7 +188,7 @@ const VpayTag = () => {
               </TouchableOpacity>
             )}
 
-            {/* 🕓 Local Contacts Sections */}
+            {/* Local Contacts Sections */}
             {!query && (
               <>
                 <RecentBeneficiaries

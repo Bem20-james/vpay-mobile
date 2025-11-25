@@ -8,6 +8,7 @@ import CustomButton from "@/components/CustomButton";
 import { useFetchSessions, useRemoveSessions } from "@/hooks/useUser";
 import Navigator from "@/components/Navigator";
 import { Colors } from "@/constants/Colors";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 interface Device {
   id: string;
@@ -17,12 +18,89 @@ interface Device {
   created_at: string;
   isCurrentDevice: boolean;
 }
+const DeviceSkeleton = () => {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
+  return (
+    <View
+      style={[
+        styles.skeletonCard,
+        {
+          backgroundColor: isDark
+            ? "rgba(255,255,255,0.06)"
+            : "rgba(0,0,0,0.06)"
+        }
+      ]}
+    >
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <View
+          style={[
+            styles.skeletonIcon,
+            {
+              backgroundColor: isDark
+                ? "rgba(255,255,255,0.10)"
+                : "rgba(0,0,0,0.08)"
+            }
+          ]}
+        />
+        <View style={{ flex: 1 }}>
+          <View
+            style={[
+              styles.skeletonLineLarge,
+              {
+                backgroundColor: isDark
+                  ? "rgba(255,255,255,0.10)"
+                  : "rgba(0,0,0,0.08)"
+              }
+            ]}
+          />
+
+          <View
+            style={[
+              styles.skeletonLineSmall,
+              {
+                backgroundColor: isDark
+                  ? "rgba(255,255,255,0.08)"
+                  : "rgba(0,0,0,0.07)"
+              }
+            ]}
+          />
+
+          <View
+            style={[
+              styles.skeletonLineTiny,
+              {
+                backgroundColor: isDark
+                  ? "rgba(255,255,255,0.06)"
+                  : "rgba(0,0,0,0.06)"
+              }
+            ]}
+          />
+        </View>
+      </View>
+
+      <View
+        style={[
+          styles.skeletonButton,
+          {
+            backgroundColor: isDark
+              ? "rgba(255,255,255,0.10)"
+              : "rgba(0,0,0,0.08)"
+          }
+        ]}
+      />
+    </View>
+  );
+};
 
 const ManageDevices: React.FC = () => {
-  const colorScheme = useColorScheme();
-  const boxBackgroundColor =
-    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
-  const { sessions, refetch } = useFetchSessions();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const boxBackgroundColor = isDark
+    ? Colors.dark.background
+    : Colors.light.background;
+  const { sessions, refetch, loading } = useFetchSessions();
   const { removeSession, loadingIds } = useRemoveSessions();
 
   const handleLogoutDevice = async (deviceId: string) => {
@@ -42,10 +120,9 @@ const ManageDevices: React.FC = () => {
         style={[
           styles.deviceCard,
           {
-            backgroundColor:
-              colorScheme === "dark"
-                ? Colors.dark.accentBg
-                : Colors.light.accentBg
+            backgroundColor: isDark
+              ? Colors.dark.accentBg
+              : Colors.light.accentBg
           },
           item.isCurrentDevice && styles.currentDeviceHighlight
         ]}
@@ -91,14 +168,22 @@ const ManageDevices: React.FC = () => {
           <ThemedText style={styles.description}>
             You're currently logged in on the following devices.
           </ThemedText>
-          <FlatList
-            data={sessions}
-            keyExtractor={(item) => item.id}
-            renderItem={renderItem}
-            contentContainerStyle={{ paddingBottom: 10 }}
-            nestedScrollEnabled={true}
-            scrollEnabled={false}
-          />
+          {loading ? (
+            <>
+              <DeviceSkeleton />
+              <DeviceSkeleton />
+              <DeviceSkeleton />
+            </>
+          ) : (
+            <FlatList
+              data={sessions}
+              keyExtractor={(item) => item.id}
+              renderItem={renderItem}
+              contentContainerStyle={{ paddingBottom: 10 }}
+              nestedScrollEnabled={true}
+              scrollEnabled={false}
+            />
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -159,5 +244,52 @@ const styles = StyleSheet.create({
   currentDeviceHighlight: {
     borderWidth: 1,
     borderColor: "#007AFF"
+  },
+  //skeleton styles
+  skeletonCard: {
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+    backgroundColor: "rgba(0,0,0,0.06)"
+  },
+
+  skeletonIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 6,
+    backgroundColor: "rgba(0,0,0,0.08)",
+    marginRight: 12
+  },
+
+  skeletonLineLarge: {
+    height: 14,
+    borderRadius: 6,
+    backgroundColor: "rgba(0,0,0,0.08)",
+    width: "60%",
+    marginBottom: 10
+  },
+
+  skeletonLineSmall: {
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: "rgba(0,0,0,0.07)",
+    width: "40%",
+    marginBottom: 8
+  },
+
+  skeletonLineTiny: {
+    height: 10,
+    borderRadius: 6,
+    backgroundColor: "rgba(0,0,0,0.06)",
+    width: "30%"
+  },
+
+  skeletonButton: {
+    marginTop: 16,
+    height: 28,
+    width: 90,
+    borderRadius: 6,
+    backgroundColor: "rgba(0,0,0,0.08)",
+    alignSelf: "flex-end"
   }
 });

@@ -4,11 +4,11 @@ import { ThemedView } from "./ThemedView";
 import { ThemedText } from "./ThemedText";
 import { DefaultTheme } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import CountryFlag from "react-native-country-flag";
 import { styles } from "../styles/formfield";
 import { Colors } from "@/constants/Colors";
 import { btmSheetStyles } from "@/styles/bottomsheets";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 export type CountryItem = {
   id?: number;
@@ -89,10 +89,11 @@ const FormField = ({
     }
   }, [defaultCountry, selectedCountry]);
 
-  const colorScheme = useColorScheme();
-  const border = colorScheme === "dark" ? "#414141" : "#d7d7d7";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const border = isDark ? "#414141" : "#d7d7d7";
   const txtColor =
-    colorScheme === "dark" ? Colors.light.accentBg : Colors.dark.background;
+    isDark ? Colors.light.accentBg : Colors.dark.background;
 
   return (
     <ThemedView style={[otherStyles, { backgroundColor: DefaultTheme }]}>

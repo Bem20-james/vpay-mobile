@@ -24,7 +24,7 @@ function useFetchAirtimeProviders() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `${SERVER_BASE_URL}/user/airtime/providers`,
+        `${SERVER_BASE_URL}/airtime/providers`,
         config
       );
       const result = response.data;
@@ -68,7 +68,7 @@ const usePurchaseAirtime = () => {
     try {
       const { activity_pin, ...rest } = data;
       const response = await axios.post(
-        `${SERVER_BASE_URL}/user/airtime/request`,
+        `${SERVER_BASE_URL}/airtime/request`,
         rest,
         {
           ...config,

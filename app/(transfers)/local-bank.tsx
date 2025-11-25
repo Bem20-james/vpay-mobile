@@ -12,16 +12,16 @@ import BanksBottomSheet from "@/components/BottomSheets/Banks";
 import { TransferStyles as styles } from "@/styles/transfers";
 import { styles as formStyles } from "@/styles/formfield";
 import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { useFetchBanks } from "@/hooks/useGeneral";
 import { useLookUpUser } from "@/hooks/useTransfers";
 import Toast from "react-native-toast-message";
 import { TransferStyles } from "@/styles/transfers";
 import { useUser } from "@/contexts/UserContexts";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const LocalBank = () => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const backgroundColor = isDark
     ? Colors.dark.background
     : Colors.light.background;
@@ -132,7 +132,7 @@ const LocalBank = () => {
                   title="Account Number"
                   value={accountNumber}
                   handleChangeText={setAccountNumber}
-                  placeholder="0000000000"
+                  placeholder="Enter account number"
                   keyboardType="phone-pad"
                   maxLength={10}
                 />
@@ -151,15 +151,16 @@ const LocalBank = () => {
                   Account Name
                 </ThemedText>
                 <ThemedView
-                  lightColor="#14547C"
+                  lightColor="#F2F2F7"
                   darkColor="#0A2D4A"
                   style={[
                     styles.inputField,
                     {
                       borderRadius: 5,
+                      elevation: 3,
                       borderColor: error
                         ? "#FF6B6B"
-                        : colorScheme === "dark"
+                        : isDark
                         ? "#414141"
                         : "#d7d7d7",
                       height: 45,

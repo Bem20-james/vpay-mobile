@@ -3,8 +3,8 @@ import { View, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { ThemedText } from "./ThemedText";
 import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { SERVER_IMAGE_URL } from "@/constants/Paths";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 interface ProvidersInputFieldProps {
   value?: any;
@@ -17,8 +17,8 @@ const ProvidersInputField: React.FC<ProvidersInputFieldProps> = ({
   placeholder = "Select Provider",
   onPressDropdown
 }) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
   const textColor = isDark ? "#F8F8F8" : "#252525";
 

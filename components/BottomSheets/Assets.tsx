@@ -3,13 +3,13 @@ import { View, TouchableOpacity, StyleSheet, Image } from "react-native";
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { Portal } from "@gorhom/portal";
 import { ThemedText } from "../ThemedText";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { FontAwesome } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 import CountryFlag from "react-native-country-flag";
 import { SERVER_IMAGE_URL } from "@/constants/Paths";
 import { btmSheetStyles } from "@/styles/bottomsheets";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 interface FiatAsset {
   balance: number;
@@ -48,8 +48,9 @@ const AssetsBottomSheet = ({
   isLoading = false,
   assetType = "all"
 }: Props) => {
-  const colorScheme = useColorScheme();
-  const sheetRef = useRef<BottomSheet>(null);
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+    const sheetRef = useRef<BottomSheet>(null);
 
   useEffect(() => {
     if (isVisible) {
@@ -104,7 +105,7 @@ const AssetsBottomSheet = ({
         onClose={onClose}
         backgroundStyle={{
           backgroundColor:
-            colorScheme === "dark"
+            isDark
               ? Colors.dark.primaryBgDark
               : Colors.light.accentBg
         }}
@@ -187,19 +188,17 @@ const AssetsBottomSheet = ({
 };
 
 const styles = StyleSheet.create({
-  header: { padding: 12, alignItems: "center" },
+  header: { paddingVertical: 7, alignItems: "center" },
   title: { fontFamily: "Inter-Bold", fontSize: 16 },
   item: {
-    paddingVertical: 14,
+    paddingVertical: 12,
     paddingHorizontal: 20,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderBottomWidth: 0.7,
-    borderBottomColor: "#000000"
   },
   label: { fontSize: 15, fontFamily: "Inter-Medium" },
-  amount: { fontSize: 14, color: "#9B9B9B", fontFamily: "Questrial" },
+  amount: { fontSize: 13, color: "#9B9B9B", fontFamily: "Questrial", fontWeight: "700" },
   amountWrapper: { flexDirection: "row", alignItems: "center", gap: 6 },
   flagWrapper: { padding: 5, borderRadius: 50, marginRight: 12 },
   flag: { width: 30, height: 30, resizeMode: "contain", borderRadius: 20 },

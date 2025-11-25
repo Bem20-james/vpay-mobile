@@ -3,13 +3,13 @@ import { View, ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/ThemedText";
 import Navigator from "@/components/Navigator";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { PaymentOption } from "@/components/PaymentOption";
 import { useFetchUserAssets } from "@/hooks/useUser";
-import { MotiView } from "moti";
 import AccountBottomSheet from "@/components/BottomSheets/Accounts";
 import { Colors } from "@/constants/Colors";
 import { SERVER_IMAGE_URL } from "@/constants/Paths";
+import { useTheme } from "@/contexts/ThemeContexts";
+import { TransactionSkeleton } from "@/components/SkeletonLoader";
 
 interface FiatAccount {
   fiat_currency_name: string;
@@ -33,11 +33,12 @@ interface CryptoAccount {
 }
 
 const Accounts: React.FC = () => {
-  const colorScheme = useColorScheme();
-  const backgroundColor =
-    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
-  const boxBg =
-    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const backgroundColor = isDark
+    ? Colors.dark.background
+    : Colors.light.background;
+  const boxBg = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
   const { assets, loading } = useFetchUserAssets();
   console.log("User Assets:", assets);
 
@@ -56,72 +57,55 @@ const Accounts: React.FC = () => {
     setIsSheetVisible(true);
   };
 
-  const renderSkeleton = () => (
-    <MotiView
-      from={{ opacity: 0.3 }}
-      animate={{ opacity: 1 }}
-      transition={{ loop: true, type: "timing", duration: 1000 }}
-      style={styles.skeletonContainer}
-    >
-      <View style={styles.skeletonCircle} />
-      <View style={styles.skeletonLines}>
-        <View style={styles.skeletonLineShort} />
-        <View style={styles.skeletonLineLong} />
-      </View>
-    </MotiView>
-  );
-
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Navigator title="Accounts" />
+      <Navigator title="Accounts" />
 
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
-          <ThemedText style={styles.sectionHeader}>FIAT CURRENCY</ThemedText>
-          {loading
-            ? Array(2)
-                .fill(0)
-                .map((_, i) => (
-                  <View key={`fiat-skeleton-${i}`}>{renderSkeleton()}</View>
-                ))
-            : assets?.fiat?.map((item: FiatAccount, index: number) => (
-                <PaymentOption
-                  bgColor={boxBg}
-                  key={`fiat-${index}`}
-                  name={item.fiat_currency_name}
-                  label={item.currency_code}
-                  country_code={item.country_code}
-                  balance={item.balance}
-                  type="fiat"
-                  account_balance={item.account_balance}
-                  account_name={item.account_name}
-                  bank_name={item.bank}
-                  account_number={item.account_number}
-                  handlePress={() => openSheet("fiat", item)}
-                />
-              ))}
+          <ThemedText style={styles.sectionHeader}>
+            FIAT CURRENCY
+          </ThemedText>
+          {loading ? (
+            <TransactionSkeleton />
+          ) : (
+            assets?.fiat?.map((item: FiatAccount, index: number) => (
+              <PaymentOption
+                bgColor={boxBg}
+                key={`fiat-${index}`}
+                name={item.fiat_currency_name}
+                label={item.currency_code}
+                country_code={item.country_code}
+                balance={item.balance}
+                type="fiat"
+                account_balance={item.account_balance}
+                account_name={item.account_name}
+                bank_name={item.bank}
+                account_number={item.account_number}
+                handlePress={() => openSheet("fiat", item)}
+              />
+            ))
+          )}
 
           <ThemedText style={styles.sectionHeader}>CRYPTOCURRENCY</ThemedText>
-          {loading
-            ? Array(2)
-                .fill(0)
-                .map((_, i) => (
-                  <View key={`crypto-skeleton-${i}`}>{renderSkeleton()}</View>
-                ))
-            : assets?.crypto?.map((item: CryptoAccount, index: number) => (
-                <PaymentOption
-                  bgColor={boxBg}
-                  key={`crypto-${index}`}
-                  name={item.token_symbol}
-                  label={item.token_name}
-                  image={{ uri: `${SERVER_IMAGE_URL}/${item?.token_image}` }}
-                  balance={item.balance}
-                  price={item.price}
-                  type="crypto"
-                  address={item.wallet_address}
-                  handlePress={() => openSheet("crypto", item)}
-                />
-              ))}
+          {loading ? (
+            <TransactionSkeleton />
+          ) : (
+            assets?.crypto?.map((item: CryptoAccount, index: number) => (
+              <PaymentOption
+                bgColor={boxBg}
+                key={`crypto-${index}`}
+                name={item.token_symbol}
+                label={item.token_name}
+                image={{ uri: `${SERVER_IMAGE_URL}/${item?.token_image}` }}
+                balance={item.balance}
+                price={item.price}
+                type="crypto"
+                address={item.wallet_address}
+                handlePress={() => openSheet("crypto", item)}
+              />
+            ))
+          )}
         </View>
 
         <AccountBottomSheet
@@ -174,13 +158,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 10
   },
   sectionHeader: {
-    color: "#999",
     marginTop: 10,
     marginBottom: 10,
     paddingHorizontal: 5,
-    fontSize: 15,
-    fontFamily: "Inter-SemiBold",
-    fontWeight: "600"
+    fontSize: 12,
+    fontFamily: "Quetrials",
+    fontWeight: "700"
   },
   skeletonContainer: {
     flexDirection: "row",

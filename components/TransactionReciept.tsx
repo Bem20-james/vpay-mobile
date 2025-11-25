@@ -1,22 +1,19 @@
 import React from "react";
 import {
   View,
-  Text,
-  StyleSheet,
   SafeAreaView,
   TouchableOpacity,
-  Dimensions,
   Image,
   ScrollView
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { ThemedText } from "./ThemedText";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import CustomButton from "./CustomButton";
 import { useRouter } from "expo-router";
 import images from "@/constants/Images";
 import { trnxHistory as styles } from "@/styles/trnxstatus";
 import { Colors } from "@/constants/Colors";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 interface Props {
   data: any;
@@ -24,8 +21,8 @@ interface Props {
 }
 
 const TransactionReceipt = ({ data, onBack }: Props) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const backgroundColor = isDark
     ? Colors.dark.background
     : Colors.light.background;

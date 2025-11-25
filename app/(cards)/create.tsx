@@ -12,17 +12,17 @@ import Navigator from "@/components/Navigator";
 import { useRouter } from "expo-router";
 import { cards, CARD_WIDTH, CARD_SPACING } from "@/assets/data";
 import { cardStyles as styles } from "@/styles/cards";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { Colors } from "@/constants/Colors";
 import CustomButton from "@/components/CustomButton";
 import { ThemedText } from "@/components/ThemedText";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useCreateCard } from "@/hooks/useCards";
 import { useLoader } from "@/contexts/LoaderContext";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const ChipperCardScreen = () => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const backgroundColor = isDark
     ? Colors.dark.background
     : Colors.light.background;
@@ -72,7 +72,7 @@ const ChipperCardScreen = () => {
       });
       if (success) {
         setIsSubmitting(false);
-        router.push("/(cards)/index");
+        router.push("/(cards)");
       }
     } catch (error) {
       setIsSubmitting(false);
@@ -93,7 +93,6 @@ const ChipperCardScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Card Carousel */}
         <View style={styles.carouselContainer} {...panResponder.panHandlers}>
           <ScrollView
             ref={scrollViewRef}
@@ -139,7 +138,6 @@ const ChipperCardScreen = () => {
           </ScrollView>
         </View>
 
-        {/* Pagination Dots */}
         <View style={styles.pagination}>
           {cards.map((_, index) => (
             <View
@@ -157,8 +155,6 @@ const ChipperCardScreen = () => {
             />
           ))}
         </View>
-
-        {/* Content */}
         <View style={styles.contentContainer}>
           <ThemedText
             style={[styles.subtitle, { color: currentCard.accentColor }]}
@@ -166,7 +162,6 @@ const ChipperCardScreen = () => {
             {currentCard.subtitle}
           </ThemedText>
 
-          {/* Features */}
           {currentCard.features.map((feature, index) => (
             <View key={index} style={styles.featureContainer}>
               <View style={styles.featureHeader}>
@@ -183,7 +178,6 @@ const ChipperCardScreen = () => {
             </View>
           ))}
 
-          {/* Fees Section */}
           <View style={styles.feesContainer}>
             <View style={styles.featureHeader}>
               <FontAwesome6
@@ -205,7 +199,6 @@ const ChipperCardScreen = () => {
             ))}
           </View>
 
-          {/* Terms Link */}
           <TouchableOpacity style={styles.termsButton}>
             <ThemedText
               style={[styles.termsText, { color: currentCard.accentColor }]}
@@ -218,6 +211,7 @@ const ChipperCardScreen = () => {
             title={`Create ${currentCard.name}`}
             handlePress={handleCardCreation}
             disabled={isSubmitting}
+            btnStyles={{ marginBottom: 10 }}
           />
         </View>
       </ScrollView>

@@ -4,8 +4,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { ThemedText } from "./ThemedText";
 import { ThemedView } from "./ThemedView";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 interface ActionItem {
   label: string;
@@ -23,9 +23,9 @@ interface Props {
 
 const QuickActionsSection: React.FC<Props> = ({ title = "", actions }) => {
   const router = useRouter();
-  const colorScheme = useColorScheme();
-  const bgColor =
-    colorScheme === "dark" ? Colors.light.primaryDark3 : "#ffffff";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const bgColor = isDark ? Colors.light.primaryDark3 : "#ffffff";
 
   return (
     <View style={styles.container}>

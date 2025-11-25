@@ -20,6 +20,7 @@ import * as Clipboard from "expo-clipboard";
 import OtpVerification from "@/app/(auth)/otp-verification";
 import QRCode from "react-native-qrcode-svg";
 import { useRouter } from "expo-router";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 interface Props {
   showBack?: () => void;
@@ -34,11 +35,11 @@ const Setup2FAScreen: React.FC<Props> = ({ showBack }) => {
   const [showOtpScreen, setShowOtpScreen] = useState(false);
   const router = useRouter();
 
-  const colorScheme = useColorScheme();
-  const bgColor =
-    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
 
-    console.log("2FA data:", data2FA);
+  console.log("2FA data:", data2FA);
 
   // Fetch setup data on mount
   useEffect(() => {
@@ -121,17 +122,22 @@ const Setup2FAScreen: React.FC<Props> = ({ showBack }) => {
             Or enter this secret manually:
           </ThemedText>
 
-          <View style={styles.bgBx}>
-            <View style={styles.icon}>
-              <ThemedText>{data2FA?.secret ?? "Loading..."}</ThemedText>
-              <TouchableOpacity onPress={handleCopy}>
-                <MaterialIcons
-                  name="content-copy"
-                  size={25}
-                  color={"#208BC9"}
-                />
-              </TouchableOpacity>
-            </View>
+          <View
+            style={[
+              styles.bgBx,
+              {
+                backgroundColor: isDark
+                  ? Colors.dark.primaryDark2
+                  : "#CDEBFA"
+              }
+            ]}
+          >
+            <ThemedText style={styles.walletTxt}>
+              {data2FA?.secret ?? "Loading..."}
+            </ThemedText>
+            <TouchableOpacity onPress={handleCopy}>
+              <MaterialIcons name="content-copy" size={25} color={"#208BC9"} />
+            </TouchableOpacity>
           </View>
 
           <CustomButton
@@ -151,13 +157,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 10
   },
-  icon: {
+  bgBx: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center"
-  },
-  bgBx: {
-    backgroundColor: Colors.dark.primaryDark2,
+    alignItems: "center",
+    gap: 5,
     paddingHorizontal: 10,
     paddingVertical: 15,
     borderRadius: 6
@@ -173,8 +177,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#208BC9",
+    borderColor: "#000000",
     alignItems: "center"
+  },
+  walletTxt: {
+    fontFamily: "Questrial",
+    fontSize: 14
   }
 });
 

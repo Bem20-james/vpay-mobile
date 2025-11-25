@@ -1,42 +1,38 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { Platform, View, Image, StyleSheet } from "react-native";
-
+import { View, StyleSheet } from "react-native";
 import { HapticTab } from "@/components/HapticTab";
-import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
-import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { ThemedText } from "@/components/ThemedText";
-import icons from "@/constants/Icons";
+import { useTheme } from "@/contexts/ThemeContexts";
+import { Feather, Ionicons } from "@expo/vector-icons";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const TabIcon = ({
     name,
-    icon,
+    IconComponent,
+    iconName,
     color,
     focused
   }: {
     name: string;
-    icon: any;
+    IconComponent: any;
+    iconName: string;
     color: string;
     focused: boolean;
   }) => {
     return (
       <View style={styles.items}>
-        <Image
-          source={icon}
-          resizeMode="contain"
-          tintColor={color}
-          style={styles.icon}
-        />
+        <IconComponent name={iconName} size={20} color={color} />
+
         <ThemedText
           style={{
             fontFamily: focused ? "Inter-SemiBold" : "Inter-Regular",
-            fontSize: 10,
-            color: color
+            fontSize: 11,
+            color
           }}
         >
           {name}
@@ -54,9 +50,8 @@ export default function TabLayout() {
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: {
-          backgroundColor: colorScheme === "dark" ? "#000000" : "#FFFFFF",
+          backgroundColor: isDark ? "#000000" : "#FFFFFF",
           borderTopWidth: 0,
-          borderTopColor: "none",
           height: 50,
           paddingTop: 7
         }
@@ -69,14 +64,16 @@ export default function TabLayout() {
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
-              icon={icons.home}
-              color={color}
               name="Home"
+              color={color}
               focused={focused}
+              IconComponent={Feather}
+              iconName="home"
             />
           )
         }}
       />
+
       <Tabs.Screen
         name="transfer"
         options={{
@@ -84,14 +81,33 @@ export default function TabLayout() {
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
-              icon={icons.transfer}
-              color={color}
               name="Transfer"
+              color={color}
               focused={focused}
+              IconComponent={Feather}
+              iconName="send"
             />
           )
         }}
       />
+
+      <Tabs.Screen
+        name="swap"
+        options={{
+          title: "Swap",
+          headerShown: false,
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon
+              name="Swap"
+              color={color}
+              focused={focused}
+              IconComponent={Feather}
+              iconName="repeat"
+            />
+          )
+        }}
+      />
+
       <Tabs.Screen
         name="cards"
         options={{
@@ -99,14 +115,16 @@ export default function TabLayout() {
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
-              icon={icons.cards}
-              color={color}
               name="Cards"
+              color={color}
               focused={focused}
+              IconComponent={Feather}
+              iconName="credit-card"
             />
           )
         }}
       />
+
       <Tabs.Screen
         name="settings"
         options={{
@@ -114,10 +132,11 @@ export default function TabLayout() {
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
-              icon={icons.settings}
-              color={color}
               name="Settings"
+              color={color}
               focused={focused}
+              IconComponent={Ionicons}
+              iconName="settings-sharp"
             />
           )
         }}
@@ -127,10 +146,6 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
-  icon: {
-    width: 20,
-    height: 20
-  },
   items: {
     marginTop: 5,
     alignItems: "center",

@@ -2,14 +2,13 @@ import { View, ScrollView, Pressable } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { styles as homeStyles } from "@/styles/home";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { Colors } from "@/constants/Colors";
 import { ThemedText } from "@/components/ThemedText";
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, router } from "expo-router";
-import Toast from "react-native-toast-message";
+import { router } from "expo-router";
 import CustomButton from "@/components/CustomButton";
 import { styles } from "@/styles/trnxstatus";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 interface Currency {
   country_code: string;
@@ -53,10 +52,10 @@ const InternationalReview = ({
   selectedAsset,
   conversion,
   description,
-  title = "Review Details",
+  title = "Review Details"
 }: Props) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const backgroundColor = isDark
     ? Colors.dark.background
     : Colors.light.background;

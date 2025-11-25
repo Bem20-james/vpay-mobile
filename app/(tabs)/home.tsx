@@ -22,17 +22,18 @@ import { styles } from "@/styles/home";
 import QuickActionsSection from "@/components/QuickAction";
 import RecentTransaction from "@/components/Recents/RecentTransactions";
 import { quickActions, billOptions } from "@/assets/data";
-import { trnxHistory } from "@/assets/data";
 import StickyHeader from "@/components/StickyHeader";
 import OptionsBottomSheet from "@/components/BottomSheets/Options";
 import { useUser } from "@/contexts/UserContexts";
 import { Colors } from "@/constants/Colors";
 import { useFetchUserAssets } from "@/hooks/useUser";
 import { MotiView } from "moti";
+import { useFetchTrnxHistory } from "@/hooks/useGeneral";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 export default function HomeScreen() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === "dark";
   const backgroundColor = isDark
     ? Colors.dark.background
     : Colors.light.background;
@@ -46,6 +47,8 @@ export default function HomeScreen() {
   const headerOpacity = useRef(new Animated.Value(0)).current;
   const headerTranslateY = useRef(new Animated.Value(-50)).current;
   const { user } = useUser();
+
+  const { trnxHistory, loading: historyLoading } = useFetchTrnxHistory();
 
   const countryCode = user?.country?.code;
   const { assets, loading } = useFetchUserAssets();
@@ -102,6 +105,12 @@ export default function HomeScreen() {
     }
   );
 
+  const getThemeIcon = () => {
+    if (theme === "dark") return "dark-mode";
+    if (theme === "light") return "light-mode";
+    return "brightness-auto";
+  };
+
   return (
     <SafeAreaView
       style={[styles.safeArea, { backgroundColor: backgroundColor }]}
@@ -136,19 +145,30 @@ export default function HomeScreen() {
             </ThemedText>
           </View>
           <View style={styles.dFlex}>
-            <Pressable onPress={() => router.push("/notifications")}>
-              <MaterialIcons
-                name="notifications"
-                size={25}
-                color={colorScheme === "dark" ? "#218DC9" : "#80D1FF"}
-                style={{ marginRight: 7 }}
-              />
+            <Pressable
+              onPress={() => router.push("/notifications")}
+              style={{
+                borderRadius: 100,
+                padding: 4,
+                borderWidth: 0.6,
+                borderColor: isDark ? Colors.dark.accentBg : "#ffffff"
+              }}
+            >
+              <MaterialIcons name="notifications" size={25} color={"#218DC9"} />
             </Pressable>
-            <Pressable onPress={() => router.push("/notifications")}>
+            <Pressable
+              onPress={toggleTheme}
+              style={{
+                borderRadius: 100,
+                padding: 4,
+                borderWidth: 0.6,
+                borderColor: isDark ? Colors.dark.accentBg : "#ffffff"
+              }}
+            >
               <MaterialIcons
-                name="dark-mode"
+                name={getThemeIcon()}
                 size={25}
-                color={colorScheme === "dark" ? "#218DC9" : "#80D1FF"}
+                color={"#218DC9"}
               />
             </Pressable>
           </View>
@@ -263,25 +283,47 @@ export default function HomeScreen() {
             )}
           </View>
 
-          <View style={{ marginTop: 7 }}>
-            <Pressable
-              onPress={() => router.push("/accounts")}
-              style={({ pressed }) => [
-                styles.addBtn,
-                { opacity: pressed ? 0.7 : 1 }
-              ]}
-            >
-              <View style={styles.iconBg}>
-                <Entypo name="plus" size={18} color="#2FCBF2" />
-              </View>
-              <ThemedText
-                lightColor="#F8F8F8"
-                darkColor="#F8F8F8"
-                style={{ fontFamily: "Inter-Bold", fontSize: 12 }}
+          <View style={styles.actionsRow}>
+            <View style={{ marginTop: 7 }}>
+              <Pressable
+                onPress={() => router.push("/accounts")}
+                style={({ pressed }) => [
+                  styles.addBtn,
+                  { opacity: pressed ? 0.7 : 1 }
+                ]}
               >
-                Add money
-              </ThemedText>
-            </Pressable>
+                <View style={styles.iconBg}>
+                  <Entypo name="plus" size={18} color="#2FCBF2" />
+                </View>
+                <ThemedText
+                  lightColor="#F8F8F8"
+                  darkColor="#F8F8F8"
+                  style={{ fontFamily: "Inter-Bold", fontSize: 12 }}
+                >
+                  Add money
+                </ThemedText>
+              </Pressable>
+            </View>
+            <View style={{ marginTop: 7 }}>
+              <Pressable
+                onPress={() => router.push("/(tabs)/transfer")}
+                style={({ pressed }) => [
+                  styles.addBtn,
+                  { opacity: pressed ? 0.7 : 1 }
+                ]}
+              >
+                <View style={styles.iconBg}>
+                  <Entypo name="minus" size={18} color="#2FCBF2" />
+                </View>
+                <ThemedText
+                  lightColor="#F8F8F8"
+                  darkColor="#F8F8F8"
+                  style={{ fontFamily: "Inter-Bold", fontSize: 12 }}
+                >
+                  Send money
+                </ThemedText>
+              </Pressable>
+            </View>
           </View>
         </ThemedView>
 

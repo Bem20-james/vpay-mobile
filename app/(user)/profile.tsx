@@ -6,16 +6,16 @@ import {
   Image,
   Switch
 } from "react-native";
-import { MaterialIcons, Ionicons } from "@expo/vector-icons";
+import { MaterialIcons, Ionicons, AntDesign } from "@expo/vector-icons";
 import { ThemedText } from "@/components/ThemedText";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Navigator from "@/components/Navigator";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { useRouter } from "expo-router";
-import images from "@/constants/Images";
 import { styles } from "@/styles/users";
 import { useFetchAuthUser } from "@/hooks/useUser";
 import VerificationBtmSheet from "@/components/BottomSheets/Verification";
+import { Colors } from "@/constants/Colors";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 export const Option = ({
   title,
@@ -49,7 +49,7 @@ export const Option = ({
   image?: any;
 }) => (
   <TouchableOpacity
-    style={[styles.optionItem, { backgroundColor: backgroundColor }]}
+    style={[styles.optionItem, { backgroundColor: backgroundColor, paddingVertical: image ? 10 : 3 }]}
     onPress={onPress}
     disabled={hasSwitch}
   >
@@ -60,8 +60,8 @@ export const Option = ({
         </View>
       )}
       {image && (
-        <View style={[styles.iconContainer, { backgroundColor: iconBgColor }]}>
-          <Image source={image} width={50} height={50} />
+        <View style={[styles.imageCon, { backgroundColor: iconBgColor }]}>
+          <Image source={image} style={styles.image} />
         </View>
       )}
       <View>
@@ -72,13 +72,15 @@ export const Option = ({
         >
           {title}
         </ThemedText>
-        <ThemedText
-          lightColor="#9B9B9B"
-          darkColor="#9B9B9B"
-          style={styles.optionLabel}
-        >
-          {label}
-        </ThemedText>
+        {label && (
+          <ThemedText
+            lightColor="#9B9B9B"
+            darkColor="#9B9B9B"
+            style={styles.optionLabel}
+          >
+            {label}
+          </ThemedText>
+        )}
       </View>
     </View>
 
@@ -99,9 +101,12 @@ export const Option = ({
 );
 
 const Profile = () => {
-  const colorScheme = useColorScheme();
-  const backgroundColor = colorScheme === "dark" ? "#000000" : "#EEF3FB";
-  const boxBg = colorScheme === "dark" ? "#161622" : "#FFFFFF";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const backgroundColor = isDark
+    ? Colors.dark.background
+    : Colors.light.background;
+  const boxBg = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
   const router = useRouter();
   const { userData } = useFetchAuthUser();
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
@@ -110,15 +115,15 @@ const Profile = () => {
     <SafeAreaView
       style={[styles.safeArea, { backgroundColor: backgroundColor }]}
     >
-      <ScrollView>
+      <Navigator title="Account" showBackIcon={true} />
+
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
-          <Navigator title="Account" showBackIcon={true} />
           <View style={styles.avatarBox}>
             <View style={styles.avatarCon}>
-              <Image source={images.avatar} style={styles.avatar} />
-              <MaterialIcons
-                name="edit"
-                size={20}
+              <AntDesign
+                name="user"
+                size={80}
                 color="#161622"
                 style={styles.icon}
               />
@@ -160,43 +165,52 @@ const Profile = () => {
 
           <View>
             <Option
-              title="Accounts"
-              hasChevron
-              onPress={() => router.push("/(user)/accounts")}
+              title={
+                userData?.firstname + " " + userData?.lastname || "John Doe"
+              }
+              label="Account Name"
             />
+            <Option
+              title={"+" + userData?.phone || "0123456789"}
+              label="Phone Number"
+            />
+            <Option
+              title={userData?.email || "myemail@gmail.com"}
+              label="Email Address"
+            />
+            {userData?.residential_address && (
+              <Option
+                title={userData?.residential_address}
+                label="Address"
+                hasChevron
+                onPress={() => console.log("Change VPay PIN pressed")}
+              />
+            )}
+            {userData?.marital_status && (
+              <Option
+                title={userData?.marital_status}
+                label="Marital Status"
+                hasChevron
+                onPress={() => console.log("Change VPay PIN pressed")}
+              />
+            )}
             <Option
               title="Personal"
               hasChevron
               onPress={() => router.push("/(user)/personal")}
             />
             <Option
+              title="Accounts"
+              hasChevron
+              onPress={() => router.push("/(user)/accounts")}
+            />
+            <Option
               title="Verification"
               hasChevron
               onPress={() => setIsBottomSheetVisible(true)}
-              //onPress={() => console.log("Change VPay PIN pressed")}
-
               label="verify your identity"
             />
-            <Option
-              title={
-                userData?.firstname + " " + userData?.lastname || "John Doe"
-              }
-              label="Account Name"
-              hasChevron
-              onPress={() => console.log("Change VPay PIN pressed")}
-            />
-            <Option
-              title={"+" + userData?.phone || "0123456789"}
-              label="Phone Number"
-              hasChevron
-              onPress={() => console.log("Change VPay PIN pressed")}
-            />
-            <Option
-              title={userData?.email || "myemail@gmail.com"}
-              label="Email Address"
-              hasChevron
-              onPress={() => console.log("Change VPay PIN pressed")}
-            />
+
             {userData?.residential_address && (
               <Option
                 title={userData?.residential_address}
@@ -232,7 +246,7 @@ const Profile = () => {
         <VerificationBtmSheet
           isVisible={isBottomSheetVisible}
           onClose={() => setIsBottomSheetVisible(false)}
-          title="Pay bills"
+          title="Verify your account"
         />
       </ScrollView>
     </SafeAreaView>

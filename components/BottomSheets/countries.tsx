@@ -2,11 +2,11 @@ import React, { useRef } from "react";
 import { TouchableOpacity, View, ActivityIndicator } from "react-native";
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { Portal } from "@gorhom/portal";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import CountryFlag from "react-native-country-flag";
 import { ThemedText } from "../ThemedText";
 import { btmSheetStyles as styles } from "../../styles/bottomsheets";
 import { Colors } from "@/constants/Colors";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 export type CountryItem = {
   id?: number;
@@ -35,8 +35,8 @@ const CountryBottomSheet = ({
   snapPoints = ["30%", "50%"]
 }: CountryBottomSheetProps) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const colorScheme = useColorScheme();
-
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   if (!isVisible) return null;
 
   return (
@@ -49,10 +49,9 @@ const CountryBottomSheet = ({
         handleIndicatorStyle={styles.indicatorHandle}
         onClose={onClose}
         backgroundStyle={{
-          backgroundColor:
-            colorScheme === "dark"
-              ? Colors.dark.primaryBgDark
-              : Colors.light.accentBg
+          backgroundColor: isDark
+            ? Colors.dark.primaryBgDark
+            : Colors.light.background
         }}
       >
         <ThemedText style={styles.title}>{title}</ThemedText>

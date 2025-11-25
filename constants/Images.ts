@@ -17,6 +17,7 @@ import tether from "../assets/images/tether.png";
 import tier1 from "../assets/images/tier1.png";
 import tier2 from "../assets/images/tier2.png";
 import tier3 from "../assets/images/tier3.png";
+import verification from "../assets/images/verification.png"
 
 const images = {
   onboard1,
@@ -38,6 +39,7 @@ const images = {
   tier1,
   tier2,
   tier3,
+  verification
 };
 
 export default images;

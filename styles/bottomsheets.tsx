@@ -17,14 +17,13 @@ export const btmSheetStyles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingVertical: 10,
-    borderBottomWidth: 0.5
   },
   label: {
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: "Questrial"
   },
   value: {
-    fontSize: 15,
+    fontSize: 14,
     fontFamily: "Inter-SemiBold"
   },
   paymentMethod: {
@@ -68,15 +67,11 @@ export const btmSheetStyles = StyleSheet.create({
     textAlign: "center",
     fontFamily: "Inter-SemiBold",
     fontSize: 16,
-    borderBottomWidth: 0.7,
-    borderBottomColor: "#9B9B9B",
-    paddingBottom: 5,
+    paddingBottom: 5
   },
   sheetItem: {
     paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E7E7E7"
+    paddingHorizontal: 7,
   },
   sheetCon: {
     flexDirection: "row",
@@ -119,11 +114,9 @@ export const btmSheetStyles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     width: "100%",
-    color: "#000"
+    color: "#000",
+    fontFamily: "Inter-Regular"
   },
-
-
-
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',

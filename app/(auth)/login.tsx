@@ -2,7 +2,6 @@ import { Image, View, ScrollView, Text, Pressable } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { ThemedText } from "@/components/ThemedText";
 import images from "@/constants/Images";
 import FormField from "@/components/FormFields";
@@ -15,15 +14,17 @@ import OtpVerification from "./otp-verification";
 import Toast from "react-native-toast-message";
 import OtpMediumModal from "@/components/OtpMediumModal";
 import { Colors } from "@/constants/Colors";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const isValidEmail = (value: string): boolean =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
 const Login = () => {
-  const colorScheme = useColorScheme();
-  const router = useRouter();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+    const router = useRouter();
   const bgColor =
-    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+    isDark ? Colors.dark.accentBg : Colors.light.accentBg;
   const [form, setForm] = useState({ identifier: "", password: "" });
   const [errors, setErrors] = useState({ identifier: "", password: "" });
   const [showOtpScreen, setShowOtpScreen] = useState(false);
@@ -117,7 +118,7 @@ const Login = () => {
     >
       <ScrollView>
         <View style={styles.container}>
-          {colorScheme === "dark" ? (
+          {isDark ? (
             <Image source={images.logolight} style={styles.logo} />
           ) : (
             <Image source={images.logodark} style={styles.logo} />

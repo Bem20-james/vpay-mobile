@@ -23,7 +23,7 @@ function useFetchDataProviders() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `${SERVER_BASE_URL}/user/mobiledata/providers`,
+        `${SERVER_BASE_URL}/mobiledata/providers`,
         config
       );
       const result = response.data;
@@ -63,9 +63,8 @@ function useFetchDataOptions(provider?: string) {
     if (!prov) return;
     setLoading(true);
     try {
-      console.log("Fetching data options for provider:", prov);
       const response = await axios.post(
-        `${SERVER_BASE_URL}/user/mobiledata/options`,
+        `${SERVER_BASE_URL}/mobiledata/options`,
         { provider: prov },
         config
       );
@@ -115,7 +114,7 @@ const usePurchaseData = () => {
       const { activity_pin, ...rest } = data;
 
       const response = await axios.post(
-        `${SERVER_BASE_URL}/user/mobiledata/request`,
+        `${SERVER_BASE_URL}/mobiledata/request`,
         rest,
         {
           ...config,

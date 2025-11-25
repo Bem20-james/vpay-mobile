@@ -2,20 +2,24 @@ import { ScrollView, View, TextInput } from "react-native";
 import React from "react";
 import Navigator from "@/components/Navigator";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { StatusBar } from "expo-status-bar";
 import { Feather } from "@expo/vector-icons";
 import { TransferStyles as styles } from "@/styles/transfers";
+import { useTheme } from "@/contexts/ThemeContexts";
+import { Colors } from "react-native/Libraries/NewAppScreen";
 
 const TagSendScreen = () => {
-  const colorScheme = useColorScheme();
-  const backgroundColor = colorScheme === "dark" ? "#000000" : "#EEF3FB";
-  const statusBarBg = colorScheme === "dark" ? "#000000" : "#EEF3FB";
-
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const backgroundColor = isDark
+    ? Colors.dark.background
+    : Colors.light.background;
+  const statusBarBg = isDark ? Colors.dark.background : Colors.light.background;
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
+      <Navigator title="Vpay tag" />
+
       <ScrollView>
-        <Navigator title="Vpay tag" />
         <View style={styles.container}>
           {/* send */}
           <View style={styles.searchContainer}>

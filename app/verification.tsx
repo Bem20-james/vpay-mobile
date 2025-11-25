@@ -1,9 +1,7 @@
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import { View, ScrollView } from "react-native";
 import React, { useState } from "react";
 import Navigator from "@/components/Navigator";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
-import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ThemedText } from "@/components/ThemedText";
 import { Option } from "./(user)/profile";
@@ -13,22 +11,20 @@ import { KycStyles as styles } from "@/styles/kyc";
 import images from "@/constants/Images";
 import AddressVerification from "@/components/kyc/AddressVerification";
 import { Colors } from "@/constants/Colors";
-import { useUser } from "@/contexts/UserContexts";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const Verification = () => {
-  const colorScheme = useColorScheme();
-  const backgroundColor =
-    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
-  const bgColor =
-    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const backgroundColor = isDark
+    ? Colors.dark.background
+    : Colors.light.background;
+  const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
 
-  const statusBarBg =
-    colorScheme === "dark" ? Colors.dark.background : Colors.light.background;
-  const router = useRouter();
+  const statusBarBg = isDark ? Colors.dark.background : Colors.light.background;
   const [showPersonalInfo, setShowPersonalInfo] = useState(false);
   const [showIdVerification, setShowIdVerification] = useState(false);
   const [showAddressInfo, setShowAddressInfo] = useState(false);
-  const {user} = useUser()
 
   if (showPersonalInfo) {
     return <PersonalInfo onBack={() => setShowPersonalInfo(false)} />;
@@ -66,7 +62,7 @@ const Verification = () => {
               backgroundColor={bgColor}
               image={images.tier1}
             />
-            
+
             <Option
               label="Identity Verification"
               title="Tier 2"

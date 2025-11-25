@@ -2,12 +2,12 @@ import React, { useRef } from "react";
 import { TouchableOpacity, View, ActivityIndicator } from "react-native";
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { Portal } from "@gorhom/portal";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { ThemedText } from "../ThemedText";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Colors } from "@/constants/Colors";
 import { btmSheetStyles } from "@/styles/bottomsheets";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 export type OptionItem = {
   id?: number;
@@ -37,7 +37,8 @@ const OptionsBottomSheet = ({
   snapPoints = ["30%", "30%"]
 }: OptionsBottomSheetProps) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const colorScheme = useColorScheme();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const router = useRouter();
 
   if (!isVisible) return null;
@@ -52,10 +53,9 @@ const OptionsBottomSheet = ({
         handleIndicatorStyle={btmSheetStyles.indicatorHandle}
         onClose={onClose}
         backgroundStyle={{
-          backgroundColor:
-            colorScheme === "dark"
-              ? Colors.dark.primaryBgDark
-              : Colors.light.accentBg
+          backgroundColor: isDark
+            ? Colors.dark.primaryBgDark
+            : Colors.light.accentBg
         }}
       >
         <ThemedText
@@ -74,9 +74,10 @@ const OptionsBottomSheet = ({
             <TouchableOpacity
               style={[
                 btmSheetStyles.sheetItem,
+
                 {
-                  borderBottomColor:
-                    colorScheme === "dark" ? "#333333" : "#F8F8F8"
+                  borderBottomColor: isDark ? "#252d31ff" : "#e5e5ecff",
+                  borderBottomWidth: 0.5
                 }
               ]}
               onPress={() => {
@@ -94,10 +95,7 @@ const OptionsBottomSheet = ({
                     <MaterialCommunityIcons
                       name={item.icon}
                       size={20}
-                      color={
-                        item.iconColor ||
-                        (colorScheme === "dark" ? "#FFFFFF" : "#000000")
-                      }
+                      color={item.iconColor || (isDark ? "#FFFFFF" : "#000000")}
                       style={[
                         btmSheetStyles.sheetIcon,
                         { backgroundColor: item.iconBg || "#EDFDFF" }

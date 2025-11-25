@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import React from "react";
 import Navigator from "@/components/Navigator";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
@@ -24,10 +23,11 @@ import ProvidersBottomSheet from "../BottomSheets/Providers";
 import { TransferStyles } from "@/styles/transfers";
 import { useLoader } from "@/contexts/LoaderContext";
 import { useLookUpMobileMoneyUser } from "@/hooks/useTransfers";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const SendMobileMoney = ({ onBack, selectedCountry }: SendScreenProps) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const {theme} = useTheme();
+  const isDark = theme === "dark";
   const txtColor = isDark ? Colors.light.accentBg : Colors.dark.background;
   const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
   const screenHeight = Dimensions.get("window").height;
@@ -153,7 +153,7 @@ const SendMobileMoney = ({ onBack, selectedCountry }: SendScreenProps) => {
                     borderRadius: 5,
                     borderColor: error
                       ? "#FF6B6B"
-                      : colorScheme === "dark"
+                      : isDark
                       ? "#414141"
                       : "#d7d7d7",
                     height: 45,

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { View, ScrollView, StyleSheet } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { StatusBar } from "expo-status-bar";
 import Navigator from "@/components/Navigator";
 import CustomButton from "@/components/CustomButton";
@@ -17,10 +16,11 @@ import { airtimDataBeneficiaries, airtimeDataRecents } from "@/assets/data";
 import { useNavigation } from "expo-router";
 import ServicesDispatcher from "@/components/ServicesDispatcher";
 import { useUser } from "@/contexts/UserContexts";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const DataScreen = () => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const boxBackgroundColor = isDark
     ? Colors.dark.background
     : Colors.light.background;
@@ -38,8 +38,7 @@ const DataScreen = () => {
   const [showDataBundles, setShowDataBundles] = useState(false);
   const { user } = useUser();
   const countryCode = user?.country?.code;
-    const [targetCurrency, setTargetCurrency] = useState<any>(null);
-
+  const [targetCurrency, setTargetCurrency] = useState<any>(null);
 
   useEffect(() => {
     if (loading) showLoader();
@@ -161,7 +160,6 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    marginHorizontal: 5
   },
   scrollContent: {
     flexGrow: 1

@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   ScrollView
 } from "react-native";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { ThemedText } from "@/components/ThemedText";
 import Navigator from "@/components/Navigator";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,26 +16,55 @@ import { useFetchTrnxHistory } from "@/hooks/useGeneral";
 import { formatDateTime } from "@/utils/formatDateTime";
 import { TransactionSkeleton } from "@/components/SkeletonLoader";
 import { TransactionIcon } from "@/components/TransactionIcons";
+import { useTheme } from "@/contexts/ThemeContexts";
+import { useNavigation } from "expo-router";
 
 const TransactionScreen = () => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const backgroundColor = isDark
     ? Colors.dark.background
     : Colors.light.background;
   const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
+  const navigation = useNavigation();
 
   const [selectedTransaction, setSelectedTransaction] = useState<any | null>(
     null
   );
-
   const { trnxHistory, loading } = useFetchTrnxHistory();
 
   const handlePress = (item: any) => setSelectedTransaction(item);
 
+  //converting transactionType to readable label
+  const getTransactionLabel = (type: string) => {
+    switch (type?.toLowerCase()) {
+      case "airtime":
+        return "Airtime purchase";
+      case "data":
+        return "Data purchase";
+      case "electricity":
+        return "Electricity bill";
+      case "bet_funding":
+        return "Betting payment";
+      case "cable-tv":
+        return "Cable TV subscription";
+      case "transfer":
+        return "Transfer";
+      default:
+        return type;
+    }
+  };
+
   return (
     <SafeAreaView style={{ backgroundColor, flex: 1 }}>
-      <Navigator title="Transaction History" />
+      <Navigator
+        title="Transaction History"
+        onBack={
+          selectedTransaction
+            ? () => setSelectedTransaction(null)
+            : navigation.goBack
+        }
+      />
       <ScrollView>
         <View style={styles.container}>
           {loading ? (
@@ -50,7 +78,7 @@ const TransactionScreen = () => {
               scrollEnabled={false}
               renderItem={({ item }) => {
                 const amountPrefix =
-                  item?.transaction_type === "credit" ? "+" : "-";
+                  item?.transactionType !== "deposit" ? "+" : "-";
 
                 return (
                   <TouchableOpacity
@@ -60,21 +88,21 @@ const TransactionScreen = () => {
                   >
                     <View style={styles.colBox}>
                       <View style={styles.row}>
-                        <TransactionIcon type={item?.transaction_type} />
+                        <TransactionIcon type={item?.transactionType} />
                         <View>
                           <ThemedText
                             lightColor="#252525"
                             darkColor="#FFFFFF"
                             style={styles.label}
                           >
-                            {item?.transaction_type || "Transaction"}
+                            {getTransactionLabel(item?.transactionType)}
                           </ThemedText>
                           <ThemedText
                             lightColor="#9B9B9B"
                             darkColor="#9B9B9B"
                             style={styles.timestamp}
                           >
-                            {formatDateTime(item?.created_at)}
+                            {formatDateTime(item?.date)}
                           </ThemedText>
                         </View>
                       </View>
@@ -85,7 +113,7 @@ const TransactionScreen = () => {
                       >
                         {`${amountPrefix}${getSymbolFromCurrency(
                           item?.currency
-                        )}${item?.amount || 0}`}
+                        )}${Number(item?.amount ?? 0).toFixed(2)}`}
                       </ThemedText>
                     </View>
                   </TouchableOpacity>

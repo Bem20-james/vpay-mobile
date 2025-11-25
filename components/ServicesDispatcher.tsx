@@ -7,7 +7,6 @@ import {
   ActivityIndicator
 } from "react-native";
 import { useRouter } from "expo-router";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import CustomButton from "@/components/CustomButton";
 import { Colors } from "@/constants/Colors";
 import { useLoader } from "@/contexts/LoaderContext";
@@ -23,6 +22,7 @@ import AssetsBottomSheet from "./BottomSheets/Assets";
 import { useFetchUserAssets } from "@/hooks/useUser";
 import { useServiceOptions } from "@/hooks/useServiceOptions";
 import { useRateConversion } from "@/hooks/useGeneral";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 type Currency = {
   country_code?: string;
@@ -55,8 +55,8 @@ const ServicesDispatcher = ({
   targetCurrency,
   meterType
 }: ServicesDispatcherProps) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
   const inputBgColor = isDark
     ? Colors.dark.background
@@ -65,7 +65,7 @@ const ServicesDispatcher = ({
   const router = useRouter();
   const { showLoader, hideLoader } = useLoader();
 
-  // ✅ Unified API data fetch using our custom hook
+  //Unified API data fetch using our custom hook
   const { options, loading: optionsLoading } = useServiceOptions(
     type,
     provider

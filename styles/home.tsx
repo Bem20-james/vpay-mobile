@@ -32,15 +32,13 @@ export const styles = StyleSheet.create({
     height: 30,
     borderRadius: 20
   },
-
   balCon: {
     backgroundColor: "#218DC9",
-    padding: 15,
+    padding: 10,
     borderRadius: 15,
-    marginTop: 10,
+    marginTop: 7,
     marginHorizontal: 10
   },
-
   dFlex: {
     flexDirection: "row",
     alignItems: "center",
@@ -95,5 +93,18 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 5
+  },
+  actionsRow: {
+    flexDirection: "row",
+    gap: 10,
+    alignItems: "center",
+    marginTop: 7
+  },
+  iconButton: {
+    borderRadius: 100,
+    padding: 4,
+    color: "#218DC9",
+    borderWidth: 0.6,
+    borderColor: "#ffffff"
   }
 });

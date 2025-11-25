@@ -3,7 +3,6 @@ import { View, ScrollView, StyleSheet } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { StatusBar } from "expo-status-bar";
 import Navigator from "@/components/Navigator";
 import CustomButton from "@/components/CustomButton";
@@ -17,10 +16,11 @@ import ReviewBottomSheet from "@/components/BottomSheets/Review";
 import ProviderInput from "@/components/PhoneInputField";
 import { useUser } from "@/contexts/UserContexts";
 import { ConversionBody } from "@/components/AmountInputField";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const AirtimeScreen = () => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const boxBackgroundColor = isDark
     ? Colors.dark.background
     : Colors.light.background;
@@ -135,7 +135,7 @@ const AirtimeScreen = () => {
           <CustomButton
             title="Continue"
             handlePress={() => setShowReviewSheet(true)}
-            btnStyles={{ marginTop: 20 }}
+            btnStyles={{ marginTop: 30 }}
             variant="primary"
             size="medium"
             disabled={isContinueDisabled}

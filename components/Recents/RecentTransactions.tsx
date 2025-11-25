@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   StyleSheet,
@@ -6,36 +6,83 @@ import {
   TouchableOpacity,
   Pressable
 } from "react-native";
-import { MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { ThemedText } from "../ThemedText";
 import getSymbolFromCurrency from "currency-symbol-map";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
+import { formatDateTime } from "@/utils/formatDateTime";
+import { TransactionIcon } from "../TransactionIcons";
+import { useTheme } from "@/contexts/ThemeContexts";
+import { MotiView } from "moti";
+import TransactionReceipt from "../TransactionReciept";
 
 interface HistoryItem {
   id: string;
-  label: string;
-  icon: keyof typeof MaterialCommunityIcons.glyphMap;
-  backgroundColor: string;
-  iconColor: string;
-  amount: string;
-  timestamp: string;
+  currency: string;
+  amount: number;
+  status: string;
+  transactionType: string;
+  date: string;
 }
 
 interface Props {
   title?: string;
   actions: HistoryItem[];
+  loading?: boolean;
 }
+
+//converting transactionType to readable label
+const getTransactionLabel = (type: string) => {
+  switch (type?.toLowerCase()) {
+    case "airtime":
+      return "Airtime purchase";
+    case "data":
+      return "Data purchase";
+    case "electricity":
+      return "Electricity bill";
+    case "bet_funding":
+      return "Betting payment";
+    case "cable-tv":
+      return "Cable TV subscription";
+    case "transfer":
+      return "Transfer";
+    default:
+      return type;
+  }
+};
+
+const TransactionSkeleton = () => {
+  return (
+    <>
+      {[...Array(5)].map((_, i) => (
+        <MotiView
+          key={i}
+          from={{ opacity: 0.4 }}
+          animate={{ opacity: 1 }}
+          transition={{ loop: true, type: "timing", duration: 800 }}
+          style={styles.skeleton}
+        />
+      ))}
+    </>
+  );
+};
 
 const RecentTransaction: React.FC<Props> = ({
   title = "Recent transactions",
-  actions
+  actions,
+  loading = false
 }) => {
   const router = useRouter();
-  const colorScheme = useColorScheme();
-  const bgColor =
-    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
+  const [selectedTransaction, setSelectedTransaction] = useState<any | null>(
+    null
+  );
+
+  const latestTrxn = actions?.slice(0, 5) ?? [];
+  const handlePress = (item: any) => setSelectedTransaction(item);
 
   return (
     <View style={styles.container}>
@@ -47,9 +94,10 @@ const RecentTransaction: React.FC<Props> = ({
         >
           {title}
         </ThemedText>
+
         <Pressable
           onPress={() => router.push("/transactions")}
-          style={({ pressed }) => [styles.more, { opacity: pressed ? 0.7 : 1 }]}
+          style={({ pressed }) => [styles.more, { opacity: pressed ? 0.6 : 1 }]}
         >
           <ThemedText
             style={{ fontFamily: "Inter-SemiBold", fontSize: 13 }}
@@ -58,68 +106,67 @@ const RecentTransaction: React.FC<Props> = ({
           >
             see more
           </ThemedText>
-          <Entypo
-            name="chevron-small-right"
-            size={20}
-            color={"#218DC9"}
-            style={{ marginTop: 3 }}
-          />
+          <Entypo name="chevron-small-right" size={20} color={"#218DC9"} />
         </Pressable>
       </View>
-      <FlatList
-        data={actions}
-        keyExtractor={(item) => item.id}
-        numColumns={1}
-        nestedScrollEnabled={true}
-        scrollEnabled={false}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[{ backgroundColor: bgColor }, styles.actionBox]}
-            onPress={() => {}}
-            activeOpacity={0.7}
-          >
-            <View style={styles.colBox}>
-              <View style={styles.row}>
-                <View
-                  style={[
-                    styles.iconWrapper,
-                    { backgroundColor: item.backgroundColor }
-                  ]}
+
+      {loading ? (
+        <TransactionSkeleton />
+      ) : !selectedTransaction ? (
+        <FlatList
+          data={latestTrxn}
+          keyExtractor={(item) => item.id}
+          numColumns={1}
+          nestedScrollEnabled={true}
+          scrollEnabled={false}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={handlePress}
+              style={[{ backgroundColor: bgColor }, styles.actionBox]}
+              activeOpacity={0.7}
+            >
+              <View style={styles.colBox}>
+                <View style={styles.row}>
+                  <TransactionIcon type={item?.transactionType} />
+
+                  <View>
+                    <ThemedText
+                      lightColor="#252525"
+                      darkColor="#FFFFFF"
+                      style={styles.label}
+                    >
+                      {getTransactionLabel(item?.transactionType)}
+                    </ThemedText>
+
+                    <ThemedText
+                      lightColor="#9B9B9B"
+                      darkColor="#9B9B9B"
+                      style={styles.timestamp}
+                    >
+                      {formatDateTime(item?.date)}
+                    </ThemedText>
+                  </View>
+                </View>
+
+                <ThemedText
+                  style={styles.amount}
+                  lightColor="#BF281C"
+                  darkColor="#BF281C"
                 >
-                  <MaterialCommunityIcons
-                    name={item.icon}
-                    size={20}
-                    color={item.iconColor}
-                  />
-                </View>
-                <View>
-                  <ThemedText
-                    lightColor="#252525"
-                    darkColor="#FFFFFF"
-                    style={styles.label}
-                  >
-                    {item.label}
-                  </ThemedText>
-                  <ThemedText
-                    lightColor="#9B9B9B"
-                    darkColor="#9B9B9B"
-                    style={styles.timestamp}
-                  >
-                    {item.timestamp}
-                  </ThemedText>
-                </View>
+                  {`${getSymbolFromCurrency(item?.currency)}${Number(
+                    item?.amount ?? 0
+                  ).toFixed(2)}`}
+                </ThemedText>
               </View>
-              <ThemedText
-                lightColor="#BF281C"
-                darkColor="#BF281C"
-                style={styles.amount}
-              >
-                {`${"-" + getSymbolFromCurrency("NGN")}${item.amount}`}
-              </ThemedText>
-            </View>
-          </TouchableOpacity>
-        )}
-      />
+            </TouchableOpacity>
+          )}
+        />
+      ) : (
+        <TransactionReceipt
+          data={selectedTransaction}
+          onBack={() => setSelectedTransaction(null)}
+        />
+      )}
     </View>
   );
 };
@@ -137,64 +184,51 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: "Inter-Medium",
-    fontSize: 13,
-    letterSpacing: 0
+    fontSize: 13
   },
   more: {
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center"
+    alignItems: "center"
   },
+
   colBox: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
     width: "100%"
-  },
-  column: {
-    justifyContent: "space-between"
   },
   actionBox: {
     width: "100%",
     borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 7,
-    padding: 10,
+    padding: 12,
+    marginBottom: 8,
     elevation: 1,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 2 }
+    shadowOpacity: 0.08,
+    shadowRadius: 4
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
     gap: 10
-  },
-  iconWrapper: {
-    padding: 10,
-    borderRadius: 30,
-    marginBottom: 8
   },
   label: {
     fontFamily: "Inter-SemiBold",
-    fontWeight: 500,
-    fontSize: 14,
-    letterSpacing: 0
+    fontSize: 14
   },
   timestamp: {
     fontFamily: "Questrial",
-    fontWeight: 500,
-    fontSize: 14,
-    letterSpacing: 0
+    fontSize: 12
   },
   amount: {
     fontFamily: "Inter-SemiBold",
-    fontWeight: 500,
-    fontSize: 14,
-    letterSpacing: 0
+    fontSize: 14
+  },
+  skeleton: {
+    height: 60,
+    width: "100%",
+    backgroundColor: "#d9d9d9",
+    borderRadius: 12,
+    marginBottom: 10,
+    opacity: 0.6
   }
 });
 

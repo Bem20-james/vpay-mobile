@@ -9,11 +9,11 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { ThemedText } from "./ThemedText";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { MotiView } from "moti";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { SERVER_IMAGE_URL } from "@/constants/Paths";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -40,8 +40,8 @@ const CustomChip: React.FC<CustomChipProps> = ({
   itemStyle,
   isLoading = false
 }) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const BgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
   const txtColor = isDark ? Colors.light.accentBg : Colors.dark.background;
 

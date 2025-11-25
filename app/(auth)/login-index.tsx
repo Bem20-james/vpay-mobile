@@ -18,12 +18,13 @@ import { useLoader } from "@/contexts/LoaderContext";
 import OtpMediumModal from "@/components/OtpMediumModal";
 import OtpVerification from "./otp-verification";
 import { useUser } from "@/contexts/UserContexts";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const IndexLogin = () => {
-  const colorScheme = useColorScheme();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const router = useRouter();
-  const bgColor =
-    colorScheme === "dark" ? Colors.dark.accentBg : Colors.light.accentBg;
+  const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showBiometricIcon, setShowBiometricIcon] = useState(false);
@@ -129,7 +130,7 @@ const IndexLogin = () => {
       // ✅ If we have a user saved
       if (isTokenExpired()) {
         const refreshed = await refreshUserToken();
-        console.log("refresh user:", refreshed)
+        console.log("refresh user:", refreshed);
         if (!refreshed) {
           Toast.show({
             type: "error",
@@ -170,9 +171,11 @@ const IndexLogin = () => {
     <SafeAreaView style={{ backgroundColor: bgColor, height: "100%" }}>
       <ScrollView>
         <View style={styles.container}>
-          {colorScheme === "dark"
-            ? <Image source={images.logolight} style={styles.logo} />
-            : <Image source={images.logodark} style={styles.logo} />}
+          {isDark ? (
+            <Image source={images.logolight} style={styles.logo} />
+          ) : (
+            <Image source={images.logodark} style={styles.logo} />
+          )}
           <View style={styles.userField}>
             <View style={styles.avatarBg}>
               <Image source={images.avatar} style={styles.avatar} />
@@ -198,7 +201,7 @@ const IndexLogin = () => {
 
           <FormField
             placeholder={"Password"}
-            handleChangeText={value => setPassword(value)}
+            handleChangeText={(value) => setPassword(value)}
             value={password}
             isIcon
             iconName="shield"
@@ -232,7 +235,7 @@ const IndexLogin = () => {
             </ThemedText>
           </Pressable>
 
-          {showBiometricIcon &&
+          {showBiometricIcon && (
             <View style={styles.fingerprint}>
               <Pressable
                 onPress={handleBiometricLogin}
@@ -246,7 +249,8 @@ const IndexLogin = () => {
               <ThemedText lightColor="#9B9B9B" style={{ fontSize: 14 }}>
                 use fingerprint
               </ThemedText>
-            </View>}
+            </View>
+          )}
 
           <View
             style={{
@@ -261,6 +265,7 @@ const IndexLogin = () => {
             <CustomButton
               title="Login"
               handlePress={() => setShowModal(true)}
+              //handlePress={() => router.push("/(tabs)/home")}
               btnStyles={{ width: "100%" }}
               isLoading={isLoading}
               disabled={!password}
@@ -290,6 +295,7 @@ const IndexLogin = () => {
                     style={{
                       fontFamily: "Questrial",
                       fontWeight: "bold",
+                      fontSize: 13,
                       color: "#218DC9",
                       textDecorationLine: "underline"
                     }}

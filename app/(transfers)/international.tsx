@@ -8,7 +8,6 @@ import {
 import React, { useState } from "react";
 import Navigator from "@/components/Navigator";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { StatusBar } from "expo-status-bar";
 import { ThemedText } from "@/components/ThemedText";
 import { KycStyles as styles } from "@/styles/kyc";
@@ -19,6 +18,7 @@ import SendInternational from "@/components/Transfers/sendInternational";
 import { Colors } from "@/constants/Colors";
 import { useFetchCountries } from "@/hooks/useGeneral";
 import { MotiView } from "moti";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const SkeletonLoader = () => (
   <View style={{ marginTop: 20 }}>
@@ -71,8 +71,8 @@ const SkeletonLoader = () => (
 );
 
 const International = () => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const backgroundColor = isDark
     ? Colors.dark.background
     : Colors.light.background;

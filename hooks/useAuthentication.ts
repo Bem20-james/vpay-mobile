@@ -70,7 +70,7 @@ const useVerifyEmail = () => {
       const { message } = response.data;
 
       if (response.status === 200) {
-        Toast.show({ type: "success", text1: message || "Email verified successfully!" });
+        Toast.show({ type: "success", text1: message || "Email verified successfuly!" });
         router.push({
           pathname: "/(auth)/transaction-pin",
           params: { email },
@@ -107,7 +107,7 @@ const useResendEmailOTP = () => {
       console.log("data:", result)
 
       if (response.status === 200) {
-        Toast.show({ type: "success", text1: result.message || "OTP resent successfully!" });
+        Toast.show({ type: "success", text1: result.message || "OTP resent successfuly!" });
       }
 
     } catch (err: any) {
@@ -141,7 +141,7 @@ const useResendLoginOTP = () => {
       console.log("data:", result)
 
       if (response.status === 200) {
-        Toast.show({ type: "success", text1: result.message || "OTP resent successfully!" });
+        Toast.show({ type: "success", text1: result.message || "OTP resent successfuly!" });
       }
 
     } catch (err: any) {
@@ -263,7 +263,7 @@ const useForgotPwd = () => {
       const result = response?.data;
 
       if (result.success) {
-        Toast.show({ type: "success", text1: result.message || "OTP sent successfully!" });
+        Toast.show({ type: "success", text1: result.message || "OTP sent successfuly!" });
         return true;
       }
     } catch (err: any) {
@@ -299,7 +299,7 @@ const useResendPwdResetOTP = () => {
       console.log("data:", result)
 
       if (response.status === 200) {
-        Toast.show({ type: "success", text1: result.message || "OTP resent successfully!" });
+        Toast.show({ type: "success", text1: result.message || "OTP resent successfuly!" });
       }
 
     } catch (err: any) {
@@ -587,7 +587,7 @@ const useChangePwd = () => {
       console.log("change pwd res:", result)
 
       if (result.success === "true") {
-        Toast.show({ type: "success", text1: result.message || "Password changed successfully!" });
+        Toast.show({ type: "success", text1: result.message || "Password changed successfuly!" });
         return true;
       }
     } catch (err: any) {
@@ -627,7 +627,7 @@ const useResendChangePwdOTP = () => {
       console.log("data:", result)
 
       if (response.status === 200) {
-        Toast.show({ type: "success", text1: result.message || "OTP resent successfully!" });
+        Toast.show({ type: "success", text1: result.message || "OTP resent successfuly!" });
       }
 
     } catch (err: any) {

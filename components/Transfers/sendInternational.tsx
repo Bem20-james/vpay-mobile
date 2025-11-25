@@ -2,7 +2,6 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { StyleSheet, View, ScrollView } from "react-native";
 import React from "react";
 import Navigator from "@/components/Navigator";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { Colors } from "@/constants/Colors";
 import FormField from "@/components/FormFields";
 import CustomButton from "@/components/CustomButton";
@@ -14,10 +13,11 @@ import LocalInternational from "./LocalInternational";
 import BanksBottomSheet from "../BottomSheets/Banks";
 import { useFetchBanks } from "@/hooks/useGeneral";
 import { useUser } from "@/contexts/UserContexts";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 const SendInternational = ({ onBack, selectedCountry }: SendScreenProps) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const {theme} = useTheme();
+  const isDark = theme === "dark";
   const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
 
   const [showSendScreen, setShowSendScreen] = useState(false);

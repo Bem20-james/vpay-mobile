@@ -1,7 +1,8 @@
 import { ThemedText } from "@/components/ThemedText";
 import React from "react";
 import { View, Switch, TouchableOpacity, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
+import { useColorScheme } from "@/hooks/useColorScheme.web";
 
 export const SettingItem = ({
   title,
@@ -13,7 +14,7 @@ export const SettingItem = ({
   onPress,
   icon,
   iconColor,
-  bgColor = "#F2F2F7",
+  bgColor = "#FFFFFF",
   background,
   itemStyles
 }: {
@@ -29,45 +30,55 @@ export const SettingItem = ({
   bgColor?: string;
   background?: string;
   itemStyles?: any;
-}) => (
-  <TouchableOpacity
-    style={[styles.settingItem, itemStyles, { backgroundColor: background }]}
-    onPress={onPress}
-    disabled={hasSwitch}
-  >
-    <View style={styles.settingLeft}>
-      {icon && (
-        <View style={[styles.iconContainer, { backgroundColor: bgColor }]}>
-          <Ionicons name={icon} size={20} color={iconColor} />
+}) => {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+
+  return (
+    <TouchableOpacity
+      style={[styles.settingItem, itemStyles, { backgroundColor: background }]}
+      onPress={onPress}
+      disabled={hasSwitch}
+    >
+      <View style={styles.settingLeft}>
+        {icon && (
+          <View
+            style={[
+              styles.iconContainer,
+              { backgroundColor: isDark ? "F2F2F7" : bgColor }
+            ]}
+          >
+            <MaterialIcons name={icon} size={18} color={iconColor} />
+          </View>
+        )}
+        <View style={{ flexDirection: "column" }}>
+          <ThemedText
+            lightColor="#252525"
+            darkColor="#FFFFFF"
+            style={styles.settingText}
+          >
+            {title}
+          </ThemedText>
+          {label && <ThemedText style={styles.label}>{label}</ThemedText>}
         </View>
-      )}
-      <View style={{ flexDirection: "column" }}>
-        <ThemedText
-          lightColor="#252525"
-          darkColor="#FFFFFF"
-          style={styles.settingText}
-        >
-          {title}
-        </ThemedText>
-        {label && <ThemedText style={styles.label}>{label}</ThemedText>}
       </View>
-    </View>
 
-    {hasSwitch && (
-      <Switch
-        value={switchValue}
-        onValueChange={onSwitchChange}
-        trackColor={{ false: "#E5E5E5", true: "#80D1FF" }}
-        thumbColor={switchValue ? "#208BC9" : "#FFFFFF"}
-        ios_backgroundColor="#E5E5E5"
-      />
-    )}
+      {hasSwitch && (
+        <Switch
+          value={switchValue}
+          onValueChange={onSwitchChange}
+          trackColor={{ false: "#E5E5E5", true: "#80D1FF" }}
+          thumbColor={switchValue ? "#208BC9" : "#FFFFFF"}
+          ios_backgroundColor="#E5E5E5"
+        />
+      )}
 
-    {hasChevron && (
-      <Ionicons name="chevron-forward" size={18} color="#218DC9" />
-    )}
-  </TouchableOpacity>
-);
+      {hasChevron && (
+        <Ionicons name="chevron-forward" size={18} color="#218DC9" />
+      )}
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   settingItem: {
@@ -86,7 +97,7 @@ const styles = StyleSheet.create({
   settingText: {
     fontFamily: "Inter-Bold",
     fontWeight: 600,
-    fontSize: 14,
+    fontSize: 13,
     lineHeight: 14,
     letterSpacing: 0
   },
@@ -98,8 +109,8 @@ const styles = StyleSheet.create({
     color: "#9B9B9B"
   },
   iconContainer: {
-    width: 32,
-    height: 32,
+    width: 28,
+    height: 28,
     borderRadius: 32,
     alignItems: "center",
     justifyContent: "center",

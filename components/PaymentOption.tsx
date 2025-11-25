@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  View,
-  TouchableOpacity,
-  Image,
-  StyleSheet
-} from "react-native";
+import { View, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { MaterialIcons } from "@expo/vector-icons";
 import CountryFlag from "react-native-country-flag";
@@ -42,19 +37,13 @@ export const PaymentOption: React.FC<PaymentOptionProps> = ({
   bgColor,
   handlePress
 }) => {
-
   return (
     <TouchableOpacity
       style={[styles.optionContainer, { backgroundColor: bgColor }]}
       onPress={() => handlePress()}
     >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-        {type === "crypto" && (
-          <Image
-            source={image}
-            style={styles.icon}
-          />
-        )}
+        {type === "crypto" && <Image source={image} style={styles.icon} />}
         {type === "fiat" && (
           <CountryFlag
             isoCode={country_code ?? ""}
@@ -85,11 +74,11 @@ export const PaymentOption: React.FC<PaymentOptionProps> = ({
       </View>
 
       <View style={{ flexDirection: "row", gap: 10 }}>
-        <ThemedText>
-          { Number(balance).toFixed(2)}
+        <ThemedText style={styles.accountBalance}>
+          {Number(balance).toFixed(2)}
         </ThemedText>
         <ThemedText style={styles.arrow}>
-          <MaterialIcons name="chevron-right" size={30} color="#218DC9" />
+          <MaterialIcons name="chevron-right" size={20} color="#218DC9" />
         </ThemedText>
       </View>
     </TouchableOpacity>
@@ -114,7 +103,7 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     marginRight: 15,
-    resizeMode: "contain",
+    resizeMode: "contain"
   },
   flagicon: {
     marginRight: 10,
@@ -122,16 +111,20 @@ const styles = StyleSheet.create({
     borderRadius: 5
   },
   accountText: {
-    fontSize: 15,
-    fontFamily: "Inter-Medium"
+    fontSize: 13,
+    fontFamily: "Inter-Medium",
+  },
+  accountBalance: {
+    fontSize: 13,
+    fontFamily: "Inter-Bold"
   },
   optionDescription: {
     fontSize: 12,
     fontFamily: "Questrial",
-    textTransform: "uppercase"
+    textTransform: "uppercase",
   },
   arrow: {
-    fontSize: 18,
+    fontSize: 10,
     color: "#999"
   }
 });
