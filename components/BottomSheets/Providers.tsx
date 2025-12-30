@@ -75,7 +75,10 @@ const ProvidersBottomSheet: React.FC<ProvidersBottomSheetProps> = ({
 
             return (
               <TouchableOpacity
-                style={styles.item}
+                style={[
+                  styles.item,
+                  { borderBottomColor: isDark ? "#252d31ff" : "#e5e5ecff" }
+                ]}
                 onPress={() => {
                   onSelect(item);
                   onClose();
@@ -123,8 +126,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     flexDirection: "row",
     alignItems: "center",
-    borderBottomWidth: 0.7,
-    borderBottomColor: "#000000"
+    borderBottomWidth: 0.5
   },
   image: {
     width: 30,

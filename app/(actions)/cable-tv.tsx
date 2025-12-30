@@ -91,8 +91,10 @@ const CableTVScreen = () => {
     };
   }, [userNumber, selectedProvider, stableLookup]);
 
+  console.log("SUBSCRIBER INFO:", subscriber);
+
   const handleContinue = () => {
-    if (!subscriber?.customerName) {
+    if (!subscriber?.customer_name) {
       Toast.show({
         type: "error",
         text1: "Please wait for account lookup to complete"
@@ -194,12 +196,12 @@ const CableTVScreen = () => {
                         style={[
                           formStyles.input,
                           {
-                            color: subscriber?.customerName
+                            color: subscriber?.customer_name
                               ? txtColor
                               : "#9B9B9B",
-                            fontSize: subscriber?.customerName ? 15 : 12,
+                            fontSize: subscriber?.customer_name ? 15 : 12,
                             fontFamily: "Questrial",
-                            fontWeight: subscriber?.customerName
+                            fontWeight: subscriber?.customer_name
                               ? "700"
                               : "400",
                             flex: 1
@@ -207,7 +209,7 @@ const CableTVScreen = () => {
                         ]}
                         placeholder="Subscriber's name will appear here"
                         placeholderTextColor="#9B9B9B"
-                        value={subscriber?.customerName ?? ""}
+                        value={subscriber?.customer_name ?? ""}
                         editable={false}
                       />
                     )}
@@ -246,7 +248,7 @@ const CableTVScreen = () => {
                     opacity:
                       userNumber.length === 10 &&
                       selectedProvider &&
-                      subscriber?.customerName
+                      subscriber?.customer_name
                         ? 1
                         : 0.6
                   }}
@@ -255,7 +257,7 @@ const CableTVScreen = () => {
                       !isLoading &&
                       userNumber.length === 10 &&
                       selectedProvider &&
-                      subscriber?.customerName
+                      subscriber?.customer_name
                     )
                   }
                   variant="primary"
@@ -268,7 +270,7 @@ const CableTVScreen = () => {
           <ServicesDispatcher
             type="cable"
             title="Select package"
-            name={subscriber?.customerName}
+            name={subscriber?.customer_name}
             number={userNumber}
             provider={selectedProvider?.provider_name}
             logo={selectedProvider?.image}

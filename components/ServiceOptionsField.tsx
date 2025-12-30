@@ -2,16 +2,18 @@ import React, { useState, useMemo } from "react";
 import { View, Pressable, FlatList, StyleSheet } from "react-native";
 import { ThemedText } from "./ThemedText";
 import { TransferStyles as styles } from "@/styles/transfers";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { Colors } from "@/constants/Colors";
 import { useUser } from "@/contexts/UserContexts";
 import getSymbolFromCurrency from "currency-symbol-map";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 type OptionItem = {
-  name: string;
-  amount: number;
-  code: string;
+  service_name: string;
+  price: number;
+  service_id: string;
   description?: string;
+  variation_id?: string;
+  data_plan: string;
 };
 
 type ServiceOptionsFieldProps = {
@@ -29,8 +31,8 @@ const ServiceOptionsField = ({
   type = "data",
   onSelect
 }: ServiceOptionsFieldProps) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
   const txtColor = isDark ? Colors.light.accentBg : Colors.dark.background;
   const inputBgColor = isDark
@@ -50,8 +52,8 @@ const ServiceOptionsField = ({
     const key = selectedTab.toLowerCase();
     return data.filter(
       (item) =>
-        item.name.toLowerCase().includes(key) ||
-        item.code.toLowerCase().includes(key)
+        item.data_plan.toLowerCase().includes(key) ||
+        item.service_id.toLowerCase().includes(key)
     );
   }, [data, selectedTab, type]);
 
@@ -96,7 +98,7 @@ const ServiceOptionsField = ({
       {/* Options List */}
       <FlatList
         data={filteredData}
-        keyExtractor={(item) => item.code}
+        keyExtractor={(item) => `${item.variation_id}`}
         numColumns={3}
         nestedScrollEnabled
         scrollEnabled={false}
@@ -106,7 +108,7 @@ const ServiceOptionsField = ({
         }}
         contentContainerStyle={{ marginTop: 10 }}
         renderItem={({ item }) => {
-          const isSelected = selectedOption?.code === item.code;
+          const isSelected = selectedOption?.variation_id === item.variation_id;
           return (
             <Pressable
               onPress={() => handleSelect(item)}
@@ -126,7 +128,7 @@ const ServiceOptionsField = ({
                   textAlign: "center"
                 }}
               >
-                {item.name}
+                {item.data_plan}
               </ThemedText>
 
               <ThemedText
@@ -138,7 +140,7 @@ const ServiceOptionsField = ({
                 }}
               >
                 {getSymbolFromCurrency(currencySymbol ?? "")}
-                {item.amount}
+                {item.price}
               </ThemedText>
             </Pressable>
           );

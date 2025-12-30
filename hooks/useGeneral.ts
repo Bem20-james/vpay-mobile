@@ -245,15 +245,17 @@ const fetchTrnxHistory = async (config: any): Promise<History[]> => {
   try {
     const url = `${SERVER_BASE_URL}/user/recent-transactions`;
     const response = await axios.get<HistoryResponse>(url, config);
-    const result = response.data
+    const result = response.data;
 
-    console.log("TRNX HISTORY:", result)
+    console.log("TRNX HISTORY:", result);
 
     if (result?.success && response.data?.result) {
       return response.data.result;
     }
 
-    throw new Error(response.data?.message || "Failed to fetch transaction history");
+    throw new Error(
+      response.data?.message || "Failed to fetch transaction history"
+    );
   } catch (error: any) {
     throw new Error(error.response?.data?.message || error.message);
   }
@@ -267,12 +269,12 @@ function useFetchTrnxHistory() {
     isLoading,
     isFetching,
     error,
-    refetch,
+    refetch
   } = useQuery<History[], AxiosError>({
     queryKey: ["transactionHistory"],
     queryFn: () => fetchTrnxHistory(config),
     staleTime: 1000 * 60 * 5,
-    retry: 2,
+    retry: 2
   });
 
   useEffect(() => {
@@ -282,19 +284,18 @@ function useFetchTrnxHistory() {
       text1:
         (error.response?.data as any)?.message ||
         error.message ||
-        "Failed to fetch transaction history",
+        "Failed to fetch transaction history"
     });
-    console.error()
+    console.error();
   }, [error]);
 
   return {
     trnxHistory,
     loading: isLoading || isFetching,
     error,
-    refetch,
+    refetch
   };
 }
-
 
 export {
   useFetchCountries,

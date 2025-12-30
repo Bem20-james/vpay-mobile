@@ -108,7 +108,7 @@ const ElectricityScreen = () => {
   }, [meterNumber, selectedProvider, stableLookup]);
 
   const handleContinue = () => {
-    if (!customer?.customerName) {
+    if (!customer?.customer_name) {
       Toast.show({
         type: "error",
         text1: "Please wait for account lookup to complete"
@@ -215,12 +215,12 @@ const ElectricityScreen = () => {
                           style={[
                             formStyles.input,
                             {
-                              color: customer?.customerName
+                              color: customer?.customer_name
                                 ? txtColor
                                 : "#9B9B9B",
-                              fontSize: customer?.customerName ? 15 : 12,
+                              fontSize: customer?.customer_name ? 15 : 12,
                               fontFamily: "Questrial",
-                              fontWeight: customer?.customerName
+                              fontWeight: customer?.customer_name
                                 ? "700"
                                 : "400",
                               flex: 1
@@ -228,7 +228,7 @@ const ElectricityScreen = () => {
                           ]}
                           placeholder="customer's name will appear here"
                           placeholderTextColor="#9B9B9B"
-                          value={customer?.customerName ?? ""}
+                          value={customer?.customer_name ?? ""}
                           editable={false}
                         />
                       )}
@@ -282,7 +282,7 @@ const ElectricityScreen = () => {
                       showSendScreen &&
                       meterNumber.length === 11 &&
                       selectedProvider &&
-                      customer?.customerName
+                      customer?.customer_name
                         ? 1
                         : 0.6
                   }}
@@ -292,7 +292,7 @@ const ElectricityScreen = () => {
                       !isLoading &&
                       meterNumber.length === 11 &&
                       selectedProvider &&
-                      customer?.customerName
+                      customer?.customer_name
                     )
                   }
                   variant="primary"
@@ -305,7 +305,7 @@ const ElectricityScreen = () => {
           <ServicesDispatcher
             type="electricity"
             title="Select package"
-            name={customer?.customerName}
+            name={customer?.customer_name}
             number={meterNumber}
             provider={selectedProvider?.provider_name}
             logo={selectedProvider?.image}

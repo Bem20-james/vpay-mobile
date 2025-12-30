@@ -81,7 +81,7 @@ const ServicesDispatcher = ({
   const allAssets = [...fiatAssets, ...cryptoAssets];
   const { rate, loading: rateLoading, refetch } = useRateConversion();
 
-  console.log("selected option:", selectedOption);
+  console.log("SERVICE OPTIONS RETURNED:", options);
   console.log("TARGET CURRENCY:", targetCurrency);
 
   useEffect(() => {
@@ -102,11 +102,11 @@ const ServicesDispatcher = ({
 
   useEffect(() => {
     const fetchConversion = async () => {
-      if (selectedOption?.amount && selectedCurrency) {
+      if (selectedOption?.price && selectedCurrency) {
         await refetch({
           base_currency: selectedCurrency.currency_code || "",
           target_currency: targetCurrency, // modified from hardcoded "NGN" to be dynamic with currency_code from providers
-          amount: Number(selectedOption?.amount),
+          amount: Number(selectedOption?.price),
           transaction_type: "airtime"
         });
       }
@@ -295,7 +295,7 @@ const ServicesDispatcher = ({
                     fontFamily: "Questrial"
                   }}
                 >
-                  {Number(selectedOption?.amount)} {rate?.base_currency}{" "}
+                  {Number(selectedOption?.price)} {rate?.target_currency}{" "}
                 </ThemedText>
 
                 <MaterialCommunityIcons
@@ -313,7 +313,7 @@ const ServicesDispatcher = ({
                   }}
                 >
                   {Number(rate?.converted_amount ?? 0).toFixed(2)}{" "}
-                  {rate?.target_currency}
+                  {rate?.base_currency}
                 </ThemedText>
               </View>
             </View>
@@ -326,7 +326,7 @@ const ServicesDispatcher = ({
           btnStyles={{ marginTop: 40 }}
           variant="primary"
           size="medium"
-          disabled={!selectedOption?.amount || rateLoading}
+          disabled={!selectedOption?.price || rateLoading}
         />
       </View>
 
@@ -348,7 +348,7 @@ const ServicesDispatcher = ({
         isVisible={showReviewSheet}
         onClose={() => setShowReviewSheet(false)}
         onPay={handlePay}
-        amount={selectedOption?.amount}
+        amount={selectedOption?.price}
         phoneNumber={number}
         provider={provider}
         name={name}

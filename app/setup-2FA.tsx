@@ -11,7 +11,6 @@ import Toast from "react-native-toast-message";
 import { useUser } from "@/contexts/UserContexts";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Navigator from "@/components/Navigator";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { Colors } from "@/constants/Colors";
 import { ThemedText } from "@/components/ThemedText";
 import CustomButton from "@/components/CustomButton";

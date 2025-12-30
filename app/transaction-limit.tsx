@@ -1,16 +1,18 @@
 import React from "react";
-import { View, ScrollView, Pressable, TouchableOpacity } from "react-native";
+import { View, ScrollView, TouchableOpacity, Image } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useColorScheme } from "@/hooks/useColorScheme.web";
 import { StatusBar } from "expo-status-bar";
 import { Colors } from "@/constants/Colors";
 import { LinearGradient } from "expo-linear-gradient";
 import { styles } from "@/styles/trnxlimit";
 import { tierData } from "@/assets/data";
+import Navigator from "@/components/Navigator";
+import { useTheme } from "@/contexts/ThemeContexts";
+import images from "@/constants/Images";
 
 export interface TierData {
   tier: string;
@@ -19,9 +21,79 @@ export interface TierData {
   isCurrent: boolean;
 }
 
+interface TierViewProps {
+  dailyLimit: string;
+  maxBal: string;
+  limitValue: string;
+  balValue: string;
+  image: any;
+  tier: string;
+}
+
+const TierView = ({
+  dailyLimit = "Daily Limit",
+  maxBal = "Maximum Balance",
+  limitValue,
+  balValue,
+  image,
+  tier
+}: TierViewProps) => {
+  return (
+    <ThemedView
+      lightColor="#FFFFFF"
+      darkColor={Colors.dark.accentBg}
+      style={styles.limitInfoCard}
+    >
+      <View style={styles.tableHeader}>
+        <Image source={image} style={styles.tierImage} />
+        <ThemedText
+          lightColor="#208BC9"
+          darkColor="#208BC9"
+          style={styles.limitInfoLabel}
+        >
+          {tier}
+        </ThemedText>
+      </View>
+
+      <View style={styles.tierView}>
+        <ThemedText
+          lightColor="#666666"
+          darkColor="#A0A0A0"
+          style={styles.label}
+        >
+          {dailyLimit}
+        </ThemedText>
+        <ThemedText
+          lightColor="#888888"
+          darkColor="#B0B0B0"
+          style={styles.label}
+        >
+          {maxBal}
+        </ThemedText>
+      </View>
+      <View style={[styles.tableRow]}>
+        <ThemedText
+          lightColor={"#252525"}
+          darkColor="#F8F8F8"
+          style={styles.tableCellText}
+        >
+          {limitValue}
+        </ThemedText>
+        <ThemedText
+          lightColor={"#252525"}
+          darkColor="#F8F8F8"
+          style={styles.tableCellText}
+        >
+          {balValue}
+        </ThemedText>
+      </View>
+    </ThemedView>
+  );
+};
+
 export default function AccountLimitsScreen() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const backgroundColor = isDark
     ? Colors.dark.background
     : Colors.light.background;
@@ -36,55 +108,32 @@ export default function AccountLimitsScreen() {
         backgroundColor={backgroundColor}
       />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <Pressable
-          onPress={() => router.back()}
-          style={({ pressed }) => [
-            styles.backButton,
-            { opacity: pressed ? 0.7 : 1 }
-          ]}
-        >
-          <Ionicons
-            name="chevron-back"
-            size={24}
-            color={isDark ? "#F8F8F8" : "#252525"}
-          />
-        </Pressable>
-        <ThemedText
-          lightColor="#252525"
-          darkColor="#F8F8F8"
-          style={styles.headerTitle}
-        >
-          Account Limits
-        </ThemedText>
-        <View style={{ width: 40 }} />
-      </View>
+      <Navigator title="Transaction Limits" onBack={router.back} />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Account Info Card */}
+        <ThemedText
+          lightColor="#9B9B9B"
+          darkColor="#EEF3FB"
+          style={styles.subtitle}
+        >
+          The higher your account tier, the higher your transaction limit.
+        </ThemedText>
         <LinearGradient
-          colors={["#F4D58D", "#E8C468"]}
+          colors={["#a6c9daff", "#208BC9"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.accountCard}
         >
           <View style={styles.cardHeader}>
-            <ThemedText
-              lightColor="#8B6914"
-              darkColor="#8B6914"
-              style={styles.cardLabel}
-            >
-              Account Info
-            </ThemedText>
+            <ThemedText style={styles.cardLabel}>Account Info</ThemedText>
             <View style={styles.coinBadge}>
               <MaterialIcons
                 name="account-balance-wallet"
                 size={24}
-                color="#F4D58D"
+                color="#208BC9"
               />
             </View>
           </View>
@@ -98,16 +147,16 @@ export default function AccountLimitsScreen() {
               901 187 9815
             </ThemedText>
             <TouchableOpacity style={styles.copyButton}>
-              <MaterialIcons name="content-copy" size={16} color="#8B6914" />
+              <MaterialIcons name="content-copy" size={16} color="#14408bff" />
             </TouchableOpacity>
           </View>
 
           <ThemedText
-            lightColor="#8B6914"
-            darkColor="#8B6914"
+            lightColor="#14408bff"
+            darkColor="#14408bff"
             style={styles.accountName}
           >
-            - JAMES IREM ADIKWONUKWU
+            - JAMES BEM AONDOAKURA
           </ThemedText>
         </LinearGradient>
 
@@ -123,144 +172,37 @@ export default function AccountLimitsScreen() {
               darkColor="#A0A0A0"
               style={styles.linkedIdLabel}
             >
-              Linked ID
+              Verification
             </ThemedText>
-            <View style={styles.linkedIdRight}>
-              <ThemedText
-                lightColor="#252525"
-                darkColor="#F8F8F8"
-                style={styles.linkedIdValue}
-              >
-                BVN & NIN
-              </ThemedText>
-              <Ionicons
-                name="chevron-forward"
-                size={20}
-                color={isDark ? "#A0A0A0" : "#666666"}
-              />
-            </View>
+            <Ionicons name="chevron-forward" size={20} color={"#208BC9"} />
           </View>
         </ThemedView>
 
-        {/* Limit Info */}
-        <ThemedView
-          lightColor="#FFFFFF"
-          darkColor={Colors.dark.accentBg}
-          style={styles.limitInfoCard}
-        >
-          <ThemedText
-            lightColor="#666666"
-            darkColor="#A0A0A0"
-            style={styles.limitInfoLabel}
-          >
-            Limit Info
-          </ThemedText>
-          <ThemedText
-            lightColor="#888888"
-            darkColor="#B0B0B0"
-            style={styles.limitInfoText}
-          >
-            The higher your account tier, the higher your transaction limit.
-          </ThemedText>
-        </ThemedView>
+        <TierView
+          dailyLimit="Daily Limit"
+          maxBal="Maximum Balance"
+          limitValue="₦500,000"
+          balValue="₦1,000,000"
+          image={images.tier1}
+          tier="Basic"
+        />
 
-        {/* Level Benefits */}
-        <ThemedView
-          lightColor="#FFFFFF"
-          darkColor={Colors.dark.accentBg}
-          style={styles.benefitsCard}
-        >
-          <ThemedText
-            lightColor="#252525"
-            darkColor="#F8F8F8"
-            style={styles.benefitsTitle}
-          >
-            Level Benefit
-          </ThemedText>
-
-          {/* Table Header */}
-          <View style={styles.tableHeader}>
-            <ThemedText
-              lightColor="#666666"
-              darkColor="#A0A0A0"
-              style={[styles.tableHeaderText, { flex: 1.2 }]}
-            >
-              Tier
-            </ThemedText>
-            <ThemedText
-              lightColor="#666666"
-              darkColor="#A0A0A0"
-              style={[
-                styles.tableHeaderText,
-                { flex: 1.5, textAlign: "center" }
-              ]}
-            >
-              Daily{"\n"}transaction limit
-            </ThemedText>
-            <ThemedText
-              lightColor="#666666"
-              darkColor="#A0A0A0"
-              style={[
-                styles.tableHeaderText,
-                { flex: 1.3, textAlign: "right" }
-              ]}
-            >
-              Maximum{"\n"}account balance
-            </ThemedText>
-          </View>
-
-          {/* Table Rows */}
-          {tierData.map((item, index) => (
-            <View
-              key={index}
-              style={[
-                styles.tableRow,
-                item.isCurrent && styles.tableRowCurrent
-              ]}
-            >
-              <View style={[styles.tierCell, { flex: 1.2 }]}>
-                <ThemedText
-                  lightColor={item.isCurrent ? "#FFFFFF" : "#252525"}
-                  darkColor="#F8F8F8"
-                  style={styles.tierText}
-                >
-                  {item.tier}
-                </ThemedText>
-                {item.isCurrent && (
-                  <View style={styles.currentBadge}>
-                    <ThemedText
-                      lightColor="#00D084"
-                      darkColor="#00D084"
-                      style={styles.currentBadgeText}
-                    >
-                      Current
-                    </ThemedText>
-                  </View>
-                )}
-              </View>
-              <ThemedText
-                lightColor={item.isCurrent ? "#FFFFFF" : "#252525"}
-                darkColor="#F8F8F8"
-                style={[
-                  styles.tableCellText,
-                  { flex: 1.5, textAlign: "center" }
-                ]}
-              >
-                {item.dailyLimit}
-              </ThemedText>
-              <ThemedText
-                lightColor={item.isCurrent ? "#FFFFFF" : "#252525"}
-                darkColor="#F8F8F8"
-                style={[
-                  styles.tableCellText,
-                  { flex: 1.3, textAlign: "right" }
-                ]}
-              >
-                {item.accountBalance}
-              </ThemedText>
-            </View>
-          ))}
-        </ThemedView>
+        <TierView
+          dailyLimit="Daily Limit"
+          maxBal="Maximum Balance"
+          limitValue="₦500,000"
+          balValue="₦1,000,000"
+          image={images.tier2}
+          tier="Silver"
+        />
+        <TierView
+          dailyLimit="Daily Limit"
+          maxBal="Maximum Balance"
+          limitValue="₦500,000"
+          balValue="₦1,000,000"
+          image={images.tier3}
+          tier="Gold"
+        />
       </ScrollView>
     </SafeAreaView>
   );

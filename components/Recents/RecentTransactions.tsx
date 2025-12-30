@@ -15,7 +15,6 @@ import { formatDateTime } from "@/utils/formatDateTime";
 import { TransactionIcon } from "../TransactionIcons";
 import { useTheme } from "@/contexts/ThemeContexts";
 import { MotiView } from "moti";
-import TransactionReceipt from "../TransactionReciept";
 
 interface HistoryItem {
   id: string;
@@ -77,12 +76,18 @@ const RecentTransaction: React.FC<Props> = ({
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
-  const [selectedTransaction, setSelectedTransaction] = useState<any | null>(
-    null
-  );
 
   const latestTrxn = actions?.slice(0, 5) ?? [];
-  const handlePress = (item: any) => setSelectedTransaction(item);
+
+  const handlePress = (item: HistoryItem) => {
+    router.push({
+      pathname: "/transaction-reciept",
+      params: {
+        data: JSON.stringify(item),
+        transactionType: item.transactionType
+      }
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -112,7 +117,7 @@ const RecentTransaction: React.FC<Props> = ({
 
       {loading ? (
         <TransactionSkeleton />
-      ) : !selectedTransaction ? (
+      ) : (
         <FlatList
           data={latestTrxn}
           keyExtractor={(item) => item.id}
@@ -121,8 +126,8 @@ const RecentTransaction: React.FC<Props> = ({
           scrollEnabled={false}
           renderItem={({ item }) => (
             <TouchableOpacity
-              onPress={handlePress}
               style={[{ backgroundColor: bgColor }, styles.actionBox]}
+              onPress={() => handlePress(item)}
               activeOpacity={0.7}
             >
               <View style={styles.colBox}>
@@ -160,11 +165,6 @@ const RecentTransaction: React.FC<Props> = ({
               </View>
             </TouchableOpacity>
           )}
-        />
-      ) : (
-        <TransactionReceipt
-          data={selectedTransaction}
-          onBack={() => setSelectedTransaction(null)}
         />
       )}
     </View>

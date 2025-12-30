@@ -28,6 +28,7 @@ function useFetchAirtimeProviders() {
         config
       );
       const result = response.data;
+      console.log("response:", result);
 
       if (result.success && result.code === 0) {
         setProviders(result.result);

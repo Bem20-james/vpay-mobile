@@ -15,6 +15,8 @@ import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { formatDateTime } from "@/utils/formatDateTime";
+import { useTheme } from "@/contexts/ThemeContexts";
 
 export type TransactionType =
   | "transfer"
@@ -30,8 +32,8 @@ export type TransactionType =
 const TransactionSuccess = () => {
   const params = useLocalSearchParams<any>();
 
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const backgroundColor = isDark
     ? Colors.dark.background
     : Colors.light.background;
@@ -185,12 +187,12 @@ const TransactionSuccess = () => {
           </ThemedText>
 
           <ThemedText style={[styles.amount, { color: textPrimary }]}>
-            {getSymbolFromCurrency(currency_recieved)}
+            {getSymbolFromCurrency(currency_sent)}
 
             {totalDebited || "0.00"}
           </ThemedText>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <ThemedText>
+            <ThemedText style={{ fontSize: 12, color: textSecondary }}>
               {getSymbolFromCurrency(currency_recieved)}
               {amount}
             </ThemedText>
@@ -200,7 +202,7 @@ const TransactionSuccess = () => {
               color="#999"
               style={{ marginHorizontal: 6 }}
             />
-            <ThemedText>
+            <ThemedText style={{ fontSize: 12, color: textSecondary }}>
               {getSymbolFromCurrency(currency_sent)}
               {totalDebited}
             </ThemedText>
@@ -230,7 +232,7 @@ const TransactionSuccess = () => {
               value={bank}
             />
             <DetailRow label="Transaction ID" value={reference} />
-            <DetailRow label="Date & Time" value={date} />
+            <DetailRow label="Date & Time" value={formatDateTime(date)} />
             <DetailRow label="Currency Sent" value={currency_sent} />
             <DetailRow label="Currency Received" value={currency_recieved} />
             <DetailRow

@@ -10,14 +10,14 @@ import { ThemedText } from "@/components/ThemedText";
 import Navigator from "@/components/Navigator";
 import { SafeAreaView } from "react-native-safe-area-context";
 import getSymbolFromCurrency from "currency-symbol-map";
-import TransactionReceipt from "@/components/TransactionReciept";
 import { Colors } from "@/constants/Colors";
 import { useFetchTrnxHistory } from "@/hooks/useGeneral";
 import { formatDateTime } from "@/utils/formatDateTime";
 import { TransactionSkeleton } from "@/components/SkeletonLoader";
 import { TransactionIcon } from "@/components/TransactionIcons";
 import { useTheme } from "@/contexts/ThemeContexts";
-import { useNavigation } from "expo-router";
+import { useRouter } from "expo-router";
+import { HistoryItem } from "@/components/Recents/RecentTransactions";
 
 const TransactionScreen = () => {
   const { theme } = useTheme();
@@ -26,14 +26,23 @@ const TransactionScreen = () => {
     ? Colors.dark.background
     : Colors.light.background;
   const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
-  const navigation = useNavigation();
+  const router = useRouter();
 
   const [selectedTransaction, setSelectedTransaction] = useState<any | null>(
     null
   );
   const { trnxHistory, loading } = useFetchTrnxHistory();
 
-  const handlePress = (item: any) => setSelectedTransaction(item);
+  const handlePress = (item: HistoryItem) => {
+    setSelectedTransaction(item);
+    router.push({
+      pathname: "/transaction-reciept",
+      params: {
+        data: JSON.stringify(item),
+        transactionType: item.transactionType
+      }
+    });
+  };
 
   //converting transactionType to readable label
   const getTransactionLabel = (type: string) => {
@@ -60,16 +69,14 @@ const TransactionScreen = () => {
       <Navigator
         title="Transaction History"
         onBack={
-          selectedTransaction
-            ? () => setSelectedTransaction(null)
-            : navigation.goBack
+          selectedTransaction ? () => setSelectedTransaction(null) : router.back
         }
       />
       <ScrollView>
         <View style={styles.container}>
           {loading ? (
             <TransactionSkeleton />
-          ) : !selectedTransaction ? (
+          ) : (
             <FlatList
               data={trnxHistory}
               keyExtractor={(item) => item.id?.toString()}
@@ -119,11 +126,6 @@ const TransactionScreen = () => {
                   </TouchableOpacity>
                 );
               }}
-            />
-          ) : (
-            <TransactionReceipt
-              data={selectedTransaction}
-              onBack={() => setSelectedTransaction(null)}
             />
           )}
         </View>

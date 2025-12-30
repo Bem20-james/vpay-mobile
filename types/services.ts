@@ -39,8 +39,8 @@ export interface ProviderRes<T> {
 }
 
 export interface LookUpResult {
-  provider: string;
-  customerName: string;
+  provider_name: string;
+  customer_name: string;
   smartNumber: string;
   status: string | boolean;
 }

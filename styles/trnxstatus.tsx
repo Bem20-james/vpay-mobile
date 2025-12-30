@@ -8,8 +8,8 @@ export const styles = StyleSheet.create({
     alignItems: "center"
   },
   iconContainer: {
-    width: 130,
-    height: 130,
+    width: 110,
+    height: 110,
     borderRadius: 100,
     alignItems: "center",
     justifyContent: "center",
@@ -25,7 +25,6 @@ export const styles = StyleSheet.create({
   amount: {
     fontSize: 35,
     fontFamily: "Inter-Bold",
-    marginBottom: 5,
     fontWeight: "900",
     textAlign: "center",
     lineHeight: 40
@@ -106,24 +105,28 @@ export const styles = StyleSheet.create({
 export const trnxHistory = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F5F5F5"
+    paddingHorizontal: 10,
+    height: "100%"
   },
   container: {
     flex: 1,
-    alignItems: "center"
+    alignItems: "center",
+    marginHorizontal: 10
+  },
+  header:{
+    display:"flex",
+    flexDirection:"column",
+    alignItems:"center",
   },
   amount: {
-    fontSize: 25,
+    fontSize: 30,
     fontFamily: "Inter-Bold",
-    color: "#BF281C"
-  },
-  dateTime: {
-    fontSize: 14,
-    fontFamily: "Questrial",
-    marginBottom: 30
+    color: "#BF281C",
+    lineHeight: 36,
   },
   detailsContainer: {
     width: "100%",
+    marginTop: 20,
     borderRadius: 10,
     padding: 20,
     shadowColor: "#000",
@@ -162,6 +165,12 @@ export const trnxHistory = StyleSheet.create({
     paddingHorizontal: 5,
     borderRadius: 30
   },
+  statusFailed: {
+    color: "#66C61C",
+    backgroundColor: "#F0F9E8",
+    paddingHorizontal: 5,
+    borderRadius: 30
+  },
   flex: {
     flexDirection: "row",
     alignItems: "center"
@@ -182,7 +191,7 @@ export const trnxHistory = StyleSheet.create({
   },
   label: {
     fontFamily: "Questrial",
-    fontSize: 14,
+    fontSize: 15,
     letterSpacing: 0
   },
   colBox: {
@@ -192,9 +201,9 @@ export const trnxHistory = StyleSheet.create({
     width: "100%"
   },
   iconWrapper: {
-    padding: 3,
+    padding: 4,
     borderRadius: 30,
     marginBottom: 8,
-    backgroundColor: "#FBEAE9"
+    backgroundColor: "#e1c5c3ff"
   }
 });

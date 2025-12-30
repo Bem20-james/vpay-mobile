@@ -4,26 +4,15 @@ export const styles = StyleSheet.create({
   safeArea: {
     flex: 1
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontFamily: "Inter-SemiBold"
-  },
   scrollContent: {
     padding: 16,
     paddingBottom: 40
+  },
+  subtitle: {
+    fontFamily: "Questrial",
+    fontSize: 14,
+    textAlign: "center",
+    lineHeight: 20
   },
   accountCard: {
     borderRadius: 16,
@@ -46,7 +35,7 @@ export const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: "#D4A855",
+    backgroundColor: "#1b4157ff",
     justifyContent: "center",
     alignItems: "center"
   },
@@ -64,8 +53,8 @@ export const styles = StyleSheet.create({
     padding: 4
   },
   accountName: {
-    fontSize: 11,
-    fontFamily: "Inter",
+    fontSize: 12,
+    fontFamily: "Questrial",
     letterSpacing: 0.3
   },
   linkedIdCard: {
@@ -82,11 +71,6 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "Inter-Medium"
   },
-  linkedIdRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8
-  },
   linkedIdValue: {
     fontSize: 14,
     fontFamily: "Inter"
@@ -94,12 +78,16 @@ export const styles = StyleSheet.create({
   limitInfoCard: {
     borderRadius: 12,
     padding: 16,
-    marginBottom: 16
+    marginBottom: 10
+  },
+  label: {
+    fontSize: 13,
+    fontFamily: "Questrial"
   },
   limitInfoLabel: {
-    fontSize: 14,
-    fontFamily: "Inter-SemiBold",
-    marginBottom: 8
+    fontSize: 15,
+    fontFamily: "Inter-Bold",
+    letterSpacing: 0.3
   },
   limitInfoText: {
     fontSize: 13,
@@ -117,7 +105,7 @@ export const styles = StyleSheet.create({
   },
   tableHeader: {
     flexDirection: "row",
-    paddingBottom: 12,
+    paddingBottom: 8,
     borderBottomWidth: 1,
     borderBottomColor: "#E0E0E0",
     marginBottom: 8
@@ -129,22 +117,12 @@ export const styles = StyleSheet.create({
   },
   tableRow: {
     flexDirection: "row",
-    paddingVertical: 14,
+    justifyContent: "space-between",
+    paddingVertical: 10,
     borderRadius: 8,
-    marginBottom: 8
+    marginBottom: 5
   },
-  tableRowCurrent: {
-    backgroundColor: "#2A2A2A"
-  },
-  tierCell: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8
-  },
-  tierText: {
-    fontSize: 14,
-    fontFamily: "Inter-Medium"
-  },
+
   currentBadge: {
     backgroundColor: "rgba(0, 208, 132, 0.15)",
     paddingHorizontal: 8,
@@ -156,7 +134,22 @@ export const styles = StyleSheet.create({
     fontFamily: "Inter-SemiBold"
   },
   tableCellText: {
-    fontSize: 14,
-    fontFamily: "Inter"
+    fontSize: 15,
+    fontFamily: "Inter-Bold"
+  },
+  tierImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    resizeMode: "contain"
+  },
+
+  tierView: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 8,
+    borderRadius: 12
   }
 });

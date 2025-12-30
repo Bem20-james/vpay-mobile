@@ -20,8 +20,8 @@ import { useTheme } from "@/contexts/ThemeContexts";
 
 const AuthorizationPin: React.FC = () => {
   const { theme } = useTheme();
-  const isDark = theme === "dark";  const bgColor =
-    isDark ? Colors.dark.accentBg : Colors.light.accentBg;
+  const isDark = theme === "dark";
+  const bgColor = isDark ? Colors.dark.accentBg : Colors.light.accentBg;
 
   const [pin, setPin] = useState<string>("");
   const maxPinLength: number = 4;

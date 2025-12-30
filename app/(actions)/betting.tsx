@@ -51,12 +51,14 @@ const BettingScreen = () => {
   const navigation = useNavigation();
 
   console.log("SELECTED AS:", selectedProvider);
+    console.log("Bet PROVIDERS:", betProvider);
+
 
   useEffect(() => {
     let isMounted = true;
 
     const fetchAccountName = async () => {
-      if (acctId.length === 10 && selectedProvider && isMounted) {
+      if (acctId.length === 9 && selectedProvider && isMounted) {
         if (
           prevLookupParams.current.acctId === acctId &&
           prevLookupParams.current.provider === selectedProvider?.provider_name

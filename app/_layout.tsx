@@ -81,7 +81,6 @@ export default function RootLayout() {
                       name="(cards)"
                       options={{ headerShown: false }}
                     />
-
                     <Stack.Screen
                       name="notifications"
                       options={{ headerShown: false }}
@@ -109,6 +108,10 @@ export default function RootLayout() {
                     />
                     <Stack.Screen
                       name="setup-2FA"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="transaction-reciept"
                       options={{ headerShown: false }}
                     />
                   </Stack>
